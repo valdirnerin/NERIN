@@ -9,7 +9,7 @@
     "postinstall": "tailwindcss -i ./app/globals.css -o ./app/globals.css || true"
   },
   "engines": {
-    "node": ">=18"
+    "node": "20.x"
   },
   "dependencies": {
     "marked": "^16.3.0",
