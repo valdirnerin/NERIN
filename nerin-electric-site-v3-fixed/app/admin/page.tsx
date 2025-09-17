@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { requireAdmin } from '@/lib/auth'
 import { readSite } from '@/lib/content'
+export const dynamic = 'force-dynamic'
 export default async function AdminHome(){
   await requireAdmin()
   const site = readSite()

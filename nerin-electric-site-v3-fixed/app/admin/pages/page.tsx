@@ -1,5 +1,6 @@
 'use client'
 import Link from 'next/link'
+import type { Route } from 'next'
 import { useEffect, useState } from 'react'
 export default function PagesAdmin(){
   const [items, setItems] = useState<string[]>([])
@@ -20,7 +21,7 @@ export default function PagesAdmin(){
       {items.map(s => (
         <li key={s} className="card flex justify-between items-center">
           <span>{s}</span>
-          <div className="flex gap-2"><Link className="btn" href={'/admin/pages/' + s}>Editar</Link></div>
+          <div className="flex gap-2"><Link className="btn" href={`/admin/pages/${s}` as Route}>Editar</Link></div>
         </li>
       ))}
     </ul>
