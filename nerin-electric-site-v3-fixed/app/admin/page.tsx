@@ -1,9 +1,13 @@
 import Link from 'next/link'
-import { requireAdmin } from '@/lib/auth'
+import { getSession } from '@/lib/auth'
+import { redirect } from 'next/navigation'
 import { readSite } from '@/lib/content'
 export const dynamic = 'force-dynamic'
 export default async function AdminHome(){
-  await requireAdmin()
+  const session = await getSession()
+  if (!session.user || session.user.role !== 'admin') {
+    redirect('/admin/login')
+  }
   const site = readSite()
   return (
     <div className="py-10">
