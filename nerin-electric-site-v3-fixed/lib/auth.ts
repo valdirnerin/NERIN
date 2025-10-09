@@ -1,40 +1,59 @@
-import fs from 'fs'
-import path from 'path'
-import { getStorageDir } from './content'
+import { PrismaAdapter } from '@auth/prisma-adapter'
+import type { NextAuthOptions, Session } from 'next-auth'
+import NextAuth from 'next-auth'
+import { Adapter } from 'next-auth/adapters'
+import EmailProvider from 'next-auth/providers/email'
+import { getServerSession } from 'next-auth'
+import { prisma } from './prisma'
+import { resendClient } from './resend'
 
-const SESSION_FILE = 'session.json'
+const fromEmail = process.env.EMAIL_SERVER_FROM || 'NERIN <hola@nerin.com.ar>'
 
-function readFlag(){
-  const dir = getStorageDir()
-  const file = path.join(dir, SESSION_FILE)
-  if (!fs.existsSync(file)) return { admin: false, name: null }
-  try { return JSON.parse(fs.readFileSync(file,'utf-8')) } catch { return { admin: false, name: null } }
-}
-
-function writeFlag(data: any){
-  const dir = getStorageDir()
-  const file = path.join(dir, SESSION_FILE)
-  fs.writeFileSync(file, JSON.stringify(data, null, 2))
-}
-
-export async function getSession(){
-  const flag = readFlag()
-  return {
-    user: flag.admin ? { role: 'admin', name: flag.name || 'admin' } : null,
-    async save(this: any){
-      // Si this.user existe y es admin, persistimos flag; si no, lo apagamos.
-      if (this.user && this.user.role === 'admin'){
-        writeFlag({ admin: true, name: this.user.name || 'admin' })
-      } else {
-        writeFlag({ admin: false, name: null })
+export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma) as Adapter,
+  session: {
+    strategy: 'database',
+    maxAge: 60 * 60 * 24 * 30,
+  },
+  pages: {
+    signIn: '/clientes/login',
+    verifyRequest: '/clientes/verificar',
+  },
+  callbacks: {
+    async session({ session, user }): Promise<Session> {
+      if (session.user) {
+        session.user.id = user.id
+        session.user.role = user.role
+        session.user.name = user.name
+        session.user.email = user.email
       }
-    }
-  }
+      return session
+    },
+    async signIn({ user }) {
+      if (!user.email) {
+        return false
+      }
+      // permitir login siempre; la UI decidirá qué mostrar según aprobación
+      return true
+    },
+  },
+  providers: [
+    EmailProvider({
+      from: fromEmail,
+      sendVerificationRequest: async ({ identifier, url }) => {
+        const to = identifier
+        await resendClient.emails.send({
+          from: fromEmail,
+          to,
+          subject: 'Ingresá a tu portal NERIN',
+          html: `<p>Hola,</p><p>Hacé clic en el enlace para ingresar al portal de clientes NERIN:</p><p><a href="${url}">${url}</a></p><p>Si no solicitaste este acceso, ignorá este correo.</p>`
+            .replace(/\n/g, ''),
+        })
+      },
+    }),
+  ],
 }
 
-export async function requireAdmin(){
-  const flag = readFlag()
-  if (!flag.admin){
-    throw new Error('Unauthorized')
-  }
-}
+export const { handlers: authHandlers, auth, signIn, signOut } = NextAuth(authOptions)
+
+export const getSession = () => getServerSession(authOptions)
