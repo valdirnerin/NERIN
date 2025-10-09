@@ -1,13 +1,85 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-:root{--bg:#fff;--fg:#0a0a0a;--accent:#f59e0b}
-html,body{background:var(--bg);color:var(--fg)}
-.container{@apply max-w-6xl mx-auto px-4}
-.prose p{@apply leading-relaxed mb-4}
-.btn{@apply inline-flex items-center gap-2 px-4 py-2 border border-black rounded-md hover:translate-y-[1px] transition}
-.badge{@apply inline-block text-xs px-2 py-1 border border-black rounded}
-.card{@apply border border-black rounded-lg p-5 shadow-[4px_4px_0_0_#000]}
-.nav-link{@apply hover:underline underline-offset-4 decoration-2}
-input,textarea,select{@apply border border-black rounded px-3 py-2 w-full}
-label{@apply text-sm font-semibold}
+
+:root {
+  --color-background: #f8f9fb;
+  --color-foreground: #0f172a;
+  --color-primary: #111827;
+  --color-primary-foreground: #f8fafc;
+  --color-secondary: #e2e8f0;
+  --color-secondary-foreground: #111827;
+  --color-muted: #f1f5f9;
+  --color-muted-foreground: #475569;
+  --color-border: #e2e8f0;
+  --color-accent: #0ea5e9;
+  --color-accent-foreground: #f8fafc;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: #0b1120;
+    --color-foreground: #f8fafc;
+    --color-primary: #1f2937;
+    --color-primary-foreground: #f8fafc;
+    --color-secondary: #1e293b;
+    --color-secondary-foreground: #e2e8f0;
+    --color-muted: #1f2937;
+    --color-muted-foreground: #94a3b8;
+    --color-border: #1e293b;
+    --color-accent: #38bdf8;
+    --color-accent-foreground: #0f172a;
+  }
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+a {
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+a:hover,
+a:focus-visible {
+  color: var(--color-accent);
+}
+
+main {
+  display: block;
+}
+
+.focus-ring {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.35);
+}
+
+::selection {
+  background: rgba(14, 165, 233, 0.3);
+}
+
+@layer base {
+  h1 {
+    @apply font-display text-4xl md:text-5xl font-semibold tracking-tight;
+  }
+  h2 {
+    @apply font-display text-3xl md:text-4xl font-semibold tracking-tight;
+  }
+  h3 {
+    @apply font-display text-2xl font-semibold;
+  }
+  p {
+    @apply text-base leading-relaxed text-slate-600;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-border bg-white shadow-subtle transition hover:-translate-y-1 hover:shadow-lg;
+  }
+  .pill {
+    @apply inline-flex items-center gap-2 rounded-full bg-muted px-4 py-2 text-sm font-medium text-muted-foreground;
+  }
+}

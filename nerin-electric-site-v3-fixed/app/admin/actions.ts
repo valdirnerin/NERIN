@@ -1,0 +1,159 @@
+'use server'
+
+import { revalidatePath } from 'next/cache'
+import { z } from 'zod'
+import { Prisma } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
+
+const PackSchema = z.object({
+  nombre: z.string().min(3),
+  slug: z.string().min(3),
+  descripcion: z.string().min(10),
+  bocasIncluidas: z.coerce.number().min(10),
+  ambientesReferencia: z.coerce.number().min(1),
+  precioManoObraBase: z.coerce.number().min(0),
+  alcanceDetallado: z.string().min(5),
+})
+
+export async function createPack(formData: FormData) {
+  const payload = PackSchema.parse({
+    nombre: formData.get('nombre'),
+    slug: formData.get('slug'),
+    descripcion: formData.get('descripcion'),
+    bocasIncluidas: formData.get('bocasIncluidas'),
+    ambientesReferencia: formData.get('ambientesReferencia'),
+    precioManoObraBase: formData.get('precioManoObraBase'),
+    alcanceDetallado: formData.get('alcanceDetallado'),
+  })
+
+  await prisma.pack.create({
+    data: {
+      nombre: payload.nombre,
+      slug: payload.slug,
+      descripcion: payload.descripcion,
+      bocasIncluidas: payload.bocasIncluidas,
+      ambientesReferencia: payload.ambientesReferencia,
+      precioManoObraBase: new Prisma.Decimal(payload.precioManoObraBase),
+      alcanceDetallado: payload.alcanceDetallado.split('\n').map((item) => item.trim()).filter(Boolean),
+    },
+  })
+
+  revalidatePath('/admin')
+  revalidatePath('/packs')
+}
+
+const AdditionalSchema = z.object({
+  nombre: z.string().min(3),
+  descripcion: z.string().min(5),
+  unidad: z.string().min(1),
+  precioUnitarioManoObra: z.coerce.number().min(0),
+})
+
+export async function createAdditional(formData: FormData) {
+  const payload = AdditionalSchema.parse({
+    nombre: formData.get('nombre'),
+    descripcion: formData.get('descripcion'),
+    unidad: formData.get('unidad'),
+    precioUnitarioManoObra: formData.get('precioUnitarioManoObra'),
+  })
+
+  await prisma.additionalItem.create({
+    data: {
+      nombre: payload.nombre,
+      descripcion: payload.descripcion,
+      unidad: payload.unidad,
+      precioUnitarioManoObra: new Prisma.Decimal(payload.precioUnitarioManoObra),
+    },
+  })
+
+  revalidatePath('/admin')
+  revalidatePath('/presupuestador')
+}
+
+const MaintenanceSchema = z.object({
+  nombre: z.string().min(3),
+  slug: z.string().min(3),
+  visitasMes: z.coerce.number().min(1),
+  precioMensual: z.coerce.number().min(0),
+  incluye: z.string().min(5),
+})
+
+export async function createMaintenance(formData: FormData) {
+  const payload = MaintenanceSchema.parse({
+    nombre: formData.get('nombre'),
+    slug: formData.get('slug'),
+    visitasMes: formData.get('visitasMes'),
+    precioMensual: formData.get('precioMensual'),
+    incluye: formData.get('incluye'),
+  })
+
+  await prisma.maintenancePlan.create({
+    data: {
+      nombre: payload.nombre,
+      slug: payload.slug,
+      visitasMes: payload.visitasMes,
+      precioMensual: new Prisma.Decimal(payload.precioMensual),
+      incluyeTareasFijas: payload.incluye.split('\n').map((item) => item.trim()).filter(Boolean),
+      cantidadesFijasInalterables: true,
+    },
+  })
+
+  revalidatePath('/admin')
+  revalidatePath('/mantenimiento')
+}
+
+const CaseStudySchema = z.object({
+  titulo: z.string().min(3),
+  slug: z.string().min(3),
+  resumen: z.string().min(10),
+  contenido: z.string().min(20),
+})
+
+export async function createCaseStudy(formData: FormData) {
+  const payload = CaseStudySchema.parse({
+    titulo: formData.get('titulo'),
+    slug: formData.get('slug'),
+    resumen: formData.get('resumen'),
+    contenido: formData.get('contenido'),
+  })
+
+  await prisma.caseStudy.create({
+    data: {
+      titulo: payload.titulo,
+      slug: payload.slug,
+      resumen: payload.resumen,
+      contenido: payload.contenido,
+      publicado: true,
+      fotos: [],
+    },
+  })
+
+  revalidatePath('/admin')
+  revalidatePath('/obras')
+}
+
+const CertificateSchema = z.object({
+  projectId: z.string(),
+  porcentaje: z.coerce.number().min(1).max(100),
+  monto: z.coerce.number().min(0),
+})
+
+export async function createCertificate(formData: FormData) {
+  const payload = CertificateSchema.parse({
+    projectId: formData.get('projectId'),
+    porcentaje: formData.get('porcentaje'),
+    monto: formData.get('monto'),
+  })
+
+  const certificate = await prisma.progressCertificate.create({
+    data: {
+      projectId: payload.projectId,
+      porcentaje: payload.porcentaje,
+      monto: new Prisma.Decimal(payload.monto),
+      estado: 'pendiente',
+    },
+  })
+
+  revalidatePath('/admin')
+  return certificate.id
+}
