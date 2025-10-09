@@ -32,7 +32,7 @@ export async function createPreference({
     }
   }
 
-  const preference = await mpClient.preferences.create({
+  const preference = await (mpClient as any).preferences.create({
     body: {
       items,
       statement_descriptor: statementDescriptor,

@@ -93,7 +93,9 @@ export default async function ClienteDashboard() {
                             <TableCell>
                               {certificate.estado === 'pendiente' && certificate.mpInitPointUrl ? (
                                 <Button size="sm" variant="secondary" asChild>
-                                  <Link href={certificate.mpInitPointUrl}>Pagar online</Link>
+                                  <a href={certificate.mpInitPointUrl} target="_blank" rel="noopener noreferrer">
+                                    Pagar online
+                                  </a>
                                 </Button>
                               ) : (
                                 <span className="text-xs text-slate-500">{certificate.estado === 'pagado' ? 'Pagado' : ''}</span>
@@ -125,9 +127,9 @@ export default async function ClienteDashboard() {
                             <TableCell className="capitalize">{invoice.estado}</TableCell>
                             <TableCell>
                               {invoice.urlPdf ? (
-                                <Link className="text-accent" href={invoice.urlPdf}>
+                                <a className="text-accent" href={invoice.urlPdf} target="_blank" rel="noopener noreferrer">
                                   Ver PDF
-                                </Link>
+                                </a>
                               ) : (
                                 <span className="text-xs text-slate-500">Aún no disponible</span>
                               )}

@@ -145,7 +145,7 @@ export async function createCertificate(formData: FormData) {
     monto: formData.get('monto'),
   })
 
-  const certificate = await prisma.progressCertificate.create({
+  await prisma.progressCertificate.create({
     data: {
       projectId: payload.projectId,
       porcentaje: payload.porcentaje,
@@ -155,5 +155,4 @@ export async function createCertificate(formData: FormData) {
   })
 
   revalidatePath('/admin')
-  return certificate.id
 }

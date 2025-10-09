@@ -1,16 +1,13 @@
 import { PrismaAdapter } from '@auth/prisma-adapter'
-import type { NextAuthOptions, Session } from 'next-auth'
 import NextAuth from 'next-auth'
-import { Adapter } from 'next-auth/adapters'
-import EmailProvider from 'next-auth/providers/email'
-import { getServerSession } from 'next-auth'
+import type { NextAuthConfig } from 'next-auth'
 import { prisma } from './prisma'
 import { resendClient } from './resend'
 
 const fromEmail = process.env.EMAIL_SERVER_FROM || 'NERIN <hola@nerin.com.ar>'
 
-export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma) as Adapter,
+export const authOptions: NextAuthConfig = {
+  adapter: PrismaAdapter(prisma),
   session: {
     strategy: 'database',
     maxAge: 60 * 60 * 24 * 30,
@@ -20,7 +17,7 @@ export const authOptions: NextAuthOptions = {
     verifyRequest: '/clientes/verificar',
   },
   callbacks: {
-    async session({ session, user }): Promise<Session> {
+    async session({ session, user }) {
       if (session.user) {
         session.user.id = user.id
         session.user.role = user.role
@@ -37,7 +34,22 @@ export const authOptions: NextAuthOptions = {
       return true
     },
   },
-  providers: [
+  providers: [],
+}
+
+export const { handlers, auth, signIn, signOut } = NextAuth(async () => {
+  const config: NextAuthConfig = {
+    ...authOptions,
+    providers: [...authOptions.providers],
+  }
+
+  if (process.env.NEXT_RUNTIME === 'edge') {
+    return config
+  }
+
+  const { default: EmailProvider } = await import('next-auth/providers/email')
+
+  config.providers = [
     EmailProvider({
       from: fromEmail,
       sendVerificationRequest: async ({ identifier, url }) => {
@@ -51,9 +63,19 @@ export const authOptions: NextAuthOptions = {
         })
       },
     }),
-  ],
+  ]
+
+  return config
+})
+
+export const getSession = () => auth()
+
+export async function requireAdmin() {
+  const session = await auth()
+
+  if (!session || session.user?.role !== 'admin') {
+    throw new Error('Unauthorized')
+  }
+
+  return session
 }
-
-export const { handlers: authHandlers, auth, signIn, signOut } = NextAuth(authOptions)
-
-export const getSession = () => getServerSession(authOptions)

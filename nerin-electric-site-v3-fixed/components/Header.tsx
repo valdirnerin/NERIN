@@ -12,7 +12,10 @@ const navigation = [
   { href: '/empresa', label: 'Empresa' },
   { href: '/contacto', label: 'Contacto' },
   { href: '/blog', label: 'Blog' },
-]
+] as const
+
+const adminDashboardRoute = '/admin' as const
+const clientDashboardRoute = '/clientes' as const
 
 export async function Header() {
   const session = await getSession()
@@ -30,19 +33,21 @@ export async function Header() {
         </nav>
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="sm" asChild className="hidden md:inline-flex">
-            <Link
+            <a
               href={`https://wa.me/${siteConfig.whatsapp.number}?text=${encodeURIComponent(siteConfig.whatsapp.message)}`}
               aria-label="Hablar por WhatsApp"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               WhatsApp
-            </Link>
+            </a>
           </Button>
           <Button size="sm" asChild className="hidden md:inline-flex">
             <Link href="/contacto">Pedir presupuesto</Link>
           </Button>
           {session?.user ? (
             <Button variant="secondary" size="sm" asChild>
-              <Link href={session.user.role === 'admin' ? '/admin' : '/clientes'}>
+              <Link href={session.user.role === 'admin' ? adminDashboardRoute : clientDashboardRoute}>
                 {session.user.role === 'admin' ? 'Panel admin' : 'Portal clientes'}
               </Link>
             </Button>

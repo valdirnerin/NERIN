@@ -1,16 +1,15 @@
 import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
 import { auth } from '@/lib/auth'
 
 const clientWhitelist = ['/clientes/login', '/clientes/verificar']
 
-export default async function middleware(req: NextRequest) {
+export default auth(async (req) => {
   const { pathname } = req.nextUrl
   if (clientWhitelist.includes(pathname)) {
     return NextResponse.next()
   }
 
-  const session = await auth(req)
+  const session = req.auth
 
   if (pathname.startsWith('/admin')) {
     if (!session) {
@@ -29,7 +28,7 @@ export default async function middleware(req: NextRequest) {
   }
 
   return NextResponse.next()
-}
+})
 
 export const config = {
   matcher: ['/admin/:path*', '/clientes/:path*'],
