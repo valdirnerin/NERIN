@@ -243,9 +243,9 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId }: Props)
               )}
               {pdfUrl ? (
                 <Button asChild>
-                  <Link href={pdfUrl} target="_blank">
+                  <a href={pdfUrl} target="_blank" rel="noopener noreferrer">
                     Descargar PDF de cotización
-                  </Link>
+                  </a>
                 </Button>
               ) : (
                 <Button onClick={handleSubmit} disabled={isPending}>

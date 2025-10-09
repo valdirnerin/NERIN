@@ -4,14 +4,14 @@ import { siteConfig } from '@/lib/config'
 const legalLinks = [
   { href: '/terminos', label: 'Términos y condiciones' },
   { href: '/privacidad', label: 'Política de privacidad' },
-]
+] as const
 
 const quickLinks = [
   { href: '/packs', label: 'Packs eléctricos' },
   { href: '/presupuestador', label: 'Configurar pack' },
   { href: '/mantenimiento', label: 'Planes de mantenimiento' },
   { href: '/faq', label: 'Preguntas frecuentes' },
-]
+] as const
 
 export function Footer() {
   return (
@@ -50,9 +50,9 @@ export function Footer() {
               </a>
             </li>
             <li>
-              <Link href="mailto:hola@nerin.com.ar" className="hover:text-foreground">
+              <a href="mailto:hola@nerin.com.ar" className="hover:text-foreground">
                 hola@nerin.com.ar
-              </Link>
+              </a>
             </li>
             <li>
               <Link href="/contacto" className="hover:text-foreground">

@@ -20,20 +20,17 @@ export async function GET(
 
   const pdf = generateQuotePdf({ quote, pack: quote.pack })
 
-  const chunks: Buffer[] = []
-  return new Promise((resolve, reject) => {
+  const buffer = await new Promise<Buffer>((resolve, reject) => {
+    const chunks: Buffer[] = []
     pdf.on('data', (chunk) => chunks.push(chunk))
-    pdf.on('end', () => {
-      const buffer = Buffer.concat(chunks)
-      resolve(
-        new NextResponse(buffer, {
-          headers: {
-            'Content-Type': 'application/pdf',
-            'Content-Disposition': `attachment; filename="nerin-presupuesto-${quote.id}.pdf"`,
-          },
-        }),
-      )
-    })
+    pdf.on('end', () => resolve(Buffer.concat(chunks)))
     pdf.on('error', (error) => reject(error))
+  })
+
+  return new NextResponse(buffer, {
+    headers: {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="nerin-presupuesto-${quote.id}.pdf"`,
+    },
   })
 }
