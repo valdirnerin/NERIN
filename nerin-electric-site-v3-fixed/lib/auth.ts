@@ -4,6 +4,7 @@ import NextAuth from 'next-auth'
 import { Adapter } from 'next-auth/adapters'
 import EmailProvider from 'next-auth/providers/email'
 import { getServerSession } from 'next-auth'
+import { NextResponse } from 'next/server'
 import { prisma } from './prisma'
 import { resendClient } from './resend'
 
@@ -57,3 +58,13 @@ export const authOptions: NextAuthOptions = {
 export const { handlers: authHandlers, auth, signIn, signOut } = NextAuth(authOptions)
 
 export const getSession = () => getServerSession(authOptions)
+
+export const requireAdmin = async () => {
+  const session = await auth()
+
+  if (!session || session.user?.role !== 'admin') {
+    throw new NextResponse('Unauthorized', { status: 401 })
+  }
+
+  return session
+}
