@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { prisma } from '@/lib/prisma'
 import { Badge } from '@/components/ui/badge'
 import { ConfiguratorWizard } from '@/components/configurator/ConfiguratorWizard'
