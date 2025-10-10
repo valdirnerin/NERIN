@@ -1,3 +1,5 @@
+'use client'
+
 import { Accordion, AccordionItem } from '@/components/ui/accordion'
 import { Badge } from '@/components/ui/badge'
 
