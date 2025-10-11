@@ -1,13 +1,23 @@
-import { AdditionalItem, Pack } from '@prisma/client'
-
-export type WizardPack = Pick<Pack, 'id' | 'slug' | 'nombre' | 'descripcion' | 'bocasIncluidas' | 'ambientesReferencia' | 'precioManoObraBase'> & {
+export interface WizardPack {
+  id: string
+  slug: string
+  nombre: string
+  descripcion: string
   alcanceDetallado: string[]
+  bocasIncluidas: number
+  ambientesReferencia: number
+  precioManoObraBase: number
 }
 
-export type WizardAdditional = Pick<
-  AdditionalItem,
-  'id' | 'nombre' | 'descripcion' | 'unidad' | 'precioUnitarioManoObra' | 'reglasCompatibilidad'
-> & { packId?: string | null }
+export interface WizardAdditional {
+  id: string
+  nombre: string
+  descripcion: string
+  unidad: string
+  precioUnitarioManoObra: number
+  reglasCompatibilidad?: Record<string, unknown> | null
+  packId?: string | null
+}
 
 export interface WizardSummary {
   packId: string

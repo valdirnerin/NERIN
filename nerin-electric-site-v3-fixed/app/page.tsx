@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { prisma } from '@/lib/db'
+import { getMarketingHomeData } from '@/lib/marketing-data'
 import { siteConfig } from '@/lib/config'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -59,18 +59,8 @@ const faqs = [
   },
 ]
 
-async function getData() {
-  const [packs, plans, caseStudies, brands] = await Promise.all([
-    prisma.pack.findMany({ orderBy: { precioManoObraBase: 'asc' }, take: 3 }),
-    prisma.maintenancePlan.findMany({ orderBy: { precioMensual: 'asc' } }),
-    prisma.caseStudy.findMany({ where: { publicado: true }, take: 2 }),
-    prisma.brand.findMany({ take: 8 }),
-  ])
-  return { packs, plans, caseStudies, brands }
-}
-
 export default async function HomePage() {
-  const { packs, plans, caseStudies, brands } = await getData()
+  const { packs, plans, caseStudies, brands } = await getMarketingHomeData()
 
   return (
     <div className="space-y-24">

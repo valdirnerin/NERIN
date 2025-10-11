@@ -1,13 +1,13 @@
 export const dynamic = 'force-dynamic'
 import Link from 'next/link'
-import { prisma } from '@/lib/db'
+import { getCaseStudiesForMarketing } from '@/lib/marketing-data'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export const revalidate = 60
 
 export default async function ObrasPage() {
-  const caseStudies = await prisma.caseStudy.findMany({ orderBy: { createdAt: 'desc' } })
+  const caseStudies = await getCaseStudiesForMarketing()
 
   return (
     <div className="space-y-8">

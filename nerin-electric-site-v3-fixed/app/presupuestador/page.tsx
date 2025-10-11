@@ -1,13 +1,12 @@
 export const dynamic = 'force-dynamic'
-import { prisma } from '@/lib/db'
+import { getConfiguratorData } from '@/lib/marketing-data'
 import { Badge } from '@/components/ui/badge'
 import { ConfiguratorWizard } from '@/components/configurator/ConfiguratorWizard'
 
 export const revalidate = 60
 
 export default async function PresupuestadorPage({ searchParams }: { searchParams: { pack?: string } }) {
-  const packs = await prisma.pack.findMany({ orderBy: { precioManoObraBase: 'asc' } })
-  const adicionales = await prisma.additionalItem.findMany({ orderBy: { nombre: 'asc' } })
+  const { packs, adicionales } = await getConfiguratorData()
   const defaultPack = searchParams.pack
     ? packs.find((pack) => pack.slug === searchParams.pack)?.id
     : undefined
@@ -28,7 +27,7 @@ export default async function PresupuestadorPage({ searchParams }: { searchParam
     descripcion: item.descripcion,
     unidad: item.unidad,
     precioUnitarioManoObra: item.precioUnitarioManoObra,
-    reglasCompatibilidad: item.reglasCompatibilidad,
+    reglasCompatibilidad: item.reglasCompatibilidad ?? null,
     packId: item.packId,
   }))
 

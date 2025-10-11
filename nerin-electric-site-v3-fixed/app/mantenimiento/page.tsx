@@ -1,6 +1,6 @@
 export const dynamic = 'force-dynamic'
 import Link from 'next/link'
-import { prisma } from '@/lib/db'
+import { getMaintenancePlansForMarketing } from '@/lib/marketing-data'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 export const revalidate = 60
 
 export default async function MantenimientoPage() {
-  const plans = await prisma.maintenancePlan.findMany({ orderBy: { precioMensual: 'asc' } })
+  const plans = await getMaintenancePlansForMarketing()
 
   return (
     <div className="space-y-12">
