@@ -1,6 +1,7 @@
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import NextAuth from 'next-auth'
 import type { NextAuthConfig } from 'next-auth'
+import type { EmailConfig } from 'next-auth/providers/email'
 import { prisma } from './db'
 import { resendClient } from './resend'
 
@@ -47,23 +48,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth(async () => {
     return config
   }
 
-  const { default: EmailProvider } = await import('next-auth/providers/email')
+  const resendEmailProvider: EmailConfig = {
+    id: 'email',
+    type: 'email',
+    name: 'Email',
+    from: fromEmail,
+    sendVerificationRequest: async ({ identifier, url }) => {
+      const to = identifier
 
-  config.providers = [
-    EmailProvider({
-      from: fromEmail,
-      sendVerificationRequest: async ({ identifier, url }) => {
-        const to = identifier
-        await resendClient.emails.send({
-          from: fromEmail,
-          to,
-          subject: 'Ingresá a tu portal NERIN',
-          html: `<p>Hola,</p><p>Hacé clic en el enlace para ingresar al portal de clientes NERIN:</p><p><a href="${url}">${url}</a></p><p>Si no solicitaste este acceso, ignorá este correo.</p>`
-            .replace(/\n/g, ''),
-        })
-      },
-    }),
-  ]
+      await resendClient.emails.send({
+        from: fromEmail,
+        to,
+        subject: 'Ingresá a tu portal NERIN',
+        html: `<p>Hola,</p><p>Hacé clic en el enlace para ingresar al portal de clientes NERIN:</p><p><a href="${url}">${url}</a></p><p>Si no solicitaste este acceso, ignorá este correo.</p>`
+          .replace(/\n/g, ''),
+      })
+    },
+  }
+
+  config.providers = [resendEmailProvider]
 
   return config
 })
