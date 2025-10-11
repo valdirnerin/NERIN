@@ -1,36 +1,33 @@
-import { MetadataRoute } from 'next'
-import { prisma } from '@/lib/prisma'
+export const dynamic = 'force-dynamic'
+export const revalidate = 3600
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [packs, caseStudies, blog] = await Promise.all([
-    prisma.pack.findMany({ select: { slug: true, updatedAt: true } }),
-    prisma.caseStudy.findMany({ select: { slug: true, updatedAt: true } }),
-    Promise.resolve([]),
-  ])
+import { NextResponse } from 'next/server'
 
-  const baseUrl = 'https://www.nerin.com.ar'
+type UrlItem = { loc: string; priority?: number; lastmod?: string }
 
-  const staticRoutes: MetadataRoute.Sitemap = [
-    '',
-    '/packs',
-    '/presupuestador',
-    '/mantenimiento',
-    '/servicios',
-    '/obras',
-    '/empresa',
-    '/contacto',
-    '/faq',
-    '/blog',
-  ].map((path) => ({ url: `${baseUrl}${path}` }))
+function baseUrl() {
+  return process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://nerin-electric.com'
+}
 
-  const packRoutes = packs.map((pack) => ({
-    url: `${baseUrl}/packs#${pack.slug}`,
-    lastModified: pack.updatedAt,
-  }))
-  const caseRoutes = caseStudies.map((cs) => ({
-    url: `${baseUrl}/obras/${cs.slug}`,
-    lastModified: cs.updatedAt,
-  }))
+export async function GET() {
+  // Sitemap estático mínimo (sin DB) para no romper el build
+  const urls: UrlItem[] = [
+    { loc: '/', priority: 1.0 },
+    { loc: '/empresa', priority: 0.8 },
+    { loc: '/packs', priority: 0.8 },
+    { loc: '/mantenimiento', priority: 0.8 },
+    { loc: '/presupuestador', priority: 0.9 },
+  ]
 
-  return [...staticRoutes, ...packRoutes, ...caseRoutes]
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+  <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  ${urls.map(u => `
+    <url>
+      <loc>${baseUrl()}${u.loc}</loc>
+      ${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ''}
+      ${u.priority !== undefined ? `<priority>${u.priority}</priority>` : ''}
+    </url>`).join('')}
+  </urlset>`
+
+  return new NextResponse(xml, { headers: { 'Content-Type': 'application/xml' } })
 }
