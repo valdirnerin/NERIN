@@ -2,15 +2,12 @@ export const dynamic = 'force-dynamic'
 import Image from 'next/image'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { prisma } from '@/lib/db'
+import { getTechniciansForMarketing } from '@/lib/marketing-data'
 
 export const revalidate = 60
 
 export default async function EmpresaPage() {
-  const technicians = await prisma.technician.findMany({
-    where: { activo: true },
-    include: { user: true },
-  })
+  const technicians = await getTechniciansForMarketing()
 
   return (
     <div className="space-y-12">
@@ -57,7 +54,7 @@ export default async function EmpresaPage() {
           {technicians.map((tech) => (
             <Card key={tech.id} className="space-y-3">
               <CardHeader>
-                <CardTitle>{tech.user?.name}</CardTitle>
+                <CardTitle>{tech.nombre}</CardTitle>
                 <p className="text-sm text-slate-500">{tech.credenciales.join(' · ')}</p>
               </CardHeader>
               {tech.fotoUrl ? (
@@ -65,7 +62,7 @@ export default async function EmpresaPage() {
                   src={tech.fotoUrl}
                   width={400}
                   height={300}
-                  alt={`Técnico NERIN ${tech.user?.name}`}
+                  alt={`Técnico NERIN ${tech.nombre}`}
                   className="h-40 w-full rounded-2xl object-cover"
                 />
               ) : (

@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import { notFound } from 'next/navigation'
-import { prisma } from '@/lib/db'
+import { getCaseStudyBySlug } from '@/lib/marketing-data'
 import { Badge } from '@/components/ui/badge'
 
 export const revalidate = 60
@@ -11,7 +11,7 @@ interface Props {
 }
 
 export default async function ObraDetallePage({ params }: Props) {
-  const caseStudy = await prisma.caseStudy.findUnique({ where: { slug: params.slug } })
+  const caseStudy = await getCaseStudyBySlug(params.slug)
   if (!caseStudy) {
     notFound()
   }
@@ -26,9 +26,9 @@ export default async function ObraDetallePage({ params }: Props) {
           <p key={index}>{paragraph}</p>
         ))}
       </div>
-      {caseStudy.metricas && Array.isArray(caseStudy.metricas) && (
+      {caseStudy.metricas.length > 0 && (
         <section className="grid gap-4 md:grid-cols-3">
-          {(caseStudy.metricas as Array<{ label: string; value: string }>).map((metric) => (
+          {caseStudy.metricas.map((metric) => (
             <div key={metric.label} className="rounded-2xl border border-border bg-white p-4 shadow-subtle">
               <p className="text-sm text-slate-500">{metric.label}</p>
               <p className="text-lg font-semibold text-foreground">{metric.value}</p>

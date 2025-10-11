@@ -1,6 +1,6 @@
 export const dynamic = 'force-dynamic'
 import Link from 'next/link'
-import { prisma } from '@/lib/db'
+import { getPacksForMarketing } from '@/lib/marketing-data'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -8,12 +8,7 @@ import { Badge } from '@/components/ui/badge'
 export const revalidate = 60
 
 export default async function PacksPage() {
-  const packs = await prisma.pack.findMany({
-    include: {
-      additionalItems: true,
-    },
-    orderBy: { precioManoObraBase: 'asc' },
-  })
+  const packs = await getPacksForMarketing()
 
   return (
     <div className="space-y-16">
