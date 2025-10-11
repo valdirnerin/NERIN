@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import { notFound } from 'next/navigation'
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/lib/db'
 import { Badge } from '@/components/ui/badge'
 
 export const revalidate = 60

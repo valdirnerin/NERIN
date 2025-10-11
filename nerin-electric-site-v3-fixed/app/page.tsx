@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/lib/db'
 import { siteConfig } from '@/lib/config'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
