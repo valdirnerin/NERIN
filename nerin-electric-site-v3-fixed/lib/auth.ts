@@ -1,7 +1,7 @@
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import NextAuth from 'next-auth'
 import type { NextAuthConfig } from 'next-auth'
-import { prisma } from './prisma'
+import { prisma } from './db'
 import { resendClient } from './resend'
 
 const fromEmail = process.env.EMAIL_SERVER_FROM || 'NERIN <hola@nerin.com.ar>'
