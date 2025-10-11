@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { Prisma } from '@prisma/client'
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/lib/db'
 
 const PackSchema = z.object({
   nombre: z.string().min(3),
