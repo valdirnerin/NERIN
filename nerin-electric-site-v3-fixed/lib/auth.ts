@@ -56,6 +56,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth(async () => {
     sendVerificationRequest: async ({ identifier, url }) => {
       const to = identifier
 
+      const resendApiKey = process.env.RESEND_API_KEY
+      if (!resendApiKey || resendApiKey.startsWith('re_mock')) {
+        console.info('[AUTH:magic-link]', { to, url })
+        return
+      }
+
       await resendClient.emails.send({
         from: fromEmail,
         to,
