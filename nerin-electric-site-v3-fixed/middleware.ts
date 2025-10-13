@@ -31,5 +31,5 @@ export default auth(async (req) => {
 })
 
 export const config = {
-  matcher: ['/admin/:path*', '/clientes/:path*'],
+  matcher: ['/admin/:path*', '/clientes', '/clientes/(?!login$|verificar$).*'],
 }
