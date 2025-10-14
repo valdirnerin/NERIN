@@ -4,8 +4,14 @@ import { auth } from '@/lib/auth'
 const clientWhitelist = ['/clientes/login', '/clientes/verificar']
 
 export default auth(async (req) => {
-  const { pathname } = req.nextUrl
-  if (clientWhitelist.includes(pathname)) {
+  const { pathname, locale } = req.nextUrl
+
+  const normalizedPathname =
+    locale && pathname.startsWith(`/${locale}`)
+      ? pathname.slice(locale.length + 1) || '/'
+      : pathname
+
+  if (clientWhitelist.includes(normalizedPathname)) {
     return NextResponse.next()
   }
 
@@ -13,17 +19,22 @@ export default auth(async (req) => {
 
   if (pathname.startsWith('/admin')) {
     if (!session) {
-      const signInUrl = new URL('/clientes/login', req.url)
+      const signInUrl = req.nextUrl.clone()
+      signInUrl.pathname = '/clientes/login'
       return NextResponse.redirect(signInUrl)
     }
     if (session.user?.role !== 'admin') {
-      return NextResponse.redirect(new URL('/clientes', req.url))
+      const clientUrl = req.nextUrl.clone()
+      clientUrl.pathname = '/clientes'
+      return NextResponse.redirect(clientUrl)
     }
   }
 
-  if (pathname.startsWith('/clientes')) {
+  if (normalizedPathname.startsWith('/clientes')) {
     if (!session) {
-      return NextResponse.redirect(new URL('/clientes/login', req.url))
+      const signInUrl = req.nextUrl.clone()
+      signInUrl.pathname = '/clientes/login'
+      return NextResponse.redirect(signInUrl)
     }
   }
 
