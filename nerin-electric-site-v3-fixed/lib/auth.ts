@@ -4,11 +4,48 @@ import type { NextAuthConfig } from 'next-auth'
 import type { EmailConfig } from 'next-auth/providers/email'
 import { prisma } from './db'
 import { resendClient } from './resend'
+import { sanitizeError, sanitizeMetadata } from './logging'
+
+const authSecret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET
+if (!authSecret) {
+  console.error(
+    '[AUTH] Missing AUTH_SECRET or NEXTAUTH_SECRET environment variable. Authentication flows will fail in production until it is configured.',
+  )
+}
+
+const authBaseUrl = process.env.AUTH_URL ?? process.env.NEXTAUTH_URL
+if (!authBaseUrl) {
+  console.warn('[AUTH] AUTH_URL/NEXTAUTH_URL is not configured. Falling back to the request host at runtime.')
+}
 
 const fromEmail = process.env.EMAIL_SERVER_FROM || 'NERIN <hola@nerin.com.ar>'
 
 export const authOptions: NextAuthConfig = {
   adapter: PrismaAdapter(prisma),
+  trustHost: true,
+  secret: authSecret,
+  logger: {
+    error(code, metadata) {
+      console.error('[AUTH] Logger error', {
+        code,
+        details: sanitizeMetadata(metadata),
+      })
+    },
+    warn(code, metadata) {
+      console.warn('[AUTH] Logger warn', {
+        code,
+        details: sanitizeMetadata(metadata),
+      })
+    },
+    debug(code, metadata) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.debug('[AUTH] Logger debug', {
+          code,
+          details: sanitizeMetadata(metadata),
+        })
+      }
+    },
+  },
   session: {
     strategy: 'database',
     maxAge: 60 * 60 * 24 * 30,
@@ -77,7 +114,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth(async () => {
   return config
 })
 
-export const getSession = () => auth()
+export const getSession = async () => {
+  try {
+    return await auth()
+  } catch (error) {
+    console.error('[AUTH] Failed to retrieve session', sanitizeError(error))
+    return null
+  }
+}
 
 export async function requireAdmin() {
   const session = await auth()
