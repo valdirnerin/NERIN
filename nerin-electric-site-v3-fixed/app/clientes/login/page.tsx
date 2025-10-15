@@ -1,64 +1,47 @@
-'use client'
-
-import { useEffect, useState } from 'react'
-import { signIn, useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { LoginForm } from './login-form'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [status, setStatus] = useState<'idle' | 'loading' | 'sent'>('idle')
-  const router = useRouter()
-  const { status: sessionStatus } = useSession()
-
-  const isSessionLoading = sessionStatus === 'loading'
-  const isAuthenticated = sessionStatus === 'authenticated'
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.replace('/clientes')
-    }
-  }, [isAuthenticated, router])
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    setStatus('loading')
-    await signIn('email', { email, redirect: false })
-    setStatus('sent')
-  }
-
   return (
-    <div className="mx-auto max-w-md space-y-6">
-      <Badge>Portal de clientes</Badge>
-      <h1>{isAuthenticated ? 'Redirigiendo a tu panel...' : 'Ingresá con tu email'}</h1>
-      <p className="text-sm text-slate-600">
-        Te enviaremos un enlace mágico para ingresar. Si todavía no tenés acceso, escribinos a hola@nerin.com.ar.
-      </p>
-      <form onSubmit={handleSubmit} className="space-y-4 rounded-3xl border border-border bg-white p-6 shadow-subtle">
-        <div>
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            required
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="correo@empresa.com"
-            disabled={isSessionLoading || isAuthenticated}
-          />
-        </div>
-        <Button type="submit" disabled={status === 'loading' || isSessionLoading || isAuthenticated}>
-          {status === 'loading' ? 'Enviando enlace...' : 'Enviar enlace de acceso'}
-        </Button>
-        {status === 'sent' && (
-          <p className="text-xs text-slate-500">
-            Revisá tu correo y hacé clic en el enlace para ingresar.
-          </p>
-        )}
-      </form>
+    <div className="mx-auto flex max-w-5xl flex-col gap-12 px-6 py-16 md:flex-row md:items-start">
+      <div className="max-w-md space-y-6">
+        <Badge>Portal de clientes</Badge>
+        <h1 className="text-3xl font-semibold tracking-tight">Ingresá con tu email</h1>
+        <p className="text-sm text-slate-600">
+          Te enviamos un enlace mágico para que accedas a tus proyectos, certificaciones y documentación. Es rápido y seguro,
+          sin contraseñas.
+        </p>
+        <ul className="space-y-3 text-sm text-slate-600">
+          <li className="flex gap-2">
+            <span className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
+            Revisá los hitos de tu obra y certificaciones de avance.
+          </li>
+          <li className="flex gap-2">
+            <span className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
+            Descargá presupuestos, documentación técnica y comprobantes.
+          </li>
+          <li className="flex gap-2">
+            <span className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
+            Coordiná visitas y soporte con el equipo NERIN.
+          </li>
+        </ul>
+        <p className="text-xs text-slate-500">
+          ¿No tenés acceso? Escribinos a{' '}
+          <a className="font-medium underline" href="mailto:hola@nerin.com.ar">
+            hola@nerin.com.ar
+          </a>
+          .
+        </p>
+        <p className="text-xs text-slate-500">
+          ¿Sos parte del equipo NERIN?{' '}
+          <Link className="font-medium underline" href="/admin/login">
+            Ingresá al panel administrativo
+          </Link>
+          .
+        </p>
+      </div>
+      <LoginForm />
     </div>
   )
 }

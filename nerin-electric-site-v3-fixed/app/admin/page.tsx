@@ -1,8 +1,6 @@
 export const dynamic = 'force-dynamic'
 
-import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import {
   createAdditional,
@@ -21,11 +19,6 @@ import { Label } from '@/components/ui/label'
 export const revalidate = 0
 
 export default async function AdminPage() {
-  const session = await getSession()
-  if (session?.user?.role !== 'admin') {
-    redirect('/clientes')
-  }
-
   const [packs, adicionales, plans, projects] = await Promise.all([
     prisma.pack.findMany({ orderBy: { createdAt: 'desc' } }),
     prisma.additionalItem.findMany({ orderBy: { createdAt: 'desc' } }),

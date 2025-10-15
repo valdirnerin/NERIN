@@ -3,14 +3,22 @@ import NextAuth from 'next-auth'
 import type { NextAuthConfig } from 'next-auth'
 import type { EmailConfig } from 'next-auth/providers/email'
 import { prisma } from './db'
+import { authLogger } from './auth-logger'
 import { resendClient } from './resend'
-import { sanitizeError, sanitizeMetadata } from './logging'
+import { sanitizeError } from './logging'
 
-const authSecret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET
+let authSecret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET
 if (!authSecret) {
-  console.error(
-    '[AUTH] Missing AUTH_SECRET or NEXTAUTH_SECRET environment variable. Authentication flows will fail in production until it is configured.',
-  )
+  if (process.env.NODE_ENV === 'production') {
+    console.error(
+      '[AUTH] Missing AUTH_SECRET or NEXTAUTH_SECRET environment variable. Authentication flows will fail in production until it is configured.',
+    )
+  } else {
+    authSecret = 'development-secret'
+    console.warn(
+      '[AUTH] AUTH_SECRET/NEXTAUTH_SECRET was not set. Using a development-only fallback secret. Configure a real secret in production environments.',
+    )
+  }
 }
 
 const authBaseUrl = process.env.AUTH_URL ?? process.env.NEXTAUTH_URL
@@ -24,28 +32,7 @@ export const authOptions: NextAuthConfig = {
   adapter: PrismaAdapter(prisma),
   trustHost: true,
   secret: authSecret,
-  logger: {
-    error(code, metadata) {
-      console.error('[AUTH] Logger error', {
-        code,
-        details: sanitizeMetadata(metadata),
-      })
-    },
-    warn(code, metadata) {
-      console.warn('[AUTH] Logger warn', {
-        code,
-        details: sanitizeMetadata(metadata),
-      })
-    },
-    debug(code, metadata) {
-      if (process.env.NODE_ENV !== 'production') {
-        console.debug('[AUTH] Logger debug', {
-          code,
-          details: sanitizeMetadata(metadata),
-        })
-      }
-    },
-  },
+  logger: authLogger,
   session: {
     strategy: 'database',
     maxAge: 60 * 60 * 24 * 30,
