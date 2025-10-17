@@ -17,6 +17,8 @@ export default async function ClienteDashboard() {
     redirect('/clientes/login')
   }
 
+  const displayName = session.user.name?.trim() || session.user.email || 'usuario'
+
   const client = await prisma.client.findUnique({
     where: { userId: session.user.id },
     include: {
@@ -33,7 +35,7 @@ export default async function ClienteDashboard() {
     <div className="space-y-10">
       <header className="space-y-2">
         <Badge>Portal de clientes</Badge>
-        <h1>Hola {session.user.name}</h1>
+        <h1>Hola {displayName}</h1>
         <p className="text-sm text-slate-600">
           {client?.approved
             ? 'Visualizá tus proyectos, certificados de avance y facturas en un solo lugar.'

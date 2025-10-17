@@ -46,7 +46,7 @@ export const authOptions: NextAuthConfig = {
       if (session.user) {
         session.user.id = user.id
         session.user.role = user.role
-        session.user.name = user.name
+        session.user.name = user.name || user.email || session.user.name
         session.user.email = user.email
       }
       return session
