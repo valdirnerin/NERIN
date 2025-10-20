@@ -10,17 +10,17 @@ export default function AdminLoginPage() {
           <Badge>Panel administrativo</Badge>
           <h1 className="text-3xl font-semibold tracking-tight">Ingresá al panel de administración</h1>
           <p className="text-sm text-slate-600">
-            Recibís un enlace de un solo uso en tu correo corporativo. Ese enlace te lleva directo al tablero para publicar
-            packs, casos de éxito y certificados de avance.
+            Ingresá usando la cuenta administradora configurada en Render. Con ese usuario único accedés directo al tablero
+            para publicar packs, casos de éxito y certificados de avance.
           </p>
           <ol className="space-y-3 text-sm text-slate-600">
             <li className="flex gap-2">
               <span className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
-              Ingresá tu correo @nerin para verificar tu identidad.
+              Ingresá tu correo administrador.
             </li>
             <li className="flex gap-2">
               <span className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
-              Abrí el enlace mágico y llegás directo al panel.
+              Escribí la contraseña segura que definiste en las variables de entorno.
             </li>
             <li className="flex gap-2">
               <span className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
@@ -28,7 +28,7 @@ export default function AdminLoginPage() {
             </li>
           </ol>
           <p className="text-xs text-slate-500">
-            ¿Necesitás sumar a alguien del equipo? Escribinos a{' '}
+            ¿Necesitás sumar más cuentas o restablecer la clave? Escribinos a{' '}
             <a className="font-medium underline" href="mailto:hola@nerin.com.ar">
               hola@nerin.com.ar
             </a>
