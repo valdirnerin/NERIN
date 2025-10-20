@@ -2,7 +2,6 @@ import NextAuth from 'next-auth'
 import type { NextAuthConfig } from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import type { EmailConfig } from 'next-auth/providers/email'
-import { timingSafeEqual } from 'node:crypto'
 import { prisma } from './db'
 import { authLogger } from './auth-logger'
 import { resendClient } from './resend'
@@ -45,17 +44,27 @@ if (!adminEmailEnv || !adminPasswordEnv) {
 const normalizedAdminEmail = (adminEmailEnv || defaultAdminEmail).trim().toLowerCase()
 const adminPassword = adminPasswordEnv || defaultAdminPassword
 
+const textEncoder = new TextEncoder()
+
 function safeCompare(input: string, expected: string) {
   if (input.length !== expected.length) {
     return false
   }
 
-  try {
-    return timingSafeEqual(Buffer.from(input), Buffer.from(expected))
-  } catch (error) {
-    console.error('[AUTH] Error comparando credenciales', sanitizeError(error))
+  const inputBytes = textEncoder.encode(input)
+  const expectedBytes = textEncoder.encode(expected)
+
+  if (inputBytes.length !== expectedBytes.length) {
     return false
   }
+
+  let diff = 0
+
+  for (let index = 0; index < inputBytes.length; index += 1) {
+    diff |= inputBytes[index] ^ expectedBytes[index]
+  }
+
+  return diff === 0
 }
 
 const adminCredentialsProvider = Credentials({
