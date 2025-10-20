@@ -1,11 +1,13 @@
-import { PrismaAdapter } from '@auth/prisma-adapter'
 import NextAuth from 'next-auth'
 import type { NextAuthConfig } from 'next-auth'
+import Credentials from 'next-auth/providers/credentials'
 import type { EmailConfig } from 'next-auth/providers/email'
+import { timingSafeEqual } from 'node:crypto'
 import { prisma } from './db'
 import { authLogger } from './auth-logger'
 import { resendClient } from './resend'
 import { sanitizeError } from './logging'
+import { createAuthAdapter } from './auth-adapter'
 
 let authSecret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET
 if (!authSecret) {
@@ -28,8 +30,82 @@ if (!authBaseUrl) {
 
 const fromEmail = process.env.EMAIL_SERVER_FROM || 'NERIN <hola@nerin.com.ar>'
 
+const defaultAdminEmail = 'admin@nerin.com.ar'
+const defaultAdminPassword = 'AccesoNerin123'
+const adminEmailEnv = process.env.ADMIN_EMAIL
+const adminPasswordEnv = process.env.ADMIN_PASSWORD
+const adminDisplayName = process.env.ADMIN_NAME?.trim() || 'Administrador NERIN'
+
+if (!adminEmailEnv || !adminPasswordEnv) {
+  console.warn(
+    "[AUTH] Usando las credenciales admin por defecto (admin@nerin.com.ar / AccesoNerin123). Configurá ADMIN_EMAIL y ADMIN_PASSWORD en producción para personalizarlas.",
+  )
+}
+
+const normalizedAdminEmail = (adminEmailEnv || defaultAdminEmail).trim().toLowerCase()
+const adminPassword = adminPasswordEnv || defaultAdminPassword
+
+function safeCompare(input: string, expected: string) {
+  if (input.length !== expected.length) {
+    return false
+  }
+
+  try {
+    return timingSafeEqual(Buffer.from(input), Buffer.from(expected))
+  } catch (error) {
+    console.error('[AUTH] Error comparando credenciales', sanitizeError(error))
+    return false
+  }
+}
+
+const adminCredentialsProvider = Credentials({
+  id: 'admin-credentials',
+  name: 'Acceso administrador',
+  credentials: {
+    email: {
+      label: 'Correo corporativo',
+      type: 'email',
+      placeholder: normalizedAdminEmail,
+    },
+    password: {
+      label: 'Contraseña',
+      type: 'password',
+      placeholder: '••••••••',
+    },
+  },
+  authorize: async (credentials) => {
+    const email = credentials?.email?.trim().toLowerCase()
+    const password = credentials?.password || ''
+
+    if (!email || !password) {
+      return null
+    }
+
+    if (!safeCompare(email, normalizedAdminEmail) || !safeCompare(password, adminPassword)) {
+      return null
+    }
+
+    const adminUser = await prisma.user.upsert({
+      where: { email: normalizedAdminEmail },
+      update: {
+        role: 'admin',
+        name: adminDisplayName,
+        emailVerified: new Date(),
+      },
+      create: {
+        email: normalizedAdminEmail,
+        role: 'admin',
+        name: adminDisplayName,
+        emailVerified: new Date(),
+      },
+    })
+
+    return adminUser
+  },
+})
+
 export const authOptions: NextAuthConfig = {
-  adapter: PrismaAdapter(prisma),
+  adapter: createAuthAdapter(prisma),
   trustHost: true,
   secret: authSecret,
   logger: authLogger,
@@ -59,7 +135,7 @@ export const authOptions: NextAuthConfig = {
       return true
     },
   },
-  providers: [],
+  providers: [adminCredentialsProvider],
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth(async () => {
@@ -96,7 +172,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth(async () => {
     },
   }
 
-  config.providers = [resendEmailProvider]
+  config.providers = [...config.providers, resendEmailProvider]
 
   return config
 })

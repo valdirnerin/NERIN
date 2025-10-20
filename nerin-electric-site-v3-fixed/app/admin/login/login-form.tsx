@@ -1,15 +1,20 @@
-import { MagicLinkForm, type MagicLinkFormCopy } from '@/components/auth/magic-link-form'
+import {
+  AdminCredentialsForm,
+  type AdminCredentialsCopy,
+} from '@/components/auth/admin-credentials-form'
 
-const copy: MagicLinkFormCopy = {
-  cardTitle: 'Solicitá acceso seguro',
-  cardDescription: 'Usá tu correo corporativo para recibir el enlace de ingreso al panel.',
-  emailLabel: 'Correo corporativo',
-  placeholder: 'nombre@nerin.com.ar',
-  submitLabel: 'Enviar acceso al panel',
-  pendingLabel: 'Enviando enlace...',
-  successMessage: 'Abrí el enlace del correo para entrar al panel administrativo.',
+const copy: AdminCredentialsCopy = {
+  cardTitle: 'Ingresá con tu clave única',
+  cardDescription: 'Usá la cuenta administradora configurada para Render y accedé directo al panel.',
+  emailLabel: 'Correo administrador',
+  emailPlaceholder: 'admin@nerin.com.ar',
+  passwordLabel: 'Contraseña',
+  passwordPlaceholder: 'Tu contraseña segura',
+  submitLabel: 'Entrar al panel',
+  pendingLabel: 'Validando credenciales...',
+  errorMessage: 'Credenciales inválidas. Verificá el correo y la contraseña que configuraste.',
 }
 
 export function AdminLoginForm() {
-  return <MagicLinkForm {...copy} />
+  return <AdminCredentialsForm {...copy} />
 }
