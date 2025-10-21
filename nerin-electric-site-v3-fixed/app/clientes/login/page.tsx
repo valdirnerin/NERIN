@@ -1,8 +1,21 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
 import { LoginForm } from './login-form'
+import { getSession } from '@/lib/auth'
 
-export default function LoginPage() {
+export const runtime = 'nodejs'
+
+export default async function LoginPage() {
+  const session = await getSession()
+  if (session?.user?.role === 'admin') {
+    redirect('/admin')
+  }
+
+  if (session?.user?.role === 'client') {
+    redirect('/clientes')
+  }
+
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-12 px-6 py-16 md:flex-row md:items-start">
       <div className="max-w-md space-y-6">

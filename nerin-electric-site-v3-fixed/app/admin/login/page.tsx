@@ -1,9 +1,18 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
 import { AdminLoginForm } from './login-form'
+import { getSession } from '@/lib/auth'
 
-export default function AdminLoginPage() {
+export const runtime = 'nodejs'
+
+export default async function AdminLoginPage() {
+  const session = await getSession()
+  if (session?.user?.role === 'admin') {
+    redirect('/admin')
+  }
+
   return (
     <div className="mx-auto max-w-5xl px-6 py-16">
       <div className="grid gap-12 md:grid-cols-2 md:items-start">
