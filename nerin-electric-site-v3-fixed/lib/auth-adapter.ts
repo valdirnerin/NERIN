@@ -5,8 +5,12 @@ import { Prisma } from '@prisma/client'
 
 import { sanitizeError } from './logging'
 
-function normalizeIdentifier(identifier: string | undefined) {
-  return identifier?.trim().toLowerCase()
+function normalizeIdentifier(identifier: string | null | undefined) {
+  if (typeof identifier !== 'string') {
+    return undefined
+  }
+
+  return identifier.trim().toLowerCase()
 }
 
 export function createAuthAdapter(prisma: PrismaClient): Adapter {
@@ -15,7 +19,7 @@ export function createAuthAdapter(prisma: PrismaClient): Adapter {
   return {
     ...baseAdapter,
     async createVerificationToken(data) {
-      const identifier = normalizeIdentifier(data.identifier)
+      const identifier = normalizeIdentifier(data.identifier) ?? data.identifier
 
       return baseAdapter.createVerificationToken?.({
         ...data,
@@ -23,7 +27,7 @@ export function createAuthAdapter(prisma: PrismaClient): Adapter {
       } as VerificationToken)
     },
     async useVerificationToken(params) {
-      const identifier = normalizeIdentifier(params.identifier)
+      const identifier = normalizeIdentifier(params.identifier) ?? params.identifier
 
       const resolveWithBaseAdapter = async () => {
         try {

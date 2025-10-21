@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import type { Route } from 'next'
 import { signIn } from 'next-auth/react'
 
 import { Button } from '@/components/ui/button'
@@ -41,6 +42,8 @@ export function AdminCredentialsForm({
 
   const isLoading = status === 'loading'
 
+  const defaultCallbackUrl: Route = '/admin'
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
@@ -54,7 +57,11 @@ export function AdminCredentialsForm({
     setMessage('')
 
     try {
-      const callbackUrl = searchParams?.get('callbackUrl') ?? '/admin'
+      const callbackParam = searchParams?.get('callbackUrl') ?? null
+      const callbackUrl =
+        callbackParam && callbackParam.startsWith('/')
+          ? (callbackParam as Route)
+          : defaultCallbackUrl
       const result = await signIn('admin-credentials', {
         email,
         password,
@@ -68,7 +75,21 @@ export function AdminCredentialsForm({
         return
       }
 
-      router.replace(result.url ?? callbackUrl)
+      const redirectUrl = (() => {
+        if (!result.url) {
+          return callbackUrl
+        }
+
+        try {
+          const url = new URL(result.url, window.location.origin)
+          return (url.pathname as Route) ?? callbackUrl
+        } catch (error) {
+          console.error('[LOGIN] Error procesando URL de redirección', error)
+          return callbackUrl
+        }
+      })()
+
+      router.replace(redirectUrl)
     } catch (error) {
       console.error('[LOGIN] Error iniciando sesión administrador', error)
       setStatus('error')
