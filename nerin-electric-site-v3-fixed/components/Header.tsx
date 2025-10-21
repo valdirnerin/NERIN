@@ -1,8 +1,10 @@
+'use client'
+
 import Link from 'next/link'
 import { siteConfig } from '@/lib/config'
 import { Logo } from './Logo'
 import { Button } from './ui/button'
-import { getSession } from '@/lib/auth'
+import { useSession } from 'next-auth/react'
 
 const navigation = [
   { href: '/servicios', label: 'Servicios' },
@@ -17,8 +19,8 @@ const navigation = [
 const adminDashboardRoute = '/admin' as const
 const clientDashboardRoute = '/clientes' as const
 
-export async function Header() {
-  const session = await getSession()
+export function Header() {
+  const { data: session } = useSession()
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-white/90 backdrop-blur">
