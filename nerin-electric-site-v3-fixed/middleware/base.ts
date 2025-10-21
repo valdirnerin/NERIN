@@ -1,28 +1,5 @@
-import type { NextAuthRequest } from 'next-auth'
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
-import { sanitizeError } from '@/lib/logging'
-
-const publicRoutes = new Set(['/clientes/login', '/clientes/verificar', '/admin/login'])
-
-const adminDashboardRoute = '/admin' as const
-const clientDashboardRoute = '/clientes' as const
-
-async function resolveSession(req: NextAuthRequest) {
-  try {
-    const session = req.auth ?? null
-    if (session?.user) {
-      console.info('[MIDDLEWARE] Session resolved', {
-        userId: session.user.id,
-        role: session.user.role,
-      })
-    }
-    return session
-  } catch (error) {
-    console.error('[MIDDLEWARE] Failed to resolve session', sanitizeError(error))
-    return null
-  }
-}
 
 function buildLogContext(req: NextRequest, normalizedPathname: string) {
   return {
@@ -35,62 +12,13 @@ function buildLogContext(req: NextRequest, normalizedPathname: string) {
   }
 }
 
-export async function baseMiddleware(req: NextAuthRequest) {
+export function baseMiddleware(req: NextRequest) {
   const { pathname, locale } = req.nextUrl
 
   const normalizedPathname =
     locale && pathname.startsWith(`/${locale}`) ? pathname.slice(locale.length + 1) || '/' : pathname
 
-  console.info('[MIDDLEWARE] Incoming request', buildLogContext(req as NextRequest, normalizedPathname))
-
-  const session = await resolveSession(req)
-
-  if (publicRoutes.has(normalizedPathname)) {
-    if (normalizedPathname === '/clientes/login' || normalizedPathname === '/admin/login') {
-      if (session?.user) {
-        const destination = session.user.role === 'admin' ? adminDashboardRoute : clientDashboardRoute
-        console.info('[MIDDLEWARE] Redirecting authenticated user away from login', {
-          destination,
-          userId: session.user.id,
-        })
-        const redirectUrl = req.nextUrl.clone()
-        redirectUrl.pathname = destination
-        return NextResponse.redirect(redirectUrl)
-      }
-    }
-
-    console.info('[MIDDLEWARE] Allowing public access', { pathname: normalizedPathname })
-    return NextResponse.next()
-  }
-
-  if (pathname.startsWith('/admin')) {
-    if (!session) {
-      console.info('[MIDDLEWARE] Blocking unauthenticated admin request, redirecting to admin login')
-      const signInUrl = req.nextUrl.clone()
-      signInUrl.pathname = '/admin/login'
-      return NextResponse.redirect(signInUrl)
-    }
-    if (session.user?.role !== 'admin') {
-      console.info('[MIDDLEWARE] Blocking non-admin access to admin area', {
-        userId: session.user?.id,
-        role: session.user?.role,
-      })
-      const clientUrl = req.nextUrl.clone()
-      clientUrl.pathname = clientDashboardRoute
-      return NextResponse.redirect(clientUrl)
-    }
-    console.info('[MIDDLEWARE] Admin access granted', { userId: session.user?.id })
-  }
-
-  if (normalizedPathname.startsWith('/clientes')) {
-    if (!session) {
-      console.info('[MIDDLEWARE] Redirecting unauthenticated client request to login')
-      const signInUrl = req.nextUrl.clone()
-      signInUrl.pathname = '/clientes/login'
-      return NextResponse.redirect(signInUrl)
-    }
-    console.info('[MIDDLEWARE] Client access granted', { userId: session.user?.id })
-  }
+  console.info('[MIDDLEWARE] Incoming request', buildLogContext(req, normalizedPathname))
 
   return NextResponse.next()
 }
