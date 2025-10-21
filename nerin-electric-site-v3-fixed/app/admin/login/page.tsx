@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { AdminLoginForm } from './login-form'
@@ -43,7 +44,13 @@ export default function AdminLoginPage() {
           </p>
         </div>
         <div className="flex justify-center md:justify-end">
-          <AdminLoginForm />
+          <Suspense
+            fallback={
+              <div className="w-full max-w-sm shrink-0 rounded-lg border border-emerald-100/60 p-6 shadow-lg shadow-emerald-100/40" />
+            }
+          >
+            <AdminLoginForm />
+          </Suspense>
         </div>
       </div>
     </div>

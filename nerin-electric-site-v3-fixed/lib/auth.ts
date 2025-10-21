@@ -83,8 +83,13 @@ const adminCredentialsProvider = Credentials({
     },
   },
   authorize: async (credentials) => {
-    const email = credentials?.email?.trim().toLowerCase()
-    const password = credentials?.password || ''
+    const emailInput =
+      typeof credentials?.email === 'string' ? credentials.email : undefined
+    const passwordInput =
+      typeof credentials?.password === 'string' ? credentials.password : undefined
+
+    const email = emailInput?.trim().toLowerCase() || ''
+    const password = passwordInput || ''
 
     if (!email || !password) {
       return null
