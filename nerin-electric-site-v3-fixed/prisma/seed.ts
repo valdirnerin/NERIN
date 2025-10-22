@@ -89,7 +89,6 @@ async function main() {
         ]),
       },
     ],
-    skipDuplicates: true,
   })
 
   await prisma.additionalItem.createMany({
@@ -155,7 +154,6 @@ async function main() {
         precioUnitarioManoObra: 120000,
       },
     ],
-    skipDuplicates: true,
   })
 
   await prisma.maintenancePlan.createMany({
@@ -197,7 +195,6 @@ async function main() {
         cantidadesFijasInalterables: true,
       },
     ],
-    skipDuplicates: true,
   })
 
   await prisma.brand.createMany({
@@ -208,7 +205,6 @@ async function main() {
       { nombre: 'Daisa' },
       { nombre: 'Genrock' },
     ],
-    skipDuplicates: true,
   })
 
   await prisma.caseStudy.createMany({
@@ -240,7 +236,6 @@ async function main() {
         publicado: true,
       },
     ],
-    skipDuplicates: true,
   })
 
   const project = await prisma.project.upsert({
@@ -274,7 +269,6 @@ async function main() {
         paidAt: new Date(),
       },
     ],
-    skipDuplicates: true,
   })
 
   await prisma.invoice.createMany({
@@ -286,7 +280,6 @@ async function main() {
         urlPdf: 'https://example.com/factura-nerin.pdf',
       },
     ],
-    skipDuplicates: true,
   })
 
   await prisma.siteSetting.upsert({
