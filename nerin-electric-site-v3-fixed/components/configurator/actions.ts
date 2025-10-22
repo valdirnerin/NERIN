@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
+import { serializeJson } from '@/lib/serialization'
 
 const QuoteSchema = z.object({
   packId: z.string(),
@@ -38,7 +39,7 @@ export async function createConfiguratorQuote(data: z.infer<typeof QuoteSchema>)
   const quote = await prisma.configuratorQuote.create({
     data: {
       packId: pack.id,
-      itemsSeleccionados: payload,
+      itemsSeleccionados: serializeJson(payload),
       totalManoObra: new Prisma.Decimal(totalManoObra),
       proyectoElectricoAparte: new Prisma.Decimal(500000),
       configuratorQuoteItems: {

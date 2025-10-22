@@ -1,6 +1,6 @@
 # NERIN Electric · Sitio corporativo y portal operativo
 
-Proyecto completo basado en **Next.js 14 (App Router)** + **TypeScript** para comunicar los servicios eléctricos de NERIN, administrar contenido y operar el portal de clientes. Incluye integraciones con Prisma/PostgreSQL, NextAuth (magic link), Mercado Pago, RESEND y generación de PDFs para presupuestos.
+Proyecto completo basado en **Next.js 14 (App Router)** + **TypeScript** para comunicar los servicios eléctricos de NERIN, administrar contenido y operar el portal de clientes. Incluye integraciones con Prisma (SQLite por defecto, compatible con PostgreSQL), NextAuth (magic link), Mercado Pago, RESEND y generación de PDFs para presupuestos.
 
 ## Características principales
 
@@ -10,14 +10,14 @@ Proyecto completo basado en **Next.js 14 (App Router)** + **TypeScript** para co
 - **Portal de clientes** con aprobación manual, proyectos, certificados de avance pagables vía Mercado Pago y facturas.
 - **Panel admin** para CRUD de packs, adicionales, planes, casos de éxito y emisión de certificados.
 - **Autenticación** con NextAuth (magic link por RESEND) y roles `admin`, `cliente`, `tecnico`.
-- **Base de datos** Prisma + PostgreSQL con seeds realistas (packs, adicionales, planes, casos, proyecto demo, admin/cliente).
+- **Base de datos** Prisma + SQLite (archivo `dev.db` por defecto, seeds realistas) con opción de apuntar a PostgreSQL si se prefiere.
 - **DevOps**: Dockerfile listo para Render, scripts de seed, healthcheck y documentación de despliegue.
 - **Calidad**: ESLint, Prettier, Vitest (lógica de configurador), Playwright (smoke E2E). Lighthouse objetivo ≥95 (ejecutar manualmente sobre `npm run build && npm run start`).
 
 ## Requisitos
 
 - Node.js 20+
-- PostgreSQL 15+ (local o gestionado)
+- SQLite (se genera `dev.db` automáticamente) o PostgreSQL 15+ (opcional)
 - Cuenta RESEND y credenciales Mercado Pago (modo test para sandbox)
 
 ## Configuración inicial
@@ -31,7 +31,7 @@ npm install
 ### Base de datos
 
 ```bash
-npx prisma migrate dev --name init
+npx prisma db push
 npm run db:seed
 ```
 
@@ -102,21 +102,21 @@ Disponible en `/admin` (rol admin). Permite:
 
 ## Despliegue en Render
 
-1. Crear **PostgreSQL** gestionado y obtener `DATABASE_URL`.
+1. Crear **Persistent Disk** (20 GB alcanza para SQLite + uploads) o, si preferís, una base **PostgreSQL** gestionada.
 2. Crear **Web Service** (Node 20) con este repo.
 3. Variables de entorno mínimas:
-   - `DATABASE_URL`
+   - `DATABASE_URL` (ej. `file:/var/data/nerin.db` si usás Disk, o la URL de PostgreSQL si optás por ese motor)
    - `AUTH_SECRET` (o `NEXTAUTH_SECRET`)
    - `RESEND_API_KEY`
    - `EMAIL_SERVER_FROM`
    - `MERCADOPAGO_ACCESS_TOKEN`, `MERCADOPAGO_PUBLIC_KEY`, `MERCADOPAGO_WEBHOOK_SECRET`
-   - `STORAGE_DIR` (si usás Disk, ej. `/var/data`)
+   - `STORAGE_DIR` (si usás Disk, ej. `/var/data/uploads`)
    > Generá `AUTH_SECRET` con `openssl rand -base64 32` y cargalo en el panel de variables del despliegue.
 4. Commands:
    - Build: `npm ci && npm run build`
    - Start: `npm run start`
 5. Health check: `/`.
-6. Ejecutar `npm run db:migrate` y `npm run db:seed` (Render supports deploy hooks o run shell).
+6. Ejecutar `npm run db:migrate` (alias de `prisma db push`) y `npm run db:seed` desde un shell del servicio tras el primer despliegue.
 
 ### Docker
 

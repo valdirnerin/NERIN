@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
+import { serializeStringArray } from '@/lib/serialization'
 
 const PackSchema = z.object({
   nombre: z.string().min(3),
@@ -34,7 +35,12 @@ export async function createPack(formData: FormData) {
       bocasIncluidas: payload.bocasIncluidas,
       ambientesReferencia: payload.ambientesReferencia,
       precioManoObraBase: new Prisma.Decimal(payload.precioManoObraBase),
-      alcanceDetallado: payload.alcanceDetallado.split('\n').map((item) => item.trim()).filter(Boolean),
+      alcanceDetallado: serializeStringArray(
+        payload.alcanceDetallado
+          .split('\n')
+          .map((item) => item.trim())
+          .filter(Boolean),
+      ),
     },
   })
 
@@ -93,7 +99,12 @@ export async function createMaintenance(formData: FormData) {
       slug: payload.slug,
       visitasMes: payload.visitasMes,
       precioMensual: new Prisma.Decimal(payload.precioMensual),
-      incluyeTareasFijas: payload.incluye.split('\n').map((item) => item.trim()).filter(Boolean),
+      incluyeTareasFijas: serializeStringArray(
+        payload.incluye
+          .split('\n')
+          .map((item) => item.trim())
+          .filter(Boolean),
+      ),
       cantidadesFijasInalterables: true,
     },
   })
@@ -124,7 +135,7 @@ export async function createCaseStudy(formData: FormData) {
       resumen: payload.resumen,
       contenido: payload.contenido,
       publicado: true,
-      fotos: [],
+      fotos: serializeStringArray([]),
     },
   })
 

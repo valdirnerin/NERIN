@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { parseStringArray } from '@/lib/serialization'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableCell, TableHead, TableRow } from '@/components/ui/table'
@@ -31,19 +32,29 @@ export default async function ClienteDashboard() {
     },
   })
 
+  const normalizedClient = client
+    ? {
+        ...client,
+        projects: client.projects.map((project) => ({
+          ...project,
+          normativasAplicadas: parseStringArray(project.normativasAplicadas),
+        })),
+      }
+    : null
+
   return (
     <div className="space-y-10">
       <header className="space-y-2">
         <Badge>Portal de clientes</Badge>
         <h1>Hola {displayName}</h1>
         <p className="text-sm text-slate-600">
-          {client?.approved
+          {normalizedClient?.approved
             ? 'Visualizá tus proyectos, certificados de avance y facturas en un solo lugar.'
             : 'Tu cuenta está pendiente de aprobación. Mientras tanto, podés seguir avanzando con pedidos y compartir documentación.'}
         </p>
       </header>
 
-      {!client && (
+      {!normalizedClient && (
         <Card>
           <CardHeader>
             <CardTitle>Activación en proceso</CardTitle>
@@ -60,14 +71,14 @@ export default async function ClienteDashboard() {
         </Card>
       )}
 
-      {client?.projects.length ? (
+      {normalizedClient?.projects.length ? (
         <section className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-semibold text-foreground">Proyectos activos</h2>
-            <p className="text-sm text-slate-500">Empresa de envío: {client.notas ?? 'Se informará si aplica'}</p>
+            <p className="text-sm text-slate-500">Empresa de envío: {normalizedClient.notas ?? 'Se informará si aplica'}</p>
           </div>
           <div className="grid gap-6 md:grid-cols-2">
-            {client.projects.map((project) => (
+            {normalizedClient.projects.map((project) => (
               <Card key={project.id} className="space-y-3">
                 <CardHeader>
                   <CardTitle>{project.nombre}</CardTitle>

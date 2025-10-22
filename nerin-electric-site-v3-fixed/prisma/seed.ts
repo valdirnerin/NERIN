@@ -1,5 +1,5 @@
-import { Role } from '@prisma/client'
 import { prisma } from '@/lib/db'
+import { serializeJson, serializeStringArray } from '@/lib/serialization'
 
 async function main() {
   const adminEmail = 'admin@nerin.com.ar'
@@ -11,7 +11,7 @@ async function main() {
     create: {
       email: adminEmail,
       name: 'Equipo NERIN',
-      role: Role.admin,
+      role: 'admin',
     },
   })
 
@@ -21,7 +21,7 @@ async function main() {
     create: {
       email: clientEmail,
       name: 'Consorcio Demo',
-      role: Role.cliente,
+      role: 'cliente',
       telefono: '+54 9 11 5555 5555',
     },
   })
@@ -48,13 +48,13 @@ async function main() {
         ambientesReferencia: 6,
         soloManoObra: true,
         precioManoObraBase: 2500000,
-        alcanceDetallado: [
+        alcanceDetallado: serializeStringArray([
           'Canalización EMT y bandejas vistas donde aplique',
           'Tablero principal con protecciones curvas C',
           'Circuitos independientes para AA, cocina y tomas generales',
           'Puesta a tierra con jabalina de 2.4 m',
           'Certificado de mediciones',
-        ],
+        ]),
       },
       {
         nombre: 'Casa Country 1',
@@ -64,13 +64,13 @@ async function main() {
         ambientesReferencia: 10,
         soloManoObra: true,
         precioManoObraBase: 5200000,
-        alcanceDetallado: [
+        alcanceDetallado: serializeStringArray([
           'Doble tablero con seccional por planta',
           'Circuito exclusivo para piscina y bomba',
           'Preinstalación domótica y cableado de datos categoría 6A',
           'Puesta a tierra mejorada con anillo perimetral',
           'Documentación completa y ensayos finales',
-        ],
+        ]),
       },
       {
         nombre: 'Casa Country 2',
@@ -80,13 +80,13 @@ async function main() {
         ambientesReferencia: 14,
         soloManoObra: true,
         precioManoObraBase: 7800000,
-        alcanceDetallado: [
+        alcanceDetallado: serializeStringArray([
           'Tableros seccionales por planta y exteriores',
           'Integración con grupo electrógeno y UPS',
           'Circuito para sala de máquinas y presurizadora',
           'Canalizaciones ocultas con bandejas portacables',
           'Planos, memorias y certificación final',
-        ],
+        ]),
       },
     ],
     skipDuplicates: true,
@@ -165,7 +165,11 @@ async function main() {
         slug: 'basic',
         visitasMes: 1,
         precioMensual: 180000,
-        incluyeTareasFijas: ['Revisión de 10 lámparas LED', 'Chequeo de tableros', 'Informe mensual'],
+        incluyeTareasFijas: serializeStringArray([
+          'Revisión de 10 lámparas LED',
+          'Chequeo de tableros',
+          'Informe mensual',
+        ]),
         cantidadesFijasInalterables: true,
       },
       {
@@ -173,7 +177,11 @@ async function main() {
         slug: 'pro',
         visitasMes: 2,
         precioMensual: 320000,
-        incluyeTareasFijas: ['20 lámparas LED', 'Termografía bimestral', 'Chequeo de bombas'],
+        incluyeTareasFijas: serializeStringArray([
+          '20 lámparas LED',
+          'Termografía bimestral',
+          'Chequeo de bombas',
+        ]),
         cantidadesFijasInalterables: true,
       },
       {
@@ -181,7 +189,11 @@ async function main() {
         slug: 'enterprise',
         visitasMes: 4,
         precioMensual: 620000,
-        incluyeTareasFijas: ['40 lámparas LED', 'Guardia de urgencias', 'Reportes ejecutivos'],
+        incluyeTareasFijas: serializeStringArray([
+          '40 lámparas LED',
+          'Guardia de urgencias',
+          'Reportes ejecutivos',
+        ]),
         cantidadesFijasInalterables: true,
       },
     ],
@@ -207,8 +219,11 @@ async function main() {
         resumen: 'Adecuación completa de tablero general, CCTV y grupo electrógeno para edificio AAA.',
         contenido:
           'El desafío fue migrar la instalación existente sin cortar suministro crítico. Implementamos tableros modulares, cableado LSZH y monitoreo remoto. Cumplimos normativa AEA 90364-7-771 y entregamos documentación completa.',
-        metricas: [{ label: 'Tiempo de obra', value: '90 días' }, { label: 'Circuitos', value: '120' }],
-        fotos: [],
+        metricas: serializeJson([
+          { label: 'Tiempo de obra', value: '90 días' },
+          { label: 'Circuitos', value: '120' },
+        ]),
+        fotos: serializeStringArray([]),
         publicado: true,
       },
       {
@@ -217,8 +232,11 @@ async function main() {
         resumen: 'Implementación de tableros, datos y CCTV para múltiples sedes simultáneas.',
         contenido:
           'Coordinamos logística y montaje nocturno para minimizar cierres. Cada sede recibió tableros nuevos, canalizaciones ocultas y cableado estructurado certificado. Implementamos checklist digital y reportes diarios.',
-        metricas: [{ label: 'Sedes', value: '6' }, { label: 'Horas fuera de servicio', value: '<4 h por sede' }],
-        fotos: [],
+        metricas: serializeJson([
+          { label: 'Sedes', value: '6' },
+          { label: 'Horas fuera de servicio', value: '<4 h por sede' },
+        ]),
+        fotos: serializeStringArray([]),
         publicado: true,
       },
     ],
@@ -236,7 +254,7 @@ async function main() {
       estado: 'en_progreso',
       direccion: 'Av. Libertador 1500',
       metros2: 3800,
-      normativasAplicadas: ['AEA 90364-7-771', 'NFPA 70'],
+      normativasAplicadas: serializeStringArray(['AEA 90364-7-771', 'NFPA 70']),
     },
   })
 
