@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/db'
+import { parseJson, parseStringArray } from '@/lib/serialization'
 
 export interface AdditionalItemForUI {
   id: string
@@ -322,7 +323,7 @@ export async function getPacksForMarketing(): Promise<PackForUI[]> {
       slug: pack.slug,
       nombre: pack.nombre,
       descripcion: pack.descripcion,
-      alcanceDetallado: pack.alcanceDetallado,
+      alcanceDetallado: parseStringArray(pack.alcanceDetallado),
       bocasIncluidas: pack.bocasIncluidas,
       ambientesReferencia: pack.ambientesReferencia,
       precioManoObraBase: Number(pack.precioManoObraBase),
@@ -334,7 +335,7 @@ export async function getPacksForMarketing(): Promise<PackForUI[]> {
           descripcion: item.descripcion,
           unidad: item.unidad,
           precioUnitarioManoObra: Number(item.precioUnitarioManoObra),
-          reglasCompatibilidad: (item.reglasCompatibilidad as Record<string, unknown> | null) ?? null,
+          reglasCompatibilidad: parseJson<Record<string, unknown>>(item.reglasCompatibilidad),
           packId: item.packId,
         })) ?? [],
     }))
@@ -358,7 +359,7 @@ export async function getMaintenancePlansForMarketing(): Promise<MaintenancePlan
       id: plan.id,
       slug: plan.slug,
       nombre: plan.nombre,
-      incluyeTareasFijas: plan.incluyeTareasFijas,
+      incluyeTareasFijas: parseStringArray(plan.incluyeTareasFijas),
       visitasMes: plan.visitasMes,
       precioMensual: Number(plan.precioMensual),
       cantidadesFijasInalterables: plan.cantidadesFijasInalterables,
@@ -386,8 +387,8 @@ export async function getCaseStudiesForMarketing(): Promise<CaseStudyForUI[]> {
       titulo: cs.titulo,
       resumen: cs.resumen,
       contenido: cs.contenido,
-      metricas: parseMetricas(cs.metricas),
-      fotos: cs.fotos ?? [],
+      metricas: parseMetricas(parseJson(cs.metricas)),
+      fotos: parseStringArray(cs.fotos),
     }))
   } catch (error) {
     logFallback('case studies', error)
@@ -408,8 +409,8 @@ export async function getCaseStudyBySlug(slug: string): Promise<CaseStudyForUI |
       titulo: caseStudy.titulo,
       resumen: caseStudy.resumen,
       contenido: caseStudy.contenido,
-      metricas: parseMetricas(caseStudy.metricas),
-      fotos: caseStudy.fotos ?? [],
+      metricas: parseMetricas(parseJson(caseStudy.metricas)),
+      fotos: parseStringArray(caseStudy.fotos),
     }
   } catch (error) {
     logFallback(`case study ${slug}`, error)
@@ -448,7 +449,7 @@ export async function getTechniciansForMarketing(): Promise<TechnicianForUI[]> {
     return technicians.map((tech) => ({
       id: tech.id,
       nombre: tech.user?.name ?? 'Equipo NERIN',
-      credenciales: tech.credenciales,
+      credenciales: parseStringArray(tech.credenciales),
       fotoUrl: tech.fotoUrl,
     }))
   } catch (error) {
@@ -472,7 +473,7 @@ export async function getConfiguratorData(): Promise<{
       slug: pack.slug,
       nombre: pack.nombre,
       descripcion: pack.descripcion,
-      alcanceDetallado: pack.alcanceDetallado,
+      alcanceDetallado: parseStringArray(pack.alcanceDetallado),
       bocasIncluidas: pack.bocasIncluidas,
       ambientesReferencia: pack.ambientesReferencia,
       precioManoObraBase: Number(pack.precioManoObraBase),
@@ -486,7 +487,7 @@ export async function getConfiguratorData(): Promise<{
       descripcion: item.descripcion,
       unidad: item.unidad,
       precioUnitarioManoObra: Number(item.precioUnitarioManoObra),
-      reglasCompatibilidad: (item.reglasCompatibilidad as Record<string, unknown> | null) ?? null,
+      reglasCompatibilidad: parseJson<Record<string, unknown>>(item.reglasCompatibilidad),
       packId: item.packId,
     }))
 
