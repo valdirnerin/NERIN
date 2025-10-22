@@ -24,7 +24,7 @@ Proyecto completo basado en **Next.js 14 (App Router)** + **TypeScript** para co
 
 ```bash
 cp .env.example .env
-# editar con tus claves: DATABASE_URL, NEXTAUTH_SECRET, RESEND_API_KEY, MP_ACCESS_TOKEN, etc.
+# editar con tus claves: DATABASE_URL, AUTH_SECRET (openssl rand -base64 32), RESEND_API_KEY, MP_ACCESS_TOKEN, etc.
 npm install
 ```
 
@@ -106,11 +106,12 @@ Disponible en `/admin` (rol admin). Permite:
 2. Crear **Web Service** (Node 20) con este repo.
 3. Variables de entorno mínimas:
    - `DATABASE_URL`
-   - `NEXTAUTH_SECRET`
+   - `AUTH_SECRET` (o `NEXTAUTH_SECRET`)
    - `RESEND_API_KEY`
    - `EMAIL_SERVER_FROM`
    - `MERCADOPAGO_ACCESS_TOKEN`, `MERCADOPAGO_PUBLIC_KEY`, `MERCADOPAGO_WEBHOOK_SECRET`
    - `STORAGE_DIR` (si usás Disk, ej. `/var/data`)
+   > Generá `AUTH_SECRET` con `openssl rand -base64 32` y cargalo en el panel de variables del despliegue.
 4. Commands:
    - Build: `npm ci && npm run build`
    - Start: `npm run start`
