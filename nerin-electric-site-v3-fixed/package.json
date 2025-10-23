@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "prisma generate && next build",
-    "start": "prisma migrate deploy || prisma db push && node .next/standalone/server.js",
+    "start": "prisma db push && node .next/standalone/server.js",
     "lint": "next lint",
     "format": "prettier --write .",
     "test": "vitest run",
