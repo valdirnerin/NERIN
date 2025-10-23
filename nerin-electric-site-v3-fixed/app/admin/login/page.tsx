@@ -1,17 +1,33 @@
-import { Suspense } from 'react'
+'use client'
+
+export const dynamic = 'force-dynamic'
+
+import { Suspense, useEffect } from 'react'
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
+import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
+
 import { Badge } from '@/components/ui/badge'
+
 import { AdminLoginForm } from './login-form'
-import { getSession } from '@/lib/auth'
 
-export const runtime = 'nodejs'
+export default function AdminLoginPage() {
+  const router = useRouter()
+  const { data: session, status } = useSession()
 
-export default async function AdminLoginPage() {
-  const session = await getSession()
-  if (session?.user?.role === 'admin') {
-    redirect('/admin')
-  }
+  const isAdmin = session?.user?.role === 'admin'
+
+  useEffect(() => {
+    if (status !== 'authenticated') {
+      return
+    }
+
+    if (isAdmin) {
+      router.replace('/admin')
+    }
+  }, [status, isAdmin, router])
+
+  const showRedirectMessage = status === 'authenticated' && isAdmin
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-16">
@@ -20,8 +36,8 @@ export default async function AdminLoginPage() {
           <Badge>Panel administrativo</Badge>
           <h1 className="text-3xl font-semibold tracking-tight">Ingresá al panel de administración</h1>
           <p className="text-sm text-slate-600">
-            Ingresá usando la cuenta administradora configurada en Render. Con ese usuario único accedés directo al tablero
-            para publicar packs, casos de éxito y certificados de avance.
+            Ingresá usando la cuenta administradora configurada en Render. Con ese usuario único accedés directo al tablero para
+            publicar packs, casos de éxito y certificados de avance.
           </p>
           <ol className="space-y-3 text-sm text-slate-600">
             <li className="flex gap-2">
@@ -53,13 +69,21 @@ export default async function AdminLoginPage() {
           </p>
         </div>
         <div className="flex justify-center md:justify-end">
-          <Suspense
-            fallback={
-              <div className="w-full max-w-sm shrink-0 rounded-lg border border-emerald-100/60 p-6 shadow-lg shadow-emerald-100/40" />
-            }
-          >
-            <AdminLoginForm />
-          </Suspense>
+          {showRedirectMessage ? (
+            <div className="w-full max-w-sm shrink-0 rounded-lg border border-emerald-100/60 p-6 text-sm text-slate-600 shadow-lg shadow-emerald-100/40">
+              Redirigiendo al panel...
+            </div>
+          ) : (
+            <div className="w-full max-w-sm shrink-0">
+              <Suspense
+                fallback={
+                  <div className="w-full max-w-sm shrink-0 rounded-lg border border-emerald-100/60 p-6 shadow-lg shadow-emerald-100/40" />
+                }
+              >
+                <AdminLoginForm />
+              </Suspense>
+            </div>
+          )}
         </div>
       </div>
     </div>
