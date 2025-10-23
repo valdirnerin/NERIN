@@ -1,5 +1,11 @@
-import { handlers } from '@/lib/auth'
+import NextAuth from 'next-auth'
 
-export const { GET, POST } = handlers
+import { createAdminCredentialsProvider, resolveAuthOptions } from '@/lib/auth-config'
+
+const adminCredentialsProvider = createAdminCredentialsProvider()
+
+const nextAuth = NextAuth(async () => resolveAuthOptions(adminCredentialsProvider))
+
+export const { GET, POST } = nextAuth.handlers
 
 export const runtime = 'nodejs'
