@@ -2,12 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
 import { prisma } from '@/lib/db'
-import {
-  createAdditional,
-  createCertificate,
-  createMaintenance,
-  createPack,
-} from '../actions'
+import { createAdditional, createCertificate } from '../actions'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -15,6 +10,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { CaseStudyForm } from './case-study-form'
+import { PackForm } from './pack-form'
+import { MaintenanceForm } from './maintenance-form'
 
 export const revalidate = 0
 
@@ -43,39 +40,7 @@ export default async function AdminPage() {
             <CardTitle>Nuevo pack eléctrico</CardTitle>
           </CardHeader>
           <CardContent>
-            <form action={createPack} className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="nombre">Nombre</Label>
-                <Input id="nombre" name="nombre" required />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="slug">Slug</Label>
-                <Input id="slug" name="slug" required />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="descripcion">Descripción</Label>
-                <Textarea id="descripcion" name="descripcion" required />
-              </div>
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="bocasIncluidas">Bocas incluidas</Label>
-                  <Input id="bocasIncluidas" name="bocasIncluidas" type="number" required />
-                </div>
-                <div>
-                  <Label htmlFor="ambientesReferencia">Ambientes</Label>
-                  <Input id="ambientesReferencia" name="ambientesReferencia" type="number" required />
-                </div>
-                <div>
-                  <Label htmlFor="precioManoObraBase">Precio mano de obra</Label>
-                  <Input id="precioManoObraBase" name="precioManoObraBase" type="number" required />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="alcanceDetallado">Alcance (una línea por ítem)</Label>
-                <Textarea id="alcanceDetallado" name="alcanceDetallado" required />
-              </div>
-              <Button type="submit">Crear pack</Button>
-            </form>
+            <PackForm />
           </CardContent>
         </Card>
 
@@ -113,31 +78,7 @@ export default async function AdminPage() {
             <CardTitle>Nuevo plan de mantenimiento</CardTitle>
           </CardHeader>
           <CardContent>
-            <form action={createMaintenance} className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="plan-nombre">Nombre</Label>
-                <Input id="plan-nombre" name="nombre" required />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="plan-slug">Slug</Label>
-                <Input id="plan-slug" name="slug" required />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="plan-visitas">Visitas mensuales</Label>
-                  <Input id="plan-visitas" name="visitasMes" type="number" required />
-                </div>
-                <div>
-                  <Label htmlFor="plan-precio">Precio mensual</Label>
-                  <Input id="plan-precio" name="precioMensual" type="number" required />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="plan-incluye">Tareas fijas (una por línea)</Label>
-                <Textarea id="plan-incluye" name="incluye" required />
-              </div>
-              <Button type="submit">Crear plan</Button>
-            </form>
+            <MaintenanceForm />
           </CardContent>
         </Card>
 
