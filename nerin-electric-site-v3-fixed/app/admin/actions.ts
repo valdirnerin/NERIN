@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
 import { serializeStringArray } from '@/lib/serialization'
+import { makeUniqueSlug } from '@/lib/slug'
 
 const PackSchema = z.object({
   nombre: z.string().min(3),
@@ -115,32 +116,81 @@ export async function createMaintenance(formData: FormData) {
 
 const CaseStudySchema = z.object({
   titulo: z.string().min(3),
-  slug: z.string().min(3),
   resumen: z.string().min(10),
   contenido: z.string().min(20),
 })
 
-export async function createCaseStudy(formData: FormData) {
-  const payload = CaseStudySchema.parse({
+export type CaseStudyFormState = {
+  success: boolean
+  error?: string
+}
+
+export const initialCaseStudyState: CaseStudyFormState = {
+  success: false,
+}
+
+export async function upsertCaseStudy(
+  _prevState: CaseStudyFormState,
+  formData: FormData,
+): Promise<CaseStudyFormState> {
+  const parsed = CaseStudySchema.safeParse({
     titulo: formData.get('titulo'),
-    slug: formData.get('slug'),
     resumen: formData.get('resumen'),
     contenido: formData.get('contenido'),
   })
 
-  await prisma.caseStudy.create({
-    data: {
-      titulo: payload.titulo,
-      slug: payload.slug,
-      resumen: payload.resumen,
-      contenido: payload.contenido,
-      publicado: true,
-      fotos: serializeStringArray([]),
-    },
-  })
+  if (!parsed.success) {
+    return {
+      success: false,
+      error: 'Revisá los datos del caso de éxito.',
+    }
+  }
 
-  revalidatePath('/admin')
-  revalidatePath('/obras')
+  const payload = parsed.data
+
+  try {
+    const slug = await makeUniqueSlug(payload.titulo)
+
+    await prisma.caseStudy.upsert({
+      where: { slug },
+      create: {
+        titulo: payload.titulo,
+        slug,
+        resumen: payload.resumen,
+        contenido: payload.contenido,
+        publicado: true,
+        fotos: serializeStringArray([]),
+      },
+      update: {
+        titulo: payload.titulo,
+        resumen: payload.resumen,
+        contenido: payload.contenido,
+        publicado: true,
+      },
+    })
+
+    revalidatePath('/admin')
+    revalidatePath('/obras')
+
+    return { success: true }
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === 'P2002'
+    ) {
+      return {
+        success: false,
+        error: 'Ese slug ya existe',
+      }
+    }
+
+    console.error('Error al guardar el caso de éxito', error)
+
+    return {
+      success: false,
+      error: 'No se pudo guardar el caso de éxito. Intentá nuevamente.',
+    }
+  }
 }
 
 const CertificateSchema = z.object({

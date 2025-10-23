@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { prisma } from '@/lib/db'
 import {
   createAdditional,
-  createCaseStudy,
   createCertificate,
   createMaintenance,
   createPack,
@@ -13,8 +12,9 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { CaseStudyForm } from './case-study-form'
 
 export const revalidate = 0
 
@@ -146,25 +146,7 @@ export default async function AdminPage() {
             <CardTitle>Nuevo caso de éxito</CardTitle>
           </CardHeader>
           <CardContent>
-            <form action={createCaseStudy} className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="case-titulo">Título</Label>
-                <Input id="case-titulo" name="titulo" required />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="case-slug">Slug</Label>
-                <Input id="case-slug" name="slug" required />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="case-resumen">Resumen</Label>
-                <Textarea id="case-resumen" name="resumen" required />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="case-contenido">Contenido</Label>
-                <Textarea id="case-contenido" name="contenido" rows={6} required />
-              </div>
-              <Button type="submit">Publicar caso</Button>
-            </form>
+            <CaseStudyForm />
           </CardContent>
         </Card>
       </section>
