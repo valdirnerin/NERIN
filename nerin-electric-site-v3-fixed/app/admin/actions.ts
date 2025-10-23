@@ -17,7 +17,19 @@ const PackSchema = z.object({
   alcanceDetallado: z.string().min(5),
 })
 
-export async function createPack(formData: FormData) {
+export type PackFormState = {
+  success: boolean
+  error?: string
+}
+
+export const initialPackFormState: PackFormState = {
+  success: false,
+}
+
+export async function createPack(
+  _prevState: PackFormState,
+  formData: FormData,
+): Promise<PackFormState> {
   const payload = PackSchema.parse({
     nombre: formData.get('nombre'),
     slug: formData.get('slug'),
@@ -28,25 +40,47 @@ export async function createPack(formData: FormData) {
     alcanceDetallado: formData.get('alcanceDetallado'),
   })
 
-  await prisma.pack.create({
-    data: {
-      nombre: payload.nombre,
-      slug: payload.slug,
-      descripcion: payload.descripcion,
-      bocasIncluidas: payload.bocasIncluidas,
-      ambientesReferencia: payload.ambientesReferencia,
-      precioManoObraBase: new Prisma.Decimal(payload.precioManoObraBase),
-      alcanceDetallado: serializeStringArray(
-        payload.alcanceDetallado
-          .split('\n')
-          .map((item) => item.trim())
-          .filter(Boolean),
-      ),
-    },
-  })
+  const alcanceDetallado = serializeStringArray(
+    payload.alcanceDetallado
+      .split('\n')
+      .map((item) => item.trim())
+      .filter(Boolean),
+  )
 
-  revalidatePath('/admin')
-  revalidatePath('/packs')
+  const packData = {
+    nombre: payload.nombre,
+    slug: payload.slug,
+    descripcion: payload.descripcion,
+    bocasIncluidas: payload.bocasIncluidas,
+    ambientesReferencia: payload.ambientesReferencia,
+    precioManoObraBase: new Prisma.Decimal(payload.precioManoObraBase),
+    alcanceDetallado,
+  }
+
+  try {
+    await prisma.pack.upsert({
+      where: { slug: payload.slug },
+      create: packData,
+      update: packData,
+    })
+
+    revalidatePath('/admin')
+    revalidatePath('/packs')
+
+    return { success: true }
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === 'P2002'
+    ) {
+      return {
+        success: false,
+        error: 'Ese slug ya existe',
+      }
+    }
+
+    throw error
+  }
 }
 
 const AdditionalSchema = z.object({
@@ -85,7 +119,19 @@ const MaintenanceSchema = z.object({
   incluye: z.string().min(5),
 })
 
-export async function createMaintenance(formData: FormData) {
+export type MaintenanceFormState = {
+  success: boolean
+  error?: string
+}
+
+export const initialMaintenanceFormState: MaintenanceFormState = {
+  success: false,
+}
+
+export async function createMaintenance(
+  _prevState: MaintenanceFormState,
+  formData: FormData,
+): Promise<MaintenanceFormState> {
   const payload = MaintenanceSchema.parse({
     nombre: formData.get('nombre'),
     slug: formData.get('slug'),
@@ -94,24 +140,46 @@ export async function createMaintenance(formData: FormData) {
     incluye: formData.get('incluye'),
   })
 
-  await prisma.maintenancePlan.create({
-    data: {
-      nombre: payload.nombre,
-      slug: payload.slug,
-      visitasMes: payload.visitasMes,
-      precioMensual: new Prisma.Decimal(payload.precioMensual),
-      incluyeTareasFijas: serializeStringArray(
-        payload.incluye
-          .split('\n')
-          .map((item) => item.trim())
-          .filter(Boolean),
-      ),
-      cantidadesFijasInalterables: true,
-    },
-  })
+  const incluyeTareasFijas = serializeStringArray(
+    payload.incluye
+      .split('\n')
+      .map((item) => item.trim())
+      .filter(Boolean),
+  )
 
-  revalidatePath('/admin')
-  revalidatePath('/mantenimiento')
+  const maintenanceData = {
+    nombre: payload.nombre,
+    slug: payload.slug,
+    visitasMes: payload.visitasMes,
+    precioMensual: new Prisma.Decimal(payload.precioMensual),
+    incluyeTareasFijas,
+    cantidadesFijasInalterables: true,
+  }
+
+  try {
+    await prisma.maintenancePlan.upsert({
+      where: { slug: payload.slug },
+      create: maintenanceData,
+      update: maintenanceData,
+    })
+
+    revalidatePath('/admin')
+    revalidatePath('/mantenimiento')
+
+    return { success: true }
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === 'P2002'
+    ) {
+      return {
+        success: false,
+        error: 'Ese slug ya existe',
+      }
+    }
+
+    throw error
+  }
 }
 
 const CaseStudySchema = z.object({
