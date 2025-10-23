@@ -6,5 +6,5 @@ export const middleware: NextMiddleware = (request: NextRequest) => baseMiddlewa
 export default middleware
 
 export const config = {
-  matcher: ['/admin/:path*', '/clientes/:path*'],
+  matcher: ['/((?!api/health|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)'],
 }

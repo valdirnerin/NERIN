@@ -1,20 +1,53 @@
+'use client'
+
+export const dynamic = 'force-dynamic'
+
+import { useEffect, useMemo } from 'react'
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
+import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
+
 import { Badge } from '@/components/ui/badge'
+
 import { LoginForm } from './login-form'
-import { getSession } from '@/lib/auth'
 
-export const runtime = 'nodejs'
+export default function LoginPage() {
+  const router = useRouter()
+  const { data: session, status } = useSession()
 
-export default async function LoginPage() {
-  const session = await getSession()
-  if (session?.user?.role === 'admin') {
-    redirect('/admin')
-  }
+  const isAdmin = session?.user?.role === 'admin'
+  const isClient = session?.user?.role === 'client'
 
-  if (session?.user?.role === 'client') {
-    redirect('/clientes')
-  }
+  useEffect(() => {
+    if (status !== 'authenticated') {
+      return
+    }
+
+    if (isAdmin) {
+      router.replace('/admin')
+      return
+    }
+
+    if (isClient) {
+      router.replace('/clientes')
+    }
+  }, [status, isAdmin, isClient, router])
+
+  const redirectMessage = useMemo(() => {
+    if (status !== 'authenticated') {
+      return null
+    }
+
+    if (isAdmin) {
+      return 'Redirigiendo al panel administrativo...'
+    }
+
+    if (isClient) {
+      return 'Redirigiendo a tu portal...'
+    }
+
+    return null
+  }, [status, isAdmin, isClient])
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-12 px-6 py-16 md:flex-row md:items-start">
@@ -54,7 +87,15 @@ export default async function LoginPage() {
           .
         </p>
       </div>
-      <LoginForm />
+      <div className="flex w-full max-w-sm shrink-0 justify-center md:justify-end">
+        {redirectMessage ? (
+          <div className="w-full rounded-lg border border-emerald-100/60 p-6 text-sm text-slate-600 shadow-lg shadow-emerald-100/40">
+            {redirectMessage}
+          </div>
+        ) : (
+          <LoginForm />
+        )}
+      </div>
     </div>
   )
 }
