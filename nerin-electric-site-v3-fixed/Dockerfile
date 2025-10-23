@@ -20,4 +20,4 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/prisma ./prisma
-CMD ["node", "server.js"]
+CMD ["sh", "-c", "export DATABASE_URL=\"${DATABASE_URL:-file:/var/data/nerin.db}\" && node server.js"]
