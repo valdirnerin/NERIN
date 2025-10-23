@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { getStorageDir } from '@/lib/content'
 import { requireAdmin } from '@/lib/auth'
 import fs from 'fs'
@@ -34,5 +35,20 @@ export async function POST(req: Request) {
   await requireAdmin()
   const body = await req.json()
   fs.writeFileSync(filePath(), JSON.stringify(body, null, 2))
-  return NextResponse.json({ ok: true })
+  const pathsToRevalidate = ['/', '/packs', '/presupuestador']
+
+  const revalidationResults = pathsToRevalidate.map((pathname) => {
+    try {
+      revalidatePath(pathname)
+      return { path: pathname, revalidated: true }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error'
+      console.error(`Failed to revalidate ${pathname}:`, error)
+      return { path: pathname, revalidated: false, error: message }
+    }
+  })
+
+  const allRevalidated = revalidationResults.every((result) => result.revalidated)
+
+  return NextResponse.json({ ok: true, revalidated: revalidationResults, allRevalidated })
 }
