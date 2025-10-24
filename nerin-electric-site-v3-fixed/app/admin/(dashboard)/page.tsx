@@ -32,6 +32,14 @@ export default async function AdminPage() {
           Administrá packs, adicionales, planes de mantenimiento, casos de éxito y certificados de avance. Todos los
           cambios impactan en el sitio público y en el portal de clientes.
         </p>
+        <div className="flex flex-wrap gap-3 pt-2">
+          <Button variant="outline" asChild>
+            <Link href="/admin/noticias">Gestionar noticias</Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link href="/admin/packs">Gestionar packs comerciales</Link>
+          </Button>
+        </div>
       </header>
 
       <section className="grid gap-6 lg:grid-cols-2">
