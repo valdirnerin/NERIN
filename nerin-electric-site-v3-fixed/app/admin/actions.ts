@@ -6,6 +6,11 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
 import { serializeStringArray } from '@/lib/serialization'
 import { makeUniqueSlug } from '@/lib/slug'
+import type {
+  CaseStudyFormState,
+  MaintenanceFormState,
+  PackFormState,
+} from './constants'
 
 const PackSchema = z.object({
   nombre: z.string().min(3),
@@ -16,15 +21,6 @@ const PackSchema = z.object({
   precioManoObraBase: z.coerce.number().min(0),
   alcanceDetallado: z.string().min(5),
 })
-
-export type PackFormState = {
-  success: boolean
-  error?: string
-}
-
-export const initialPackFormState: PackFormState = {
-  success: false,
-}
 
 export async function createPack(
   _prevState: PackFormState,
@@ -119,15 +115,6 @@ const MaintenanceSchema = z.object({
   incluye: z.string().min(5),
 })
 
-export type MaintenanceFormState = {
-  success: boolean
-  error?: string
-}
-
-export const initialMaintenanceFormState: MaintenanceFormState = {
-  success: false,
-}
-
 export async function createMaintenance(
   _prevState: MaintenanceFormState,
   formData: FormData,
@@ -188,15 +175,6 @@ const CaseStudySchema = z.object({
   contenido: z.string().min(20),
 })
 
-export type CaseStudyFormState = {
-  success: boolean
-  error?: string
-}
-
-export const initialCaseStudyState: CaseStudyFormState = {
-  success: false,
-}
-
 export async function upsertCaseStudy(
   _prevState: CaseStudyFormState,
   formData: FormData,
@@ -239,6 +217,8 @@ export async function upsertCaseStudy(
 
     revalidatePath('/admin')
     revalidatePath('/obras')
+    revalidatePath('/blog')
+    revalidatePath('/blog/[slug]')
 
     return { success: true }
   } catch (error) {

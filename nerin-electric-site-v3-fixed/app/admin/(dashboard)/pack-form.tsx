@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { createPack, initialPackFormState } from '../actions'
+import { createPack } from '../actions'
+import { initialPackFormState } from '../constants'
 
 export function PackForm() {
   const [state, formAction] = useFormState(createPack, initialPackFormState)
