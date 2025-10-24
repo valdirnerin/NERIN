@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { createMaintenance, initialMaintenanceFormState } from '../actions'
+import { createMaintenance } from '../actions'
+import { initialMaintenanceFormState } from '../constants'
 
 export function MaintenanceForm() {
   const [state, formAction] = useFormState(createMaintenance, initialMaintenanceFormState)
