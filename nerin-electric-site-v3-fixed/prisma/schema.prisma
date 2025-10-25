@@ -104,20 +104,19 @@ model Project {
 }
 
 model Pack {
-  id                     String   @id @default(cuid())
-  slug                   String   @unique
-  nombre                 String
-  descripcion            String
-  soloManoObra           Boolean  @default(true)
-  alcanceDetallado       String   @default("[]")
-  bocasIncluidas         Int
-  ambientesReferencia    Int
-  precioManoObraBase     Decimal
-  destacado              Boolean  @default(false)
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
-  additionalItems        AdditionalItem[]
-  configuratorQuotes     ConfiguratorQuote[]
+  id           String   @id @default(cuid())
+  name         String
+  slug         String   @unique
+  description  String   @default("")
+  scope        String   @default("")
+  basePrice    Int      @default(0)
+  advancePrice Int      @default(0)
+  features     String   @default("[]")
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  additionalItems    AdditionalItem[]
+  configuratorQuotes ConfiguratorQuote[]
 }
 
 model AdditionalItem {

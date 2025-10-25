@@ -172,15 +172,21 @@ export default async function HomePage() {
           {packs.map((pack) => (
             <Card key={pack.id}>
               <CardHeader>
-                <CardTitle>{pack.nombre}</CardTitle>
+                <CardTitle>{pack.name}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-sm text-slate-500">{pack.descripcion}</p>
+                <p className="text-sm text-slate-500">{pack.description}</p>
+                <p className="text-sm text-slate-600">{pack.scope}</p>
                 <p className="text-sm font-semibold text-foreground">
-                  Mano de obra base ${Number(pack.precioManoObraBase).toLocaleString('es-AR')}
+                  Mano de obra base ${Number(pack.basePrice).toLocaleString('es-AR')}
                 </p>
+                {pack.advancePrice > 0 && (
+                  <p className="text-sm text-slate-600">
+                    Anticipo sugerido ${Number(pack.advancePrice).toLocaleString('es-AR')}
+                  </p>
+                )}
                 <ul className="space-y-2 text-sm text-slate-600">
-                  {pack.alcanceDetallado.slice(0, 5).map((item) => (
+                  {pack.features.slice(0, 5).map((item) => (
                     <li key={item}>• {item}</li>
                   ))}
                 </ul>

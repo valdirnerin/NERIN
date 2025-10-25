@@ -26,7 +26,7 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId }: Props)
     packId: defaultPackId && packs.some((pack) => pack.id === defaultPackId)
       ? defaultPackId
       : packs[0]?.id ?? '',
-    ambientes: packs[0]?.ambientesReferencia ?? 3,
+    ambientes: 4,
     bocasExtra: 0,
     adicionales: [],
     comentarios: '',
@@ -102,15 +102,17 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId }: Props)
               aria-pressed={pack.id === selectedPack.id}
             >
               <CardHeader>
-                <CardTitle>{pack.nombre}</CardTitle>
-                <p className="text-sm text-slate-500">{pack.descripcion}</p>
+                <CardTitle>{pack.name}</CardTitle>
+                <p className="text-sm text-slate-500">{pack.description}</p>
               </CardHeader>
               <CardContent className="space-y-3 text-sm text-slate-600">
-                <p>Bocas incluidas: {pack.bocasIncluidas}</p>
-                <p>Ambientes de referencia: {pack.ambientesReferencia}</p>
-                <p>Mano de obra base ${Number(pack.precioManoObraBase).toLocaleString('es-AR')}</p>
+                <p>{pack.scope || 'Definí el alcance en el panel de admin.'}</p>
+                <p>Mano de obra base ${Number(pack.basePrice).toLocaleString('es-AR')}</p>
+                {pack.advancePrice > 0 && (
+                  <p>Anticipo sugerido ${Number(pack.advancePrice).toLocaleString('es-AR')}</p>
+                )}
                 <ul className="space-y-1">
-                  {pack.alcanceDetallado.slice(0, 4).map((item) => (
+                  {pack.features.slice(0, 4).map((item) => (
                     <li key={item}>• {item}</li>
                   ))}
                 </ul>
@@ -141,7 +143,7 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId }: Props)
                 />
               </div>
               <div>
-                <Label htmlFor="bocasExtra">Bocas adicionales (sobre pack)</Label>
+                <Label htmlFor="bocasExtra">Bocas adicionales estimadas</Label>
                 <Input
                   id="bocasExtra"
                   type="number"
@@ -152,11 +154,6 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId }: Props)
                     setSummary((prev) => ({ ...prev, bocasExtra: Number(event.target.value) || 0 }))
                   }
                 />
-                {summary.bocasExtra > selectedPack.bocasIncluidas * 0.5 && (
-                  <p className="mt-2 text-sm text-accent">
-                    Estás agregando muchas bocas extra. Recomendamos evaluar un pack superior para optimizar costos.
-                  </p>
-                )}
               </div>
               <div>
                 <Label htmlFor="comentarios">Comentarios o ambientes especiales</Label>
@@ -176,9 +173,9 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId }: Props)
               <CardTitle>Resumen parcial</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-slate-600">
-              <p>Pack seleccionado: {selectedPack.nombre}</p>
-              <p>Bocas incluidas: {selectedPack.bocasIncluidas}</p>
-              <p>Bocas adicionales: {summary.bocasExtra}</p>
+              <p>Pack seleccionado: {selectedPack.name}</p>
+              <p>Alcance recomendado: {selectedPack.scope}</p>
+              <p>Bocas adicionales estimadas: {summary.bocasExtra}</p>
               <p>Ambientes estimados: {summary.ambientes}</p>
             </CardContent>
           </Card>
@@ -218,7 +215,13 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId }: Props)
               <CardTitle>Resumen de cotización</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-slate-600">
-              <p>Pack base: {selectedPack.nombre}</p>
+              <p>Pack base: {selectedPack.name}</p>
+              <p>Alcance: {selectedPack.scope}</p>
+              {selectedPack.advancePrice > 0 && (
+                <p>
+                  Anticipo sugerido: ${Number(selectedPack.advancePrice).toLocaleString('es-AR')}
+                </p>
+              )}
               <p>Mano de obra base: ${totals.subtotalPack.toLocaleString('es-AR')}</p>
               <ul className="space-y-2">
                 {totals.adicionales.map((item) => (
@@ -236,11 +239,6 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId }: Props)
                 Los materiales no están incluidos. Podés elegir marcas como Schneider, Prysmian, Gimsa, Daisa o Genrock y las
                 compramos con tu aprobación.
               </p>
-              {totals.recomendado && (
-                <p className="text-sm text-accent">
-                  Sugerencia: considerar {totals.recomendado.nombre} para optimizar tiempos y costos.
-                </p>
-              )}
               {pdfUrl ? (
                 <Button asChild>
                   <a href={pdfUrl} target="_blank" rel="noopener noreferrer">

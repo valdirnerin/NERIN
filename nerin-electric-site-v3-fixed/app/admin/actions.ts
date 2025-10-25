@@ -9,75 +9,7 @@ import { makeUniqueSlug } from '@/lib/slug'
 import type {
   CaseStudyFormState,
   MaintenanceFormState,
-  PackFormState,
 } from './constants'
-
-const PackSchema = z.object({
-  nombre: z.string().min(3),
-  slug: z.string().min(3),
-  descripcion: z.string().min(10),
-  bocasIncluidas: z.coerce.number().min(10),
-  ambientesReferencia: z.coerce.number().min(1),
-  precioManoObraBase: z.coerce.number().min(0),
-  alcanceDetallado: z.string().min(5),
-})
-
-export async function createPack(
-  _prevState: PackFormState,
-  formData: FormData,
-): Promise<PackFormState> {
-  const payload = PackSchema.parse({
-    nombre: formData.get('nombre'),
-    slug: formData.get('slug'),
-    descripcion: formData.get('descripcion'),
-    bocasIncluidas: formData.get('bocasIncluidas'),
-    ambientesReferencia: formData.get('ambientesReferencia'),
-    precioManoObraBase: formData.get('precioManoObraBase'),
-    alcanceDetallado: formData.get('alcanceDetallado'),
-  })
-
-  const alcanceDetallado = serializeStringArray(
-    payload.alcanceDetallado
-      .split('\n')
-      .map((item) => item.trim())
-      .filter(Boolean),
-  )
-
-  const packData = {
-    nombre: payload.nombre,
-    slug: payload.slug,
-    descripcion: payload.descripcion,
-    bocasIncluidas: payload.bocasIncluidas,
-    ambientesReferencia: payload.ambientesReferencia,
-    precioManoObraBase: new Prisma.Decimal(payload.precioManoObraBase),
-    alcanceDetallado,
-  }
-
-  try {
-    await prisma.pack.upsert({
-      where: { slug: payload.slug },
-      create: packData,
-      update: packData,
-    })
-
-    revalidatePath('/admin')
-    revalidatePath('/packs')
-
-    return { success: true }
-  } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === 'P2002'
-    ) {
-      return {
-        success: false,
-        error: 'Ese slug ya existe',
-      }
-    }
-
-    throw error
-  }
-}
 
 const AdditionalSchema = z.object({
   nombre: z.string().min(3),
