@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
+import dynamicImport from 'next/dynamic'
 import { prisma } from '@/lib/db'
 import { createAdditional, createCertificate } from '../actions'
 import { Badge } from '@/components/ui/badge'
@@ -10,8 +11,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { CaseStudyForm } from './case-study-form'
-import { PackForm } from './pack-form'
 import { MaintenanceForm } from './maintenance-form'
+
+const AdminPacks = dynamicImport(() => import('./AdminPacks'), { ssr: false })
 
 export const revalidate = 0
 
@@ -43,15 +45,6 @@ export default async function AdminPage() {
       </header>
 
       <section className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Nuevo pack eléctrico</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <PackForm />
-          </CardContent>
-        </Card>
-
         <Card>
           <CardHeader>
             <CardTitle>Nuevo adicional</CardTitle>
@@ -98,6 +91,10 @@ export default async function AdminPage() {
             <CaseStudyForm />
           </CardContent>
         </Card>
+      </section>
+
+      <section className="mt-10">
+        <AdminPacks />
       </section>
 
       <section className="space-y-6">

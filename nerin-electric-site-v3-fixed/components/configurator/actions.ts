@@ -34,7 +34,7 @@ export async function createConfiguratorQuote(data: z.infer<typeof QuoteSchema>)
     return acc + Number(adicional.precioUnitarioManoObra) * item.cantidad
   }, 0)
 
-  const totalManoObra = Number(pack.precioManoObraBase) + totalAdicionales
+  const totalManoObra = Number(pack.basePrice) + totalAdicionales
 
   const quote = await prisma.configuratorQuote.create({
     data: {
@@ -45,10 +45,10 @@ export async function createConfiguratorQuote(data: z.infer<typeof QuoteSchema>)
       configuratorQuoteItems: {
         create: [
           {
-            descripcion: `Pack base ${pack.nombre}`,
+            descripcion: `Pack base ${pack.name}`,
             cantidad: 1,
-            precioUnitario: pack.precioManoObraBase,
-            subtotal: pack.precioManoObraBase,
+            precioUnitario: pack.basePrice,
+            subtotal: pack.basePrice,
           },
           ...payload.adicionales.map((item) => {
             const adicional = adicionales.find((a) => a.id === item.id)

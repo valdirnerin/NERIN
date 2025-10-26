@@ -5,12 +5,12 @@ import type { WizardAdditional, WizardPack, WizardSummary } from '@/components/c
 const pack: WizardPack = {
   id: 'pack-1',
   slug: 'pack-1',
-  nombre: 'Vivienda Estándar',
-  descripcion: 'Pack base',
-  bocasIncluidas: 60,
-  ambientesReferencia: 6,
-  precioManoObraBase: 2500000,
-  alcanceDetallado: ['Item'],
+  name: 'Vivienda Estándar',
+  description: 'Pack base',
+  scope: 'Hasta 120 m²',
+  features: ['Item'],
+  basePrice: 2_500_000,
+  advancePrice: 900_000,
 }
 
 const adicionales: WizardAdditional[] = [

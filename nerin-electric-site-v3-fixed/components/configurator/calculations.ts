@@ -22,7 +22,7 @@ export function calculateTotals({
   adicionales: WizardAdditional[]
   summary: WizardSummary
 }): QuoteTotals {
-  const subtotalPack = Number(pack.precioManoObraBase)
+  const subtotalPack = Number(pack.basePrice)
   const adicionalesCalculados = summary.adicionales
     .map((item) => {
       const adicional = adicionales.find((a) => a.id === item.id)
@@ -42,18 +42,9 @@ export function calculateTotals({
   const totalAdicionales = adicionalesCalculados.reduce((acc, item) => acc + item.subtotal, 0)
   const totalManoObra = subtotalPack + totalAdicionales
 
-  let recomendado: WizardPack | undefined
-  if (summary.bocasExtra > pack.bocasIncluidas * 0.5) {
-    recomendado = {
-      ...pack,
-      nombre: `${pack.nombre} (considerar pack superior)` ,
-    }
-  }
-
   return {
     subtotalPack,
     adicionales: adicionalesCalculados,
     totalManoObra,
-    recomendado,
   }
 }

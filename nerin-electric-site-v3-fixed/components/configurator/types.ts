@@ -1,12 +1,12 @@
 export interface WizardPack {
   id: string
   slug: string
-  nombre: string
-  descripcion: string
-  alcanceDetallado: string[]
-  bocasIncluidas: number
-  ambientesReferencia: number
-  precioManoObraBase: number
+  name: string
+  description: string
+  scope: string
+  features: string[]
+  basePrice: number
+  advancePrice: number
 }
 
 export interface WizardAdditional {

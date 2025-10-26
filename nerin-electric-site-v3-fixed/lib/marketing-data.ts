@@ -14,14 +14,13 @@ export interface AdditionalItemForUI {
 export interface PackForUI {
   id: string
   slug: string
-  nombre: string
-  descripcion: string
-  alcanceDetallado: string[]
-  bocasIncluidas: number
-  ambientesReferencia: number
-  precioManoObraBase: number
-  soloManoObra?: boolean
-  additionalItems: AdditionalItemForUI[]
+  name: string
+  description: string
+  scope: string
+  basePrice: number
+  advancePrice: number
+  features: string[]
+  active: boolean
 }
 
 export interface MaintenancePlanForUI {
@@ -141,60 +140,103 @@ const fallbackAdditionalItems: AdditionalItemForUI[] = [
   },
 ]
 
+function parseFeatures(value: unknown): string[] {
+  if (typeof value === 'string') {
+    try {
+      const parsed = JSON.parse(value)
+      if (Array.isArray(parsed)) {
+        return parsed.map((item) => String(item)).filter(Boolean)
+      }
+    } catch {
+      // ignore JSON parse errors and fall back to newline splitting
+    }
+    return value
+      .split('\n')
+      .map((item) => item.trim())
+      .filter(Boolean)
+  }
+  if (Array.isArray(value)) {
+    return value.map((item) => String(item)).filter(Boolean)
+  }
+  return []
+}
+
+function normalizePack(pack: {
+  id: string
+  slug: string
+  name: string
+  description: string
+  scope: string
+  basePrice: number
+  advancePrice: number
+  features: string
+  active: boolean
+}): PackForUI {
+  return {
+    id: pack.id,
+    slug: pack.slug,
+    name: pack.name,
+    description: pack.description,
+    scope: pack.scope,
+    basePrice: Number(pack.basePrice),
+    advancePrice: Number(pack.advancePrice),
+    features: parseFeatures(pack.features),
+    active: pack.active,
+  }
+}
+
 const fallbackPacks: PackForUI[] = [
   {
     id: 'fallback-pack-1',
     slug: 'vivienda-estandar',
-    nombre: 'Vivienda Estándar',
-    descripcion: 'Pack para departamentos o PH hasta 120 m². Incluye tablero principal, cableado y puesta a tierra básica.',
-    alcanceDetallado: [
+    name: 'Vivienda Estándar',
+    description:
+      'Pack para departamentos o PH hasta 120 m². Incluye tablero principal, cableado y puesta a tierra básica.',
+    scope: 'Hasta 120 m² / 6 ambientes / 60 bocas estimadas',
+    basePrice: 2_500_000,
+    advancePrice: 900_000,
+    features: [
       'Canalización EMT y bandejas vistas donde aplique',
       'Tablero principal con protecciones curvas C',
       'Circuitos independientes para AA, cocina y tomas generales',
       'Puesta a tierra con jabalina de 2.4 m',
       'Certificado de mediciones',
     ],
-    bocasIncluidas: 60,
-    ambientesReferencia: 6,
-    precioManoObraBase: 2_500_000,
-    soloManoObra: true,
-    additionalItems: fallbackAdditionalItems.slice(0, 4),
+    active: true,
   },
   {
     id: 'fallback-pack-2',
     slug: 'casa-country-1',
-    nombre: 'Casa Country 1',
-    descripcion: 'Pack para viviendas premium hasta 250 m² con doble tablero y previsión de domótica.',
-    alcanceDetallado: [
+    name: 'Casa Country 1',
+    description: 'Pack para viviendas premium hasta 250 m² con doble tablero y previsión de domótica.',
+    scope: 'Hasta 250 m² / 10 ambientes / 120 bocas estimadas',
+    basePrice: 5_200_000,
+    advancePrice: 1_800_000,
+    features: [
       'Doble tablero con seccional por planta',
       'Circuito exclusivo para piscina y bomba',
       'Preinstalación domótica y cableado de datos categoría 6A',
       'Puesta a tierra mejorada con anillo perimetral',
       'Documentación completa y ensayos finales',
     ],
-    bocasIncluidas: 120,
-    ambientesReferencia: 10,
-    precioManoObraBase: 5_200_000,
-    soloManoObra: true,
-    additionalItems: fallbackAdditionalItems.slice(2, 7),
+    active: true,
   },
   {
     id: 'fallback-pack-3',
     slug: 'casa-country-2',
-    nombre: 'Casa Country 2',
-    descripcion: 'Pack para residencias superiores a 250 m² con tableros múltiples y backup.',
-    alcanceDetallado: [
+    name: 'Casa Country 2',
+    description: 'Pack para residencias superiores a 250 m² con tableros múltiples y backup.',
+    scope: 'Más de 250 m² / 14 ambientes / 180 bocas estimadas',
+    basePrice: 7_800_000,
+    advancePrice: 2_500_000,
+    features: [
       'Tableros seccionales por planta y exteriores',
       'Integración con grupo electrógeno y UPS',
       'Circuito para sala de máquinas y presurizadora',
       'Canalizaciones ocultas con bandejas portacables',
       'Planos, memorias y certificación final',
     ],
-    bocasIncluidas: 180,
-    ambientesReferencia: 14,
-    precioManoObraBase: 7_800_000,
-    soloManoObra: true,
-    additionalItems: fallbackAdditionalItems.slice(4),
+    active: true,
   },
 ]
 
@@ -310,35 +352,16 @@ function parseMetricas(metricas: unknown): Array<{ label: string; value: string 
 export async function getPacksForMarketing(): Promise<PackForUI[]> {
   try {
     const packs = await prisma.pack.findMany({
-      include: { additionalItems: true },
-      orderBy: { precioManoObraBase: 'asc' },
+      where: { active: true },
+      orderBy: { basePrice: 'asc' },
     })
 
     if (!packs.length) {
       return fallbackPacks
     }
 
-    return packs.map((pack) => ({
-      id: pack.id,
-      slug: pack.slug,
-      nombre: pack.nombre,
-      descripcion: pack.descripcion,
-      alcanceDetallado: parseStringArray(pack.alcanceDetallado),
-      bocasIncluidas: pack.bocasIncluidas,
-      ambientesReferencia: pack.ambientesReferencia,
-      precioManoObraBase: Number(pack.precioManoObraBase),
-      soloManoObra: pack.soloManoObra,
-      additionalItems:
-        pack.additionalItems?.map((item) => ({
-          id: item.id,
-          nombre: item.nombre,
-          descripcion: item.descripcion,
-          unidad: item.unidad,
-          precioUnitarioManoObra: Number(item.precioUnitarioManoObra),
-          reglasCompatibilidad: parseJson<Record<string, unknown>>(item.reglasCompatibilidad),
-          packId: item.packId,
-        })) ?? [],
-    }))
+    const normalized = packs.map(normalizePack).filter((pack) => pack.active)
+    return normalized.length ? normalized : fallbackPacks
   } catch (error) {
     logFallback('packs', error)
     return fallbackPacks
@@ -464,22 +487,12 @@ export async function getConfiguratorData(): Promise<{
 }> {
   try {
     const [packs, adicionales] = await Promise.all([
-      prisma.pack.findMany({ orderBy: { precioManoObraBase: 'asc' } }),
+      prisma.pack.findMany({ orderBy: { basePrice: 'asc' } }),
       prisma.additionalItem.findMany({ orderBy: { nombre: 'asc' } }),
     ])
 
-    const normalizedPacks = packs.map((pack) => ({
-      id: pack.id,
-      slug: pack.slug,
-      nombre: pack.nombre,
-      descripcion: pack.descripcion,
-      alcanceDetallado: parseStringArray(pack.alcanceDetallado),
-      bocasIncluidas: pack.bocasIncluidas,
-      ambientesReferencia: pack.ambientesReferencia,
-      precioManoObraBase: Number(pack.precioManoObraBase),
-      soloManoObra: pack.soloManoObra,
-      additionalItems: [],
-    }))
+    const normalizedPacks = packs.map(normalizePack)
+    const activePacks = normalizedPacks.filter((pack) => pack.active)
 
     const normalizedAdicionales = adicionales.map((item) => ({
       id: item.id,
@@ -492,7 +505,7 @@ export async function getConfiguratorData(): Promise<{
     }))
 
     return {
-      packs: normalizedPacks.length ? normalizedPacks : fallbackPacks,
+      packs: activePacks.length ? activePacks : fallbackPacks,
       adicionales: normalizedAdicionales.length ? normalizedAdicionales : fallbackAdditionalItems,
     }
   } catch (error) {

@@ -11,8 +11,8 @@ export function generateQuotePdf({
   const doc = new PDFDocument({ size: 'A4', margin: 50 })
   doc.fontSize(20).fillColor('#0f172a').text('NERIN · Presupuesto Eléctrico', { align: 'center' })
   doc.moveDown()
-  doc.fontSize(14).fillColor('#1e293b').text(`Pack base: ${pack.nombre}`)
-  doc.fontSize(12).fillColor('#334155').text(pack.descripcion)
+  doc.fontSize(14).fillColor('#1e293b').text(`Pack base: ${pack.name}`)
+  doc.fontSize(12).fillColor('#334155').text(pack.description)
   doc.moveDown()
 
   doc.fontSize(13).fillColor('#0f172a').text('Desglose de mano de obra:')

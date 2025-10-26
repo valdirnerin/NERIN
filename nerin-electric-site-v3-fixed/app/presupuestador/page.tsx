@@ -14,12 +14,12 @@ export default async function PresupuestadorPage({ searchParams }: { searchParam
   const wizardPacks = packs.map((pack) => ({
     id: pack.id,
     slug: pack.slug,
-    nombre: pack.nombre,
-    descripcion: pack.descripcion,
-    alcanceDetallado: pack.alcanceDetallado,
-    bocasIncluidas: pack.bocasIncluidas,
-    ambientesReferencia: pack.ambientesReferencia,
-    precioManoObraBase: pack.precioManoObraBase,
+    name: pack.name,
+    description: pack.description,
+    scope: pack.scope,
+    features: pack.features,
+    basePrice: pack.basePrice,
+    advancePrice: pack.advancePrice,
   }))
   const wizardAdicionales = adicionales.map((item) => ({
     id: item.id,
