@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
-import { blogPosts } from '@/content/blogPosts'
+import { getBlogPost } from '@/lib/blog'
+import { getSiteContent } from '@/lib/site-content'
 
 export const revalidate = 3600
 
@@ -9,14 +10,15 @@ interface Props {
 }
 
 export default function BlogPostPage({ params }: Props) {
-  const post = blogPosts.find((item) => item.slug === params.slug)
+  const site = getSiteContent()
+  const post = getBlogPost(params.slug)
   if (!post) {
     notFound()
   }
 
   return (
     <article className="space-y-6">
-      <Badge>Blog</Badge>
+      <Badge>{site.blog.introTitle}</Badge>
       <h1>{post.title}</h1>
       <p className="text-sm text-slate-500">
         {new Date(post.publishedAt).toLocaleDateString('es-AR', {
