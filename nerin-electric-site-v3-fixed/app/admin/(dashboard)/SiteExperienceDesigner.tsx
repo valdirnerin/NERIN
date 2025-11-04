@@ -15,17 +15,32 @@ interface SiteExperienceDesignerProps {
 
 type MessageState = { type: 'success' | 'error'; message: string } | null
 
-function parsePairs(value: string): Array<{ label: string; description: string }> {
-  return value
+type PairKey = 'label' | 'title'
+
+function parsePairs(value: string): Array<{ label: string; description: string }>
+function parsePairs(value: string, key: 'label'): Array<{ label: string; description: string }>
+function parsePairs(value: string, key: 'title'): Array<{ title: string; description: string }>
+function parsePairs(value: string, key: PairKey = 'label') {
+  const pairs = value
     .split('\n')
     .map((line) => line.trim())
     .filter(Boolean)
     .map((line) => {
-      const [label, ...rest] = line.split('|')
+      const [rawLabel, ...rest] = line.split('|')
       const description = rest.join('|').trim()
-      return { label: label.trim(), description }
+      const entry = rawLabel.trim()
+      if (!entry || !description) {
+        return null
+      }
+      return { entry, description }
     })
-    .filter((item) => item.label && item.description)
+    .filter((item): item is { entry: string; description: string } => item !== null)
+
+  if (key === 'label') {
+    return pairs.map(({ entry, description }) => ({ label: entry, description }))
+  }
+
+  return pairs.map(({ entry, description }) => ({ title: entry, description }))
 }
 
 function parseList(value: string): string[] {
@@ -35,8 +50,22 @@ function parseList(value: string): string[] {
     .filter(Boolean)
 }
 
-function formatPairs(items: Array<{ label: string; description: string }>): string {
-  return items.map((item) => `${item.label} | ${item.description}`).join('\n')
+function formatPairs(items: Array<{ label: string; description: string }>): string
+function formatPairs(items: Array<{ label: string; description: string }>, key: 'label'): string
+function formatPairs(items: Array<{ title: string; description: string }>, key: 'title'): string
+function formatPairs(
+  items: Array<{ label: string; description: string }> | Array<{ title: string; description: string }>,
+  key: PairKey = 'label',
+): string {
+  if (key === 'label') {
+    return (items as Array<{ label: string; description: string }>)
+      .map((item) => `${item.label} | ${item.description}`)
+      .join('\n')
+  }
+
+  return (items as Array<{ title: string; description: string }>)
+    .map((item) => `${item.title} | ${item.description}`)
+    .join('\n')
 }
 
 function formatList(items: string[]): string {
@@ -49,15 +78,15 @@ export function SiteExperienceDesigner({ initialData }: SiteExperienceDesignerPr
   const [message, setMessage] = useState<MessageState>(null)
 
   const heroStatsText = useMemo(() => formatPairs(form.hero.stats), [form.hero.stats])
-  const heroHighlightsText = useMemo(() => formatPairs(form.hero.highlights), [form.hero.highlights])
-  const servicesText = useMemo(() => formatPairs(form.services.items), [form.services.items])
+  const heroHighlightsText = useMemo(() => formatPairs(form.hero.highlights, 'title'), [form.hero.highlights])
+  const servicesText = useMemo(() => formatPairs(form.services.items, 'title'), [form.services.items])
   const faqText = useMemo(
     () => form.faq.items.map((item) => `${item.question} | ${item.answer}`).join('\n'),
     [form.faq.items],
   )
-  const maintenanceCardsText = useMemo(() => formatPairs(form.maintenance.cards), [form.maintenance.cards])
+  const maintenanceCardsText = useMemo(() => formatPairs(form.maintenance.cards, 'title'), [form.maintenance.cards])
   const maintenancePageCardsText = useMemo(
-    () => formatPairs(form.maintenancePage.cards),
+    () => formatPairs(form.maintenancePage.cards, 'title'),
     [form.maintenancePage.cards],
   )
   const responsiveText = useMemo(() => formatList(form.responsive.bulletPoints), [form.responsive.bulletPoints])
@@ -425,7 +454,7 @@ export function SiteExperienceDesigner({ initialData }: SiteExperienceDesignerPr
                 onChange={(event) =>
                   setForm((prev) => ({
                     ...prev,
-                    hero: { ...prev.hero, highlights: parsePairs(event.target.value) },
+                    hero: { ...prev.hero, highlights: parsePairs(event.target.value, 'title') },
                   }))
                 }
               />
@@ -485,7 +514,7 @@ export function SiteExperienceDesigner({ initialData }: SiteExperienceDesignerPr
                 onChange={(event) =>
                   setForm((prev) => ({
                     ...prev,
-                    services: { ...prev.services, items: parsePairs(event.target.value) },
+                    services: { ...prev.services, items: parsePairs(event.target.value, 'title') },
                   }))
                 }
               />
@@ -586,7 +615,7 @@ export function SiteExperienceDesigner({ initialData }: SiteExperienceDesignerPr
                 onChange={(event) =>
                   setForm((prev) => ({
                     ...prev,
-                    maintenance: { ...prev.maintenance, cards: parsePairs(event.target.value) },
+                    maintenance: { ...prev.maintenance, cards: parsePairs(event.target.value, 'title') },
                   }))
                 }
               />
@@ -883,7 +912,7 @@ export function SiteExperienceDesigner({ initialData }: SiteExperienceDesignerPr
                 onChange={(event) =>
                   setForm((prev) => ({
                     ...prev,
-                    maintenancePage: { ...prev.maintenancePage, cards: parsePairs(event.target.value) },
+                    maintenancePage: { ...prev.maintenancePage, cards: parsePairs(event.target.value, 'title') },
                   }))
                 }
               />

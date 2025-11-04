@@ -39,15 +39,15 @@ export default async function HomePage() {
           <p className="max-w-xl text-lg text-slate-600">{site.hero.subtitle}</p>
           <div className="flex flex-wrap gap-4">
             <Button size="pill" asChild>
-              <Link href={site.hero.primaryCta.href}>{site.hero.primaryCta.label}</Link>
+              <a href={site.hero.primaryCta.href}>{site.hero.primaryCta.label}</a>
             </Button>
             <Button size="pill" variant="secondary" asChild>
-              <Link href={site.hero.secondaryCta.href === '[whatsapp]' ? whatsappHref : site.hero.secondaryCta.href}>
+              <a href={site.hero.secondaryCta.href === '[whatsapp]' ? whatsappHref : site.hero.secondaryCta.href}>
                 {site.hero.secondaryCta.label}
-              </Link>
+              </a>
             </Button>
             <Button size="pill" variant="ghost" asChild>
-              <Link href={site.hero.tertiaryCta.href}>{site.hero.tertiaryCta.label}</Link>
+              <a href={site.hero.tertiaryCta.href}>{site.hero.tertiaryCta.label}</a>
             </Button>
           </div>
           <div className="flex flex-wrap items-center gap-6 text-sm text-slate-500">
@@ -94,7 +94,7 @@ export default async function HomePage() {
             <p>{site.packs.description}</p>
           </div>
           <Button variant="secondary" asChild>
-            <Link href={site.packs.ctaHref}>{site.packs.ctaLabel}</Link>
+            <a href={site.packs.ctaHref}>{site.packs.ctaLabel}</a>
           </Button>
         </div>
         <div className="grid gap-6 md:grid-cols-3">
@@ -120,7 +120,7 @@ export default async function HomePage() {
                   ))}
                 </ul>
                 <Button variant="ghost" asChild>
-                  <Link href={`/packs#${pack.slug}`}>Ver alcance completo</Link>
+                  <a href={`/packs#${pack.slug}`}>Ver alcance completo</a>
                 </Button>
               </CardContent>
             </Card>
@@ -178,7 +178,7 @@ export default async function HomePage() {
                   <p className="text-sm text-slate-500">{cs.resumen}</p>
                   <p className="text-sm text-slate-600">{cs.contenido.slice(0, 180)}...</p>
                   <Button variant="ghost" asChild>
-                    <Link href={`/obras/${cs.slug}`}>Ver detalle</Link>
+                    <a href={`/obras/${cs.slug}`}>Ver detalle</a>
                   </Button>
                 </CardContent>
               </Card>
@@ -222,10 +222,10 @@ export default async function HomePage() {
           </div>
           <div className="flex flex-wrap gap-4 md:justify-end">
             <Button size="pill" asChild>
-              <Link href={site.closingCta.primary.href}>{site.closingCta.primary.label}</Link>
+              <a href={site.closingCta.primary.href}>{site.closingCta.primary.label}</a>
             </Button>
             <Button size="pill" variant="secondary" asChild>
-              <Link href={site.closingCta.secondary.href}>{site.closingCta.secondary.label}</Link>
+              <a href={site.closingCta.secondary.href}>{site.closingCta.secondary.label}</a>
             </Button>
           </div>
         </div>

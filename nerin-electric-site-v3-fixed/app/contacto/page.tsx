@@ -1,5 +1,4 @@
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 import { submitContact } from './actions'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -91,9 +90,14 @@ export default function ContactoPage({ searchParams }: { searchParams?: { enviad
           </Button>
           <p className="text-xs text-slate-500">
             También podés usar nuestro{' '}
-            <Link className="underline" href={site.contactPage.typeformUrl}>
+            <a
+              className="underline"
+              href={site.contactPage.typeformUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
               Typeform
-            </Link>{' '}
+            </a>{' '}
             si preferís completar desde el celular.
           </p>
         </form>
@@ -127,7 +131,9 @@ export default function ContactoPage({ searchParams }: { searchParams?: { enviad
             </div>
           )}
           <Button asChild size="sm" variant="secondary" className="mt-4">
-            <Link href={whatsappHref}>Iniciar conversación</Link>
+            <a href={whatsappHref} target="_blank" rel="noreferrer">
+              Iniciar conversación
+            </a>
           </Button>
         </div>
       </aside>
