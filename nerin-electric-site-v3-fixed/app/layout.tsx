@@ -10,38 +10,42 @@ import { cn } from '@/lib/utils'
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const sora = Sora({ subsets: ['latin'], variable: '--font-sora' })
 
-const site = getSiteContent()
-const whatsappHref = getWhatsappHref(site)
+export function generateMetadata(): Metadata {
+  const site = getSiteContent()
 
-export const metadata: Metadata = {
-  metadataBase: new URL('https://nerin-electric.render.com'),
-  title: {
-    default: site.seo.metaTitle,
-    template: `%s · ${site.name}`,
-  },
-  description: site.seo.metaDescription,
-  keywords: site.seo.keywords,
-  alternates: {
-    canonical: '/',
-  },
-  openGraph: {
-    title: site.seo.metaTitle,
+  return {
+    metadataBase: new URL('https://nerin-electric.render.com'),
+    title: {
+      default: site.seo.metaTitle,
+      template: `%s · ${site.name}`,
+    },
     description: site.seo.metaDescription,
-    url: 'https://www.nerin.com.ar',
-    siteName: 'NERIN Electric',
-    locale: 'es_AR',
-    type: 'website',
-    images: [{ url: '/nerin/og-cover.png', width: 1200, height: 630, alt: 'NERIN Electric' }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: site.seo.metaTitle,
-    description: site.seo.metaDescription,
-    images: ['/nerin/og-cover.png'],
-  },
+    keywords: site.seo.keywords,
+    alternates: {
+      canonical: '/',
+    },
+    openGraph: {
+      title: site.seo.metaTitle,
+      description: site.seo.metaDescription,
+      url: 'https://www.nerin.com.ar',
+      siteName: 'NERIN Electric',
+      locale: 'es_AR',
+      type: 'website',
+      images: [{ url: '/nerin/og-cover.png', width: 1200, height: 630, alt: 'NERIN Electric' }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: site.seo.metaTitle,
+      description: site.seo.metaDescription,
+      images: ['/nerin/og-cover.png'],
+    },
+  }
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const site = getSiteContent()
+  const whatsappHref = getWhatsappHref(site)
+
   return (
     <html lang="es-AR" className={cn(inter.variable, sora.variable)}>
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
