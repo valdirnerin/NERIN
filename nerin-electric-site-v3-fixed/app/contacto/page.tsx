@@ -6,10 +6,14 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
+import { getSiteContent, getWhatsappHref } from '@/lib/site-content'
 
 export const revalidate = 60
 
 export default function ContactoPage({ searchParams }: { searchParams?: { enviado?: string } }) {
+  const site = getSiteContent()
+  const whatsappHref = getWhatsappHref(site)
+
   async function action(formData: FormData) {
     'use server'
     await submitContact(formData)
@@ -20,11 +24,8 @@ export default function ContactoPage({ searchParams }: { searchParams?: { enviad
     <div className="grid gap-16 lg:grid-cols-[1.2fr_1fr]">
       <div className="space-y-8">
         <Badge>Contacto</Badge>
-        <h1>Coordinemos tu obra eléctrica</h1>
-        <p className="text-lg text-slate-600">
-          Completá el formulario y un técnico senior se contactará dentro de las próximas 24 horas hábiles para
-          coordinar visita o reunión virtual.
-        </p>
+        <h1>{site.contactPage.introTitle}</h1>
+        <p className="text-lg text-slate-600">{site.contactPage.introDescription}</p>
         {searchParams?.enviado === '1' && (
           <p className="rounded-2xl border border-accent/30 bg-accent/10 p-4 text-sm text-slate-700">
             ¡Listo! Recibimos tu consulta. Te contactamos por mail dentro de las próximas 24 horas hábiles.
@@ -89,27 +90,45 @@ export default function ContactoPage({ searchParams }: { searchParams?: { enviad
             Enviar consulta
           </Button>
           <p className="text-xs text-slate-500">
-            También podés usar nuestro <Link className="underline" href="https://nerin.typeform.com/to/xxxxx">Typeform</Link>
-            {' '}si preferís completar desde el celular.
+            También podés usar nuestro{' '}
+            <Link className="underline" href={site.contactPage.typeformUrl}>
+              Typeform
+            </Link>{' '}
+            si preferís completar desde el celular.
           </p>
         </form>
       </div>
       <aside className="space-y-6 rounded-3xl border border-border bg-white p-8 shadow-subtle">
         <h2>¿Por qué elegir NERIN?</h2>
         <ul className="space-y-3 text-sm text-slate-600">
-          <li>• Equipo propio con ART y seguros vigentes.</li>
-          <li>• Certificados de avance con pago online vía Mercado Pago.</li>
-          <li>• Reportes fotográficos y checklist digital en cada visita.</li>
-          <li>• Trabajo bajo normativa AEA 90364-7-771 (2006).</li>
-          <li>• Separación transparente entre mano de obra y materiales.</li>
+          {site.contactPage.highlightBullets.map((item) => (
+            <li key={item}>• {item}</li>
+          ))}
         </ul>
         <div className="rounded-2xl bg-muted p-6 text-sm text-slate-600">
           <p className="font-semibold text-foreground">WhatsApp directo</p>
-          <p>+54 9 11 0000 0000</p>
+          <p>{site.contact.whatsappNumber}</p>
           <p className="mt-3 font-semibold text-foreground">Correo</p>
-          <p>hola@nerin.com.ar</p>
+          <p>{site.contact.email}</p>
           <p className="mt-3 font-semibold text-foreground">Oficina técnica</p>
-          <p>Villa Ortúzar · CABA</p>
+          <p>{site.contact.address}</p>
+          <p className="mt-3 font-semibold text-foreground">Horarios</p>
+          <p>{site.contact.schedule}</p>
+          <p className="mt-3 font-semibold text-foreground">Área de cobertura</p>
+          <p>{site.contact.serviceArea}</p>
+          {site.contact.secondaryPhones.length > 0 && (
+            <div className="mt-3">
+              <p className="font-semibold text-foreground">Teléfonos alternativos</p>
+              <ul className="mt-1 space-y-1">
+                {site.contact.secondaryPhones.map((phone) => (
+                  <li key={phone}>{phone}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <Button asChild size="sm" variant="secondary" className="mt-4">
+            <Link href={whatsappHref}>Iniciar conversación</Link>
+          </Button>
         </div>
       </aside>
     </div>

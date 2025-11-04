@@ -4,24 +4,24 @@ import { getPacksForMarketing } from '@/lib/marketing-data'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { getSiteContent } from '@/lib/site-content'
 
 export const revalidate = 60
 
 export default async function PacksPage() {
   const packs = await getPacksForMarketing()
+  const site = getSiteContent()
 
   return (
     <div className="space-y-16">
       <header className="space-y-6">
         <Badge>Packs de mano de obra</Badge>
-        <h1>Packs eléctricos para viviendas exigentes</h1>
-        <p className="text-lg text-slate-600">
-          Mano de obra certificada. Materiales no incluidos para que elijas marcas (Schneider, Prysmian, Gimsa,
-          Daisa, Genrock) según tu presupuesto. Proyecto eléctrico se cotiza aparte (base $500.000).
-        </p>
+        <h1>{site.packsPage.introTitle}</h1>
+        <p className="text-lg text-slate-600">{site.packsPage.introDescription}</p>
         <Button asChild size="pill">
           <Link href="/presupuestador">Configurar pack online</Link>
         </Button>
+        <p className="text-sm text-slate-500">{site.packsPage.note}</p>
       </header>
 
       <section className="space-y-8">

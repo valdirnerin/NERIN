@@ -1,10 +1,16 @@
 'use client'
 
 import Link from 'next/link'
-import { siteConfig } from '@/lib/config'
 import { Logo } from './Logo'
 import { Button } from './ui/button'
 import { useSession } from 'next-auth/react'
+
+interface HeaderProps {
+  contact: {
+    whatsappHref: string
+    whatsappLabel: string
+  }
+}
 
 const navigation = [
   { href: '/servicios', label: 'Servicios' },
@@ -19,7 +25,7 @@ const navigation = [
 const adminDashboardRoute = '/admin' as const
 const clientDashboardRoute = '/clientes' as const
 
-export function Header() {
+export function Header({ contact }: HeaderProps) {
   const { data: session } = useSession()
 
   return (
@@ -35,13 +41,8 @@ export function Header() {
         </nav>
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="sm" asChild className="hidden md:inline-flex">
-            <a
-              href={`https://wa.me/${siteConfig.whatsapp.number}?text=${encodeURIComponent(siteConfig.whatsapp.message)}`}
-              aria-label="Hablar por WhatsApp"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              WhatsApp
+            <a href={contact.whatsappHref} aria-label="Hablar por WhatsApp" target="_blank" rel="noopener noreferrer">
+              {contact.whatsappLabel}
             </a>
           </Button>
           <Button size="sm" asChild className="hidden md:inline-flex">

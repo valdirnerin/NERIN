@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { siteConfig } from '@/lib/config'
+import type { SiteExperience } from '@/types/site'
+import { getWhatsappHref } from '@/lib/site-content'
 
 const legalLinks = [
   { href: '/terminos', label: 'Términos y condiciones' },
@@ -13,18 +14,23 @@ const quickLinks = [
   { href: '/faq', label: 'Preguntas frecuentes' },
 ] as const
 
-export function Footer() {
+interface FooterProps {
+  site: SiteExperience
+}
+
+export function Footer({ site }: FooterProps) {
+  const whatsappHref = getWhatsappHref(site)
   return (
     <footer className="border-t border-border bg-white">
       <div className="container grid gap-12 py-14 md:grid-cols-4">
         <div className="space-y-3">
           <p className="text-sm uppercase tracking-[0.35em] text-slate-400">NERIN</p>
           <p className="text-sm text-slate-500">
-            Ingeniería eléctrica integral para obras, empresas y viviendas premium en CABA y GBA.
+            {site.tagline}
           </p>
-          <p className="text-sm text-slate-500">CUIT 30-71583698-5 · Lunes a viernes 08 a 18 h</p>
-          <p className="text-sm text-slate-500">{siteConfig.whatsapp.number}</p>
-          <p className="text-sm text-slate-500">{siteConfig.social.linkedin}</p>
+          <p className="text-sm text-slate-500">{site.contact.schedule}</p>
+          <p className="text-sm text-slate-500">{site.contact.phone}</p>
+          <p className="text-sm text-slate-500">{site.socials.linkedin}</p>
         </div>
         <div>
           <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Servicios</h4>
@@ -42,16 +48,13 @@ export function Footer() {
           <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Contacto</h4>
           <ul className="mt-3 space-y-2 text-sm text-slate-600">
             <li>
-              <a
-                href={`https://wa.me/${siteConfig.whatsapp.number}?text=${encodeURIComponent(siteConfig.whatsapp.message)}`}
-                className="hover:text-foreground"
-              >
+              <a href={whatsappHref} className="hover:text-foreground">
                 WhatsApp directo
               </a>
             </li>
             <li>
-              <a href="mailto:hola@nerin.com.ar" className="hover:text-foreground">
-                hola@nerin.com.ar
+              <a href={`mailto:${site.contact.email}`} className="hover:text-foreground">
+                {site.contact.email}
               </a>
             </li>
             <li>

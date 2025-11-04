@@ -1,22 +1,22 @@
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
-import { blogPosts } from '@/content/blogPosts'
+import { getBlogPosts } from '@/lib/blog'
+import { getSiteContent } from '@/lib/site-content'
 
 export const revalidate = 3600
 
 export default function BlogPage() {
+  const site = getSiteContent()
+  const posts = getBlogPosts()
   return (
     <div className="space-y-8">
       <header className="space-y-4">
-        <Badge>Blog</Badge>
-        <h1>Insights eléctricos y buenas prácticas</h1>
-        <p className="text-lg text-slate-600">
-          Consejos prácticos para administradores, desarrolladores y equipos de facilities que buscan instalaciones
-          confiables y auditables.
-        </p>
+        <Badge>{site.blog.introTitle}</Badge>
+        <h1>{site.blog.title}</h1>
+        <p className="text-lg text-slate-600">{site.blog.description}</p>
       </header>
       <div className="grid gap-6 md:grid-cols-2">
-        {blogPosts.map((post) => (
+        {posts.map((post) => (
           <article key={post.slug} className="rounded-3xl border border-border bg-white p-6 shadow-subtle">
             <p className="text-xs uppercase tracking-wide text-slate-400">
               {new Date(post.publishedAt).toLocaleDateString('es-AR', {

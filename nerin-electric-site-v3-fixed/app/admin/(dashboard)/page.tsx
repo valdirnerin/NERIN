@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 import Link from 'next/link'
 import dynamicImport from 'next/dynamic'
 import { prisma } from '@/lib/db'
+import { getSiteContent } from '@/lib/site-content'
 import { createAdditional, createCertificate } from '../actions'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -12,27 +13,32 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { CaseStudyForm } from './case-study-form'
 import { MaintenanceForm } from './maintenance-form'
+import { SiteExperienceDesigner } from './SiteExperienceDesigner'
+import { BrandManager } from './BrandManager'
+import { BlogManager } from './BlogManager'
 
 const AdminPacks = dynamicImport(() => import('./AdminPacks'), { ssr: false })
 
 export const revalidate = 0
 
 export default async function AdminPage() {
-  const [packs, adicionales, plans, projects] = await Promise.all([
+  const site = getSiteContent()
+  const [packs, adicionales, plans, projects, brands] = await Promise.all([
     prisma.pack.findMany({ orderBy: { createdAt: 'desc' } }),
     prisma.additionalItem.findMany({ orderBy: { createdAt: 'desc' } }),
     prisma.maintenancePlan.findMany({ orderBy: { createdAt: 'desc' } }),
     prisma.project.findMany({ orderBy: { createdAt: 'desc' } }),
+    prisma.brand.findMany({ orderBy: { nombre: 'asc' } }),
   ])
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
       <header className="space-y-2">
         <Badge>Panel administrativo</Badge>
-        <h1>Gestión de contenidos y operaciones</h1>
+        <h1>Control total de contenido y operaciones</h1>
         <p className="text-sm text-slate-600">
-          Administrá packs, adicionales, planes de mantenimiento, casos de éxito y certificados de avance. Todos los
-          cambios impactan en el sitio público y en el portal de clientes.
+          Diseñá la experiencia del sitio, gestioná marcas, blog, packs, planes de mantenimiento y certificados desde un solo
+          lugar. Cada cambio impacta en el sitio público, clientes y SEO.
         </p>
         <div className="flex flex-wrap gap-3 pt-2">
           <Button variant="outline" asChild>
@@ -43,6 +49,13 @@ export default async function AdminPage() {
           </Button>
         </div>
       </header>
+
+      <SiteExperienceDesigner initialData={site} />
+
+      <section className="grid gap-6 lg:grid-cols-2">
+        <BrandManager initialBrands={brands} />
+        <BlogManager />
+      </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
         <Card>
