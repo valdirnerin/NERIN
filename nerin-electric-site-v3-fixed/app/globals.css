@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 :root {
+  color-scheme: light;
   --color-background: #f8f9fb;
   --color-foreground: #0f172a;
   --color-primary: #111827;
@@ -14,22 +15,6 @@
   --color-border: #e2e8f0;
   --color-accent: #0ea5e9;
   --color-accent-foreground: #f8fafc;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-background: #0b1120;
-    --color-foreground: #f8fafc;
-    --color-primary: #1f2937;
-    --color-primary-foreground: #f8fafc;
-    --color-secondary: #1e293b;
-    --color-secondary-foreground: #e2e8f0;
-    --color-muted: #1f2937;
-    --color-muted-foreground: #94a3b8;
-    --color-border: #1e293b;
-    --color-accent: #38bdf8;
-    --color-accent-foreground: #0f172a;
-  }
 }
 
 body {
