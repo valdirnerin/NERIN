@@ -12,6 +12,9 @@ function baseUrl() {
 export async function GET() {
   const urls: UrlItem[] = [
     { loc: '/', priority: 1.0 },
+    { loc: '/presupuesto', priority: 0.95 },
+    { loc: '/consorcios', priority: 0.85 },
+    { loc: '/comercios-oficinas', priority: 0.85 },
     { loc: '/empresa', priority: 0.8 },
     { loc: '/packs', priority: 0.8 },
     { loc: '/mantenimiento', priority: 0.8 },

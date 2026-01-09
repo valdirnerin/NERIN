@@ -9,7 +9,7 @@ const legalLinks = [
 
 const quickLinks = [
   { href: '/packs', label: 'Packs eléctricos' },
-  { href: '/presupuestador', label: 'Configurar pack' },
+  { href: '/presupuesto', label: 'Pedir presupuesto' },
   { href: '/mantenimiento', label: 'Planes de mantenimiento' },
   { href: '/faq', label: 'Preguntas frecuentes' },
 ] as const
@@ -58,8 +58,8 @@ export function Footer({ site }: FooterProps) {
               </a>
             </li>
             <li>
-              <Link href="/contacto" className="hover:text-foreground">
-                Pedir visita técnica
+              <Link href="/presupuesto?tipo=visita" className="hover:text-foreground">
+                Agendar visita técnica
               </Link>
             </li>
           </ul>

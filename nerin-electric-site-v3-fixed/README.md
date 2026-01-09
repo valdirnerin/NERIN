@@ -5,7 +5,7 @@ Proyecto completo basado en **Next.js 14 (App Router)** + **TypeScript** para co
 ## Características principales
 
 - **Front público** minimalista (tipo Notion/Apple) con Tailwind y componentes accesibles.
-- **Secciones**: Home, Packs eléctricos, Presupuestador, Planes de mantenimiento, Servicios, Obras, Empresa, Blog, FAQ, Contacto, Legales.
+- **Secciones**: Home, Presupuesto, Consorcios, Comercios/Oficinas, Packs eléctricos, Presupuestador, Planes de mantenimiento, Servicios, Obras, Empresa, Blog, FAQ, Contacto, Legales.
 - **Presupuestador** en 4 pasos con validaciones, cálculo de mano de obra y generación de PDF (server side con PDFKit).
 - **Portal de clientes** con aprobación manual, proyectos, certificados de avance pagables vía Mercado Pago y facturas.
 - **Panel admin** para CRUD de packs, adicionales, planes, casos de éxito y emisión de certificados.
@@ -41,7 +41,7 @@ npm run db:seed
 
 | Comando | Descripción |
 | --- | --- |
-| `npm run dev` | Dev server en `http://localhost:3000` |
+| `npm run dev` | Dev server en `http://127.0.0.1:3000` |
 | `npm run build` | Build de producción (incluye `prisma generate`) |
 | `npm run start` | Inicia servidor productivo (`next start`) |
 | `npm run lint` | ESLint con reglas de Next |
@@ -74,7 +74,7 @@ npm run db:seed
 
 ### Mercado Pago
 
-- Checkout para mantenimiento: `/api/mantenimiento/checkout?plan=slug` crea preferencia y redirige.
+- Checkout para mantenimiento: `/api/mantenimiento/checkout?plan=slug` redirige a `/presupuesto` (captura de lead).
 - Webhook `/api/mercadopago/webhook` valida firma simple (`MERCADOPAGO_WEBHOOK_SECRET`) y marca certificados/planes como pagados.
 - Certificados se crean desde `/admin` y deben actualizarse con `mpInitPointUrl` (se guarda automáticamente en el flow de checkout de mantenimiento; para certificados de obra manuales se debe completar vía panel).
 
@@ -85,6 +85,11 @@ npm run db:seed
 ### Emails
 
 `lib/resend.ts` encapsula envío. En modo mock (sin API key) loguea en consola para no fallar.
+
+### Leads
+
+- Endpoint principal: `POST /api/leads` (guarda lead y envía notificación si `RESEND_API_KEY` + `SALES_TO_EMAIL` están configurados).
+- Panel mínimo: `/admin/leads` protegido por Basic Auth (`ADMIN_PASSWORD`).
 
 ## Portal de clientes
 
@@ -108,7 +113,10 @@ Disponible en `/admin` (rol admin). Permite:
    - `DATABASE_URL` (ej. `file:/var/data/nerin.db` si usás Disk, o la URL de PostgreSQL si optás por ese motor)
    - `AUTH_SECRET` (o `NEXTAUTH_SECRET`)
    - `RESEND_API_KEY`
-   - `EMAIL_SERVER_FROM`
+   - `FROM_EMAIL`
+   - `SALES_TO_EMAIL`
+   - `ADMIN_PASSWORD`
+   - `EMAIL_SERVER_FROM` (compatibilidad con auth emails)
    - `MERCADOPAGO_ACCESS_TOKEN`, `MERCADOPAGO_PUBLIC_KEY`, `MERCADOPAGO_WEBHOOK_SECRET`
    - `STORAGE_DIR` (si usás Disk, ej. `/var/data/uploads`)
    > Generá `AUTH_SECRET` con `openssl rand -base64 32` y cargalo en el panel de variables del despliegue.

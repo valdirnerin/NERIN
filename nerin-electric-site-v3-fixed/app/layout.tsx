@@ -53,7 +53,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Header
             contact={{
               whatsappHref,
-              whatsappLabel: site.hero.secondaryCta.label,
+              whatsappLabel: site.contact.whatsappCtaLabel,
             }}
           />
           <main className="container pb-24 pt-16">{children}</main>
@@ -65,7 +65,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             rel="noreferrer"
             aria-label="Hablar con NERIN por WhatsApp"
           >
-            {site.hero.secondaryCta.label}
+            {site.contact.whatsappCtaLabel}
           </a>
         </Providers>
       </body>
