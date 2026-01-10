@@ -21,7 +21,7 @@ export async function sendTransactionalEmail({
   }
 
   await resendClient.emails.send({
-    from: process.env.EMAIL_SERVER_FROM || 'NERIN <hola@nerin.com.ar>',
+    from: process.env.FROM_EMAIL || process.env.EMAIL_SERVER_FROM || 'NERIN <hola@nerin.com.ar>',
     to,
     subject,
     html,

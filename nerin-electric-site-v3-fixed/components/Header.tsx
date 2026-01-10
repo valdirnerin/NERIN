@@ -46,7 +46,7 @@ export function Header({ contact }: HeaderProps) {
             </a>
           </Button>
           <Button size="sm" asChild className="hidden md:inline-flex">
-            <Link href="/contacto">Pedir presupuesto</Link>
+            <Link href="/presupuesto">Pedir presupuesto</Link>
           </Button>
           {session?.user ? (
             <Button variant="secondary" size="sm" asChild>

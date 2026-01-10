@@ -29,36 +29,36 @@ export const SITE_DEFAULTS: SiteExperience = {
     serviceArea: 'Ciudad Autónoma de Buenos Aires y GBA',
     whatsappNumber: '5491100000000',
     whatsappMessage: 'Hola, soy [Nombre]. Quiero cotizar un servicio eléctrico con NERIN.',
+    whatsappCtaLabel: 'Hablar ahora',
   },
   hero: {
-    badge: 'Contratista eléctrico integral en CABA',
-    title: 'Obras eléctricas premium con trazabilidad total, sin sorpresas y listas para auditorías exigentes.',
-    subtitle:
-      'NERIN acompaña a empresas, consorcios, gimnasios y viviendas de alto nivel desde el anteproyecto hasta la entrega de certificados finales. Mano de obra propia, técnicos habilitados y reportes en tiempo real.',
+    badge: 'Contratista eléctrico para obras y mantenimiento',
+    title: 'Contratista eléctrico para obras, comercios y consorcios en CABA',
+    subtitle: 'Presupuesto en 24–48 h. Cumplimiento normativo. Experiencia real en obra.',
     backgroundImage:
       'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=900&q=80',
     caption: 'Tablero general edificio 4.000 m² · Ensayos y certificaciones completas.',
-    primaryCta: { label: 'Pedir presupuesto', href: '/contacto' },
-    secondaryCta: { label: 'Hablar por WhatsApp', href: '[whatsapp]' },
-    tertiaryCta: { label: 'Ver packs eléctricos', href: '/packs' },
+    primaryCta: { label: 'Pedir presupuesto (2 minutos)', href: '/presupuesto' },
+    secondaryCta: { label: 'Agendar visita técnica', href: '/presupuesto?tipo=visita' },
+    tertiaryCta: { label: 'Hablar ahora', href: '[whatsapp]' },
     highlights: [
       {
-        title: '+120 obras entregadas',
-        description: 'Smart Fit, KFC, supermercados DIA, edificios corporativos.',
+        title: 'Experiencia en locales y edificios',
+        description: 'KFC, Smart Fit, DIA, viviendas y consorcios.',
       },
       {
-        title: 'Certificaciones y ART al día',
-        description: 'Equipo propio, cobertura integral y protocolos de ingreso.',
+        title: 'Tiempos de respuesta claros',
+        description: 'Presupuestos en 24–48 h y seguimiento semanal.',
       },
     ],
     stats: [
       {
-        label: 'Documentación completa',
-        description: 'Planos, memorias, checklist digital y certificados de avance.',
+        label: 'Coordinación sin fricciones',
+        description: 'Equipo propio, seguros al día y reportes fotográficos.',
       },
       {
-        label: 'Normativa AEA 90364-7-771',
-        description: 'Cumplimiento y auditoría permanente en cada etapa de obra.',
+        label: 'Cumplimiento normativo',
+        description: 'AEA 90364-7-771 con trazabilidad y documentación.',
       },
     ],
   },
@@ -91,6 +91,39 @@ export const SITE_DEFAULTS: SiteExperience = {
         title: 'Aires acondicionados',
         description: 'Instalación integral con cañería de cobre, vacío, carga y alimentación eléctrica.',
       },
+    ],
+  },
+  trust: {
+    title: 'Confianza operativa para equipos exigentes',
+    subtitle: 'Procesos claros, reportes y experiencia comprobada en obra.',
+    experience: 'Experiencia en locales y edificios (KFC / Smart Fit / DIA / Viviendas)',
+    metrics: [
+      { value: '+X m²', label: 'instalados' },
+      { value: '+X', label: 'tableros armados' },
+      { value: '+X', label: 'proyectos' },
+    ],
+    testimonials: [
+      {
+        name: 'Mariana López',
+        role: 'Administración de consorcios',
+        quote: 'Equipo prolijo, reportes claros y tiempos de respuesta reales.',
+      },
+      {
+        name: 'Juan Pérez',
+        role: 'Facility Manager',
+        quote: 'Cumplieron normativa y entregaron documentación lista para auditorías.',
+      },
+      {
+        name: 'Lucía Gómez',
+        role: 'Dirección de obra',
+        quote: 'Coordinación ágil en obra y comunicación constante.',
+      },
+    ],
+    gallery: [
+      { title: 'Tableros certificados', description: 'Fotos y checklist por visita (placeholder).' },
+      { title: 'Obra comercial', description: 'Canalizaciones prolijas y señalización (placeholder).' },
+      { title: 'Puesta a tierra', description: 'Mediciones certificadas y reporte (placeholder).' },
+      { title: 'Locales activos', description: 'Trabajos sin interrumpir operación (placeholder).' },
     ],
   },
   packs: {
@@ -174,8 +207,8 @@ export const SITE_DEFAULTS: SiteExperience = {
     title: 'Listos para ejecutar tu obra eléctrica con excelencia',
     description:
       'Coordinamos visita técnica, entregamos presupuesto detallado y planificamos el cronograma completo.',
-    primary: { label: 'Solicitar visita técnica', href: '/contacto' },
-    secondary: { label: 'Configurar pack online', href: '/presupuestador' },
+    primary: { label: 'Solicitar alta del plan', href: '/presupuesto?tipo=mantenimiento' },
+    secondary: { label: 'Pedir presupuesto rápido', href: '/presupuesto' },
   },
   company: {
     introTitle: 'NERIN: ingeniería eléctrica con protocolos y trazabilidad',

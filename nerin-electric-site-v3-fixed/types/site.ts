@@ -15,6 +15,7 @@ export interface SiteExperience {
     serviceArea: string
     whatsappNumber: string
     whatsappMessage: string
+    whatsappCtaLabel: string
   }
   hero: {
     badge: string
@@ -32,6 +33,14 @@ export interface SiteExperience {
     title: string
     description: string
     items: Array<{ title: string; description: string }>
+  }
+  trust: {
+    title: string
+    subtitle: string
+    experience: string
+    metrics: Array<{ label: string; value: string }>
+    testimonials: Array<{ name: string; role: string; quote: string }>
+    gallery: Array<{ title: string; description: string }>
   }
   packs: {
     title: string

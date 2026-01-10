@@ -11,10 +11,30 @@ import { Accordion, AccordionItem } from '@/components/ui/accordion'
 
 export const revalidate = 60
 
+export function generateMetadata() {
+  const site = getSiteContent()
+  return {
+    title: 'Contratista eléctrico en CABA | Presupuestos en 24-48 h',
+    description:
+      'Contratista eléctrico para obras, comercios y consorcios en CABA. Presupuesto en 24–48 h, cumplimiento normativo y experiencia real en obra.',
+    openGraph: {
+      title: 'Contratista eléctrico en CABA | Presupuestos en 24-48 h',
+      description:
+        'Contratista eléctrico para obras, comercios y consorcios en CABA. Presupuesto en 24–48 h, cumplimiento normativo y experiencia real en obra.',
+    },
+    twitter: {
+      title: 'Contratista eléctrico en CABA | Presupuestos en 24-48 h',
+      description:
+        'Contratista eléctrico para obras, comercios y consorcios en CABA. Presupuesto en 24–48 h, cumplimiento normativo y experiencia real en obra.',
+    },
+  }
+}
+
 export default async function HomePage() {
   const { packs, plans, caseStudies, brands } = await getMarketingHomeData()
   const site = getSiteContent()
   const whatsappHref = getWhatsappHref(site)
+  const resolveHref = (href: string) => (href === '[whatsapp]' ? whatsappHref : href)
 
   return (
     <div className="space-y-24">
@@ -42,12 +62,10 @@ export default async function HomePage() {
               <a href={site.hero.primaryCta.href}>{site.hero.primaryCta.label}</a>
             </Button>
             <Button size="pill" variant="secondary" asChild>
-              <a href={site.hero.secondaryCta.href === '[whatsapp]' ? whatsappHref : site.hero.secondaryCta.href}>
-                {site.hero.secondaryCta.label}
-              </a>
+              <a href={resolveHref(site.hero.secondaryCta.href)}>{site.hero.secondaryCta.label}</a>
             </Button>
             <Button size="pill" variant="ghost" asChild>
-              <a href={site.hero.tertiaryCta.href}>{site.hero.tertiaryCta.label}</a>
+              <a href={resolveHref(site.hero.tertiaryCta.href)}>{site.hero.tertiaryCta.label}</a>
             </Button>
           </div>
           <div className="flex flex-wrap items-center gap-6 text-sm text-slate-500">
@@ -65,6 +83,48 @@ export default async function HomePage() {
             <p className="font-semibold text-slate-800">{site.hero.caption}</p>
             <p>{site.contact.serviceArea}</p>
           </div>
+        </div>
+      </section>
+
+      <section className="rounded-3xl border border-border bg-white p-10 shadow-subtle">
+        <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr]">
+          <div className="space-y-4">
+            <Badge>Confianza</Badge>
+            <h2>{site.trust.title}</h2>
+            <p className="text-slate-600">{site.trust.subtitle}</p>
+            <p className="text-sm text-slate-500">{site.trust.experience}</p>
+            <div className="mt-6 grid gap-4 sm:grid-cols-3">
+              {site.trust.metrics.map((metric) => (
+                <div key={metric.label} className="rounded-2xl border border-border/60 bg-muted/40 p-4">
+                  <p className="text-xl font-semibold text-foreground">{metric.value}</p>
+                  <p className="text-sm text-slate-500">{metric.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="grid gap-4">
+            {site.trust.testimonials.map((testimonial) => (
+              <Card key={testimonial.name} className="border border-border/60">
+                <CardContent className="space-y-2 p-5 text-sm text-slate-600">
+                  <p>“{testimonial.quote}”</p>
+                  <p className="text-xs font-semibold text-foreground">
+                    {testimonial.name} · {testimonial.role}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+        <div className="mt-8 grid gap-4 md:grid-cols-4">
+          {site.trust.gallery.map((item) => (
+            <div
+              key={item.title}
+              className="flex min-h-[120px] flex-col justify-between rounded-2xl border border-dashed border-border/60 bg-muted/40 p-4 text-sm text-slate-500"
+            >
+              <p className="font-semibold text-foreground">{item.title}</p>
+              <p>{item.description}</p>
+            </div>
+          ))}
         </div>
       </section>
 

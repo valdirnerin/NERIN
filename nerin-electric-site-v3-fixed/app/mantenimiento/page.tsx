@@ -41,10 +41,10 @@ export default async function MantenimientoPage() {
               </p>
               <div className="flex flex-col gap-2">
                 <Button asChild>
-                  <Link href={`/api/mantenimiento/checkout?plan=${plan.slug}`}>Contratar plan</Link>
+                  <Link href={`/presupuesto?tipo=mantenimiento&plan=${plan.slug}`}>Solicitar alta del plan</Link>
                 </Button>
                 <Button asChild variant="secondary">
-                  <Link href="/contacto">Hablar con un asesor</Link>
+                  <Link href="/presupuesto?tipo=mantenimiento">Hablar con un asesor</Link>
                 </Button>
               </div>
             </CardContent>

@@ -191,6 +191,24 @@ model MaintenanceSubscription {
   client           Client          @relation(fields: [clientId], references: [id], onDelete: Cascade)
 }
 
+model Lead {
+  id         String   @id @default(cuid())
+  name       String
+  phone      String
+  email      String
+  clientType String
+  location   String
+  address    String?
+  workType   String
+  urgency    String
+  details    String
+  leadType   String?
+  plan       String?
+  hasFiles   Boolean  @default(false)
+  consent    Boolean  @default(false)
+  createdAt  DateTime @default(now())
+}
+
 model WorkOrder {
   id              String   @id @default(cuid())
   projectId       String
@@ -290,4 +308,3 @@ model SiteSetting {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 }
-
