@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { parseStringArray } from '@/lib/serialization'
+import { DB_ENABLED } from '@/lib/dbMode'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableCell, TableHead, TableRow } from '@/components/ui/table'
@@ -13,6 +14,16 @@ import { Button } from '@/components/ui/button'
 export const revalidate = 0
 
 export default async function ClienteDashboard() {
+  if (!DB_ENABLED) {
+    return (
+      <div className="space-y-4">
+        <Badge>Portal de clientes</Badge>
+        <h1>Portal no configurado</h1>
+        <p className="text-sm text-slate-600">La base de datos está deshabilitada. Activala para ver proyectos.</p>
+      </div>
+    )
+  }
+
   const session = await getSession()
   if (!session?.user?.id) {
     redirect('/clientes/login')

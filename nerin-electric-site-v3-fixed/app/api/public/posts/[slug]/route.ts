@@ -1,15 +1,11 @@
 import { NextResponse } from 'next/server'
-import { getContentStore } from '@/lib/content-store'
+import { mockPosts } from '@/lib/mockData'
 
 interface Params {
   params: { slug: string }
 }
 
 export async function GET(_: Request, { params }: Params) {
-  const store = getContentStore()
-  const post = await store.getPost(params.slug)
-  if (!post || !post.publishedAt) {
-    return NextResponse.json({ error: 'Not found' }, { status: 404 })
-  }
-  return NextResponse.json({ ...post, publishedAt: post.publishedAt })
+  const post = mockPosts.find((item) => item.slug === params.slug && item.publishedAt)
+  return NextResponse.json(post ? { ...post, publishedAt: post.publishedAt } : null)
 }

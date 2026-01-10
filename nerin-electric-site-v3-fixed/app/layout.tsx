@@ -1,5 +1,6 @@
 import './globals.css'
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import { Inter, Sora } from 'next/font/google'
 import { getSiteContent, getWhatsappHref } from '@/lib/site-content'
 import { Header } from '@/components/Header'
@@ -66,7 +67,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </noscript>
         ) : null}
         <Providers>
-          <AttributionCapture />
+          <Suspense fallback={null}>
+            <AttributionCapture />
+          </Suspense>
           <Header
             contact={{
               whatsappHref,

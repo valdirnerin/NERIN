@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/db'
 import { Button } from '@/components/ui/button'
 import { requireAdmin } from '@/lib/auth'
+import { DB_ENABLED } from '@/lib/dbMode'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -11,6 +12,15 @@ type SearchParams = {
 }
 
 export default async function LeadsPage({ searchParams }: { searchParams?: SearchParams }) {
+  if (!DB_ENABLED) {
+    return (
+      <div className="space-y-4">
+        <h1 className="text-2xl font-semibold text-foreground">Leads</h1>
+        <p className="text-sm text-slate-600">La base de datos está deshabilitada. No hay leads para mostrar.</p>
+      </div>
+    )
+  }
+
   await requireAdmin()
   const leadType = searchParams?.tipo
   const urgency = searchParams?.urgencia
