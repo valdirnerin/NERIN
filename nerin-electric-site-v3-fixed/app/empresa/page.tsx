@@ -9,7 +9,7 @@ export const revalidate = 60
 
 export default async function EmpresaPage() {
   const technicians = await getTechniciansForMarketing()
-  const site = getSiteContent()
+  const site = await getSiteContent()
 
   return (
     <div className="space-y-12">

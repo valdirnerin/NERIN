@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { listItems } from '@/lib/content'
+import { getContentStore } from '@/lib/content-store'
 import { requireAdmin } from '@/lib/auth'
 
 export async function GET(req: Request) {
@@ -15,5 +15,12 @@ export async function GET(req: Request) {
 
   const { searchParams } = new URL(req.url)
   const type = searchParams.get('type') || 'blog'
-  return NextResponse.json(listItems(type))
+  const store = getContentStore()
+
+  if (type === 'blog') {
+    const posts = await store.listPosts()
+    return NextResponse.json(posts.map((post) => post.slug))
+  }
+
+  return NextResponse.json([])
 }

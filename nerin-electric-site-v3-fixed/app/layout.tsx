@@ -6,12 +6,14 @@ import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { Providers } from '@/components/Providers'
 import { cn } from '@/lib/utils'
+import { TrackingScripts } from '@/components/tracking/TrackingScripts'
+import { AttributionCapture } from '@/components/tracking/AttributionCapture'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const sora = Sora({ subsets: ['latin'], variable: '--font-sora' })
 
-export function generateMetadata(): Metadata {
-  const site = getSiteContent()
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSiteContent()
 
   return {
     metadataBase: new URL('https://nerin-electric.render.com'),
@@ -42,14 +44,29 @@ export function generateMetadata(): Metadata {
   }
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const site = getSiteContent()
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const site = await getSiteContent()
   const whatsappHref = getWhatsappHref(site)
+  const gtmId = process.env.NEXT_PUBLIC_GTM_ID || process.env.GTM_ID
+  const ga4Id = process.env.NEXT_PUBLIC_GA4_ID || process.env.GA4_ID
+  const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID || process.env.META_PIXEL_ID
 
   return (
     <html lang="es-AR" className={cn(inter.variable, sora.variable)}>
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
+        <TrackingScripts gtmId={gtmId} ga4Id={ga4Id} metaPixelId={metaPixelId} />
+        {gtmId ? (
+          <noscript>
+            <iframe
+              src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+              height="0"
+              width="0"
+              style={{ display: 'none', visibility: 'hidden' }}
+            />
+          </noscript>
+        ) : null}
         <Providers>
+          <AttributionCapture />
           <Header
             contact={{
               whatsappHref,

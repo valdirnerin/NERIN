@@ -16,13 +16,15 @@ import { MaintenanceForm } from './maintenance-form'
 import { SiteExperienceDesigner } from './SiteExperienceDesigner'
 import { BrandManager } from './BrandManager'
 import { BlogManager } from './BlogManager'
+import { ServicesManager } from './ServicesManager'
+import { ProjectsManager } from './ProjectsManager'
 
 const AdminPacks = dynamicImport(() => import('./AdminPacks'), { ssr: false })
 
 export const revalidate = 0
 
 export default async function AdminPage() {
-  const site = getSiteContent()
+  const site = await getSiteContent()
   const [packs, adicionales, plans, projects, brands] = await Promise.all([
     prisma.pack.findMany({ orderBy: { createdAt: 'desc' } }),
     prisma.additionalItem.findMany({ orderBy: { createdAt: 'desc' } }),
@@ -55,6 +57,11 @@ export default async function AdminPage() {
       <section className="grid gap-6 lg:grid-cols-2">
         <BrandManager initialBrands={brands} />
         <BlogManager />
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-2">
+        <ServicesManager />
+        <ProjectsManager />
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">

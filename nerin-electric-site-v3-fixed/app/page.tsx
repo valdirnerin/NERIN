@@ -11,8 +11,8 @@ import { Accordion, AccordionItem } from '@/components/ui/accordion'
 
 export const revalidate = 60
 
-export function generateMetadata() {
-  const site = getSiteContent()
+export async function generateMetadata() {
+  const site = await getSiteContent()
   return {
     title: 'Contratista eléctrico en CABA | Presupuestos en 24-48 h',
     description:
@@ -32,7 +32,7 @@ export function generateMetadata() {
 
 export default async function HomePage() {
   const { packs, plans, caseStudies, brands } = await getMarketingHomeData()
-  const site = getSiteContent()
+  const site = await getSiteContent()
   const whatsappHref = getWhatsappHref(site)
   const resolveHref = (href: string) => (href === '[whatsapp]' ? whatsappHref : href)
 

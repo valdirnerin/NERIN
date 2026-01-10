@@ -6,12 +6,18 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { getSiteContent, getWhatsappHref } from '@/lib/site-content'
+import { AttributionFields } from '@/components/tracking/AttributionFields'
 
 export const revalidate = 60
 
-export default function ContactoPage({ searchParams }: { searchParams?: { enviado?: string } }) {
-  const site = getSiteContent()
+export default async function ContactoPage({
+  searchParams,
+}: {
+  searchParams?: { enviado?: string; motivo?: string }
+}) {
+  const site = await getSiteContent()
   const whatsappHref = getWhatsappHref(site)
+  const motivo = searchParams?.motivo ?? ''
 
   async function action(formData: FormData) {
     'use server'
@@ -31,6 +37,8 @@ export default function ContactoPage({ searchParams }: { searchParams?: { enviad
           </p>
         )}
         <form action={action} className="space-y-6 rounded-3xl border border-border bg-white p-8 shadow-subtle">
+          <AttributionFields />
+          <input type="hidden" name="reason" value={motivo} />
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <Label htmlFor="nombre">Nombre y apellido *</Label>
@@ -60,7 +68,7 @@ export default function ContactoPage({ searchParams }: { searchParams?: { enviad
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <Label htmlFor="servicio">Servicio requerido</Label>
-              <Input name="servicio" id="servicio" placeholder="Ej: Tableros + CCTV" required />
+              <Input name="servicio" id="servicio" defaultValue={motivo} placeholder="Ej: Tableros + CCTV" required />
             </div>
             <div>
               <Label htmlFor="urgencia">Urgencia</Label>

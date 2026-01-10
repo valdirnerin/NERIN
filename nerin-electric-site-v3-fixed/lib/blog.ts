@@ -1,16 +1,5 @@
-import { listItems, readMarkdown } from '@/lib/content'
-import { blogPosts as fallbackPosts } from '@/content/blogPosts'
-
-type StoredPost = {
-  data?: {
-    title?: string
-    excerpt?: string
-    publishedAt?: string
-    heroImage?: string
-    tags?: string[]
-  }
-  content?: string
-}
+import { fetchPublicJson } from '@/lib/public-api'
+import { getContentStore } from '@/lib/content-store'
 
 export interface BlogPost {
   slug: string
@@ -22,65 +11,68 @@ export interface BlogPost {
   tags?: string[]
 }
 
-function normalizePost(slug: string, raw: StoredPost | null): BlogPost | null {
-  if (!raw || typeof raw !== 'object') {
-    return null
-  }
-
-  const title = raw.data?.title?.trim() ?? ''
-  const excerpt = raw.data?.excerpt?.trim() ?? ''
-  const publishedAt = raw.data?.publishedAt ?? new Date().toISOString().slice(0, 10)
-  const content = raw.content ?? ''
-
-  if (!title || !content) {
-    return null
-  }
-
-  return {
-    slug,
-    title,
-    excerpt,
-    publishedAt,
-    content,
-    heroImage: raw.data?.heroImage?.trim() || undefined,
-    tags: Array.isArray(raw.data?.tags) ? raw.data?.tags : undefined,
-  }
+type ContentPostSummary = {
+  slug: string
+  title: string
+  excerpt: string
+  content: string
+  publishedAt: string
+  coverImage?: string | null
 }
-
-export function getBlogPosts(): BlogPost[] {
-  const slugs = listItems('blog')
-  const posts = slugs
-    .map((slug) => normalizePost(slug, readMarkdown('blog', slug) as StoredPost | null))
-    .filter((post): post is BlogPost => Boolean(post))
-    .sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1))
-
-  if (posts.length) {
+export async function getBlogPosts(): Promise<BlogPost[]> {
+  try {
+    const posts = await fetchPublicJson<ContentPostSummary[]>('/api/public/posts')
     return posts
+      .map((post) => ({
+        slug: post.slug,
+        title: post.title,
+        excerpt: post.excerpt,
+        publishedAt: post.publishedAt,
+        content: post.content,
+        heroImage: post.coverImage ?? undefined,
+      }))
+      .sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1))
+  } catch (error) {
+    const store = getContentStore()
+    const posts = await store.listPosts()
+    return posts
+      .filter((post) => post.publishedAt)
+      .map((post) => ({
+        slug: post.slug,
+        title: post.title,
+        excerpt: post.excerpt,
+        publishedAt: post.publishedAt ?? new Date().toISOString(),
+        content: post.content,
+        heroImage: post.coverImage ?? undefined,
+      }))
+      .sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1))
   }
-
-  return fallbackPosts.map((post) => ({
-    slug: post.slug,
-    title: post.title,
-    excerpt: post.excerpt,
-    publishedAt: post.publishedAt,
-    content: post.content,
-  }))
 }
 
-export function getBlogPost(slug: string): BlogPost | null {
-  const post = normalizePost(slug, readMarkdown('blog', slug) as StoredPost | null)
-  if (post) {
-    return post
+export async function getBlogPost(slug: string): Promise<BlogPost | null> {
+  try {
+    const post = await fetchPublicJson<ContentPostSummary>(`/api/public/posts/${slug}`)
+    return {
+      slug: post.slug,
+      title: post.title,
+      excerpt: post.excerpt,
+      publishedAt: post.publishedAt,
+      content: post.content,
+      heroImage: post.coverImage ?? undefined,
+    }
+  } catch (error) {
+    const store = getContentStore()
+    const post = await store.getPost(slug)
+    if (!post) {
+      return null
+    }
+    return {
+      slug: post.slug,
+      title: post.title,
+      excerpt: post.excerpt,
+      publishedAt: post.publishedAt ?? new Date().toISOString(),
+      content: post.content,
+      heroImage: post.coverImage ?? undefined,
+    }
   }
-
-  const fallback = fallbackPosts.find((item) => item.slug === slug)
-  return fallback
-    ? {
-        slug: fallback.slug,
-        title: fallback.title,
-        excerpt: fallback.excerpt,
-        publishedAt: fallback.publishedAt,
-        content: fallback.content,
-      }
-    : null
 }

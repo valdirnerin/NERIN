@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/db'
 import { Button } from '@/components/ui/button'
+import { requireAdmin } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -10,6 +11,7 @@ type SearchParams = {
 }
 
 export default async function LeadsPage({ searchParams }: { searchParams?: SearchParams }) {
+  await requireAdmin()
   const leadType = searchParams?.tipo
   const urgency = searchParams?.urgencia
 

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockRequireAdmin = vi.fn<() => Promise<void>>()
-const mockReadSite = vi.fn<() => unknown>()
+const mockGetSiteContent = vi.fn<() => Promise<unknown>>()
 
 vi.mock('next/server', () => ({
   NextResponse: {
@@ -15,9 +15,9 @@ vi.mock('@/lib/auth', () => ({
   requireAdmin: () => mockRequireAdmin(),
 }))
 
-vi.mock('@/lib/content', () => ({
-  readSite: () => mockReadSite(),
-  writeSite: vi.fn(),
+vi.mock('@/lib/site-content', () => ({
+  getSiteContent: () => mockGetSiteContent(),
+  saveSiteContent: vi.fn(),
 }))
 
 import { GET } from '@/app/api/admin/site/route'
@@ -25,7 +25,7 @@ import { GET } from '@/app/api/admin/site/route'
 describe('app/api/admin/site/route GET', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockReadSite.mockReturnValue({ title: 'Mock site' })
+    mockGetSiteContent.mockResolvedValue({ title: 'Mock site' })
   })
 
   it('returns 401 when the admin session is missing', async () => {

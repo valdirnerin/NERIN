@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
-import { readMarkdown, writeMarkdown, deleteMarkdown } from '@/lib/content'
+import { getContentStore } from '@/lib/content-store'
 import { requireAdmin } from '@/lib/auth'
 
 class RevalidationError extends Error {
@@ -37,8 +37,25 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
   const type = searchParams.get('type') || 'blog'
   const slug = searchParams.get('slug')!
-  const item = readMarkdown(type, slug)
-  return NextResponse.json(item || { data: {}, content: '' })
+  const store = getContentStore()
+
+  if (type === 'blog') {
+    const post = await store.getPost(slug)
+    if (!post) {
+      return NextResponse.json({ data: {}, content: '' })
+    }
+    return NextResponse.json({
+      data: {
+        title: post.title,
+        excerpt: post.excerpt,
+        publishedAt: post.publishedAt ?? undefined,
+        heroImage: post.coverImage ?? undefined,
+      },
+      content: post.content,
+    })
+  }
+
+  return NextResponse.json({ data: {}, content: '' })
 }
 
 export async function POST(req: Request) {
@@ -47,9 +64,19 @@ export async function POST(req: Request) {
   const type = searchParams.get('type') || 'blog'
   const slug = searchParams.get('slug')!
   const body = await req.json()
+  const store = getContentStore()
 
   try {
-    writeMarkdown(type, slug, body.data, body.content)
+    if (type === 'blog') {
+      await store.upsertPost({
+        slug,
+        title: body.data?.title ?? '',
+        excerpt: body.data?.excerpt ?? '',
+        content: body.content ?? '',
+        coverImage: body.data?.heroImage ?? null,
+        publishedAt: body.data?.publishedAt ?? null,
+      })
+    }
 
     if (type === 'blog') {
       revalidateBlogPaths(slug)
@@ -78,8 +105,14 @@ export async function DELETE(req: Request) {
   const { searchParams } = new URL(req.url)
   const type = searchParams.get('type') || 'blog'
   const slug = searchParams.get('slug')!
+  const store = getContentStore()
   try {
-    deleteMarkdown(type, slug)
+    if (type === 'blog') {
+      const post = await store.getPost(slug)
+      if (post?.id) {
+        await store.deletePost(post.id)
+      }
+    }
 
     if (type === 'blog') {
       revalidateBlogPaths(slug)

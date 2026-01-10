@@ -1,5 +1,7 @@
-import { SITE_DEFAULTS, readSite, writeSite } from '@/lib/content'
+import { SITE_DEFAULTS } from '@/lib/content'
 import type { SiteExperience } from '@/types/site'
+import { getContentStore } from '@/lib/content-store'
+import { fetchPublicJson } from '@/lib/public-api'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -44,13 +46,34 @@ function mergeSite(defaults: SiteExperience, incoming: unknown): SiteExperience 
   return merge(target, incoming) as SiteExperience
 }
 
-export function getSiteContent(): SiteExperience {
-  const raw = readSite()
-  return mergeSite(SITE_DEFAULTS, raw)
+export async function getSiteContent(): Promise<SiteExperience> {
+  try {
+    const site = await fetchPublicJson<SiteExperience>('/api/public/site')
+    return mergeSite(SITE_DEFAULTS, site)
+  } catch (error) {
+    const store = getContentStore()
+    const settings = await store.getSettings()
+    const raw = settings?.siteExperience ?? SITE_DEFAULTS
+    return mergeSite(SITE_DEFAULTS, raw)
+  }
 }
 
-export function saveSiteContent(payload: SiteExperience) {
-  writeSite(payload)
+export async function saveSiteContent(payload: SiteExperience) {
+  const store = getContentStore()
+  const current = await store.getSettings()
+  const nextSettings = {
+    ...current,
+    companyName: payload.name,
+    whatsappNumber: payload.contact.whatsappNumber,
+    whatsappMessage: payload.contact.whatsappMessage,
+    emailContacto: payload.contact.email,
+    zone: payload.contact.serviceArea,
+    schedule: payload.contact.schedule,
+    primaryCopy: payload.tagline,
+    metrics: payload.trust.metrics.map((metric) => ({ label: metric.label, value: metric.value })),
+    siteExperience: payload,
+  }
+  await store.saveSettings(nextSettings)
 }
 
 export function getWhatsappHref(site: SiteExperience): string {
