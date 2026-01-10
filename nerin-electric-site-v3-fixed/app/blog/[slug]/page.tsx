@@ -9,9 +9,9 @@ interface Props {
   params: { slug: string }
 }
 
-export default function BlogPostPage({ params }: Props) {
-  const site = getSiteContent()
-  const post = getBlogPost(params.slug)
+export default async function BlogPostPage({ params }: Props) {
+  const site = await getSiteContent()
+  const post = await getBlogPost(params.slug)
   if (!post) {
     notFound()
   }

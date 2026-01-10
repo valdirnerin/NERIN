@@ -125,7 +125,7 @@ export function SiteExperienceDesigner({ initialData }: SiteExperienceDesignerPr
         <h2 className="text-xl font-semibold text-foreground">Diseñador de experiencia del sitio</h2>
         <p className="text-sm text-slate-600">
           Editá textos, mensajes clave, datos de contacto y contenido destacado del home, blog, obras y mantenimiento.
-          Cada cambio se guarda en <code>.data/site.json</code> y actualiza el sitio completo.
+          Cada cambio se guarda en el CMS (Postgres o file store) y actualiza el sitio completo.
         </p>
         {message && (
           <p

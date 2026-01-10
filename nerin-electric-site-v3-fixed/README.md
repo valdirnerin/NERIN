@@ -105,26 +105,50 @@ Disponible en `/admin` (rol admin). Permite:
 - Emitir certificados de avance asociados a proyectos existentes.
 - Exportar CSV de proyectos (`/api/admin/export?resource=proyectos`).
 
-## Despliegue en Render
+## Variables de entorno requeridas (CMS + tracking)
+
+### Core
+- `DATABASE_URL` (PostgreSQL recomendado; para Render Disk podés usar `file:/var/data/nerin.db`)
+- `AUTH_SECRET` o `NEXTAUTH_SECRET`
+- `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_NAME`
+- `CONTENT_STORE` (`postgres` por defecto, o `file`)
+- `CONTENT_DIR` (opcional, default `/var/data/content`)
+
+### Tracking
+- `GTM_ID`
+- `GA4_ID`
+- `META_PIXEL_ID`
+- `META_CAPI_TOKEN` (solo si activás server-side)
+
+### Email
+- `RESEND_API_KEY` (si usás Resend)
+- `FROM_EMAIL`
+- `SALES_TO_EMAIL`
+- `RESEND_CONTACT_TO` (opcional)
+- `RESEND_BCC` (opcional)
+- **SMTP fallback**: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_SECURE`
+
+### Otros
+- `STORAGE_DIR` (si usás Disk para subir archivos en el futuro)
+- `NEXT_PUBLIC_SITE_URL` (opcional, útil para entornos con proxy)
+
+## Despliegue en Render (CMS-driven)
 
 1. Crear **Persistent Disk** (20 GB alcanza para SQLite + uploads) o, si preferís, una base **PostgreSQL** gestionada.
 2. Crear **Web Service** (Node 20) con este repo.
-3. Variables de entorno mínimas:
-   - `DATABASE_URL` (ej. `file:/var/data/nerin.db` si usás Disk, o la URL de PostgreSQL si optás por ese motor)
-   - `AUTH_SECRET` (o `NEXTAUTH_SECRET`)
-   - `RESEND_API_KEY`
-   - `FROM_EMAIL`
-   - `SALES_TO_EMAIL`
-   - `ADMIN_PASSWORD`
-   - `EMAIL_SERVER_FROM` (compatibilidad con auth emails)
-   - `MERCADOPAGO_ACCESS_TOKEN`, `MERCADOPAGO_PUBLIC_KEY`, `MERCADOPAGO_WEBHOOK_SECRET`
-   - `STORAGE_DIR` (si usás Disk, ej. `/var/data/uploads`)
+3. Configurar variables de entorno:
+   - **CMS**: `CONTENT_STORE=postgres` (por defecto) o `CONTENT_STORE=file` + `CONTENT_DIR=/var/data/content`.
+   - **Admin**: `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_NAME`.
+   - **Tracking**: `GTM_ID`, `GA4_ID`, `META_PIXEL_ID` (opcionales).
+   - **Email**: `RESEND_API_KEY` o SMTP (`SMTP_HOST`, `SMTP_PORT`, etc.).
+   - **Base de datos**: `DATABASE_URL`.
    > Generá `AUTH_SECRET` con `openssl rand -base64 32` y cargalo en el panel de variables del despliegue.
 4. Commands:
    - Build: `npm ci && npm run build`
    - Start: `npm run start`
 5. Health check: `/`.
 6. Ejecutar `npm run db:migrate` (alias de `prisma db push`) y `npm run db:seed` desde un shell del servicio tras el primer despliegue.
+7. Entrá a `/admin` con las credenciales de `ADMIN_EMAIL` + `ADMIN_PASSWORD` para editar settings, servicios, trabajos y blog.
 
 ### Docker
 
@@ -136,6 +160,22 @@ Se incluye `Dockerfile` multi-stage listo para Render/containers. Montar volumen
 2. Ejecutar `npm run lint`, `npm test`.
 3. En otra terminal `npx playwright test` (requiere server corriendo).
 4. `npm run build && npm run start` y correr Lighthouse (Chrome) apuntando a `/` → objetivo ≥95 Performance/SEO/Best Practices/Accessibility.
+
+## Checklist QA mobile + tracking
+
+### Mobile-first
+- Header compacto sin overflow en 320 px.
+- Botones con padding mínimo de 44px y textos legibles.
+- CTA principal visible above-the-fold en Home.
+- Espaciado consistente entre secciones y cards.
+- Formularios: inputs full-width, labels legibles y submit accesible.
+- Performance: imágenes con lazy-load y sin CLS perceptible.
+
+### Tracking & leads
+- UTM/fbclid/gclid persisten entre páginas y llegan a `/api/leads`.
+- Evento **Lead** se dispara al enviar formulario de presupuesto.
+- `/api/tracking/lead` responde `ok: true` cuando hay token; `skipped: true` cuando falta.
+- GTM/GA4/Meta scripts cargan solo si existen sus env vars.
 
 ## Datos de ejemplo
 

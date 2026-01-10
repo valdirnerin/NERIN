@@ -1,5 +1,8 @@
 import { prisma } from '@/lib/db'
 import { serializeJson, serializeStringArray } from '@/lib/serialization'
+import { SITE_DEFAULTS } from '@/lib/content'
+import { blogPosts } from '@/content/blogPosts'
+import { hash } from 'bcryptjs'
 
 async function main() {
   const adminEmail = 'admin@nerin.com.ar'
@@ -287,11 +290,73 @@ async function main() {
     update: {},
     create: {
       id: 'default',
-      whatsappNumber: '5491100000000',
-      whatsappMessage: 'Hola, soy [Nombre]. Quiero cotizar un servicio eléctrico con NERIN.',
-      direccionOficina: 'CABA, Argentina',
-      emailContacto: 'hola@nerin.com.ar',
+      companyName: SITE_DEFAULTS.name,
+      industry: 'Instalaciones eléctricas',
+      whatsappNumber: SITE_DEFAULTS.contact.whatsappNumber,
+      whatsappMessage: SITE_DEFAULTS.contact.whatsappMessage,
+      direccionOficina: SITE_DEFAULTS.contact.address,
+      emailContacto: SITE_DEFAULTS.contact.email,
+      zone: SITE_DEFAULTS.contact.serviceArea,
+      schedule: SITE_DEFAULTS.contact.schedule,
+      primaryCopy: SITE_DEFAULTS.tagline,
+      metrics: serializeJson(SITE_DEFAULTS.trust.metrics),
+      siteExperience: serializeJson(SITE_DEFAULTS),
     },
+  })
+
+  await prisma.adminUser.upsert({
+    where: { email: adminEmail },
+    update: {},
+    create: {
+      email: adminEmail,
+      passwordHash: await hash('AccesoNerin123', 12),
+      role: 'ADMIN',
+    },
+  })
+
+  await prisma.contentService.createMany({
+    data: SITE_DEFAULTS.services.items.map((item, index) => ({
+      title: item.title,
+      description: item.description,
+      order: index + 1,
+      active: true,
+    })),
+    skipDuplicates: true,
+  })
+
+  await prisma.portfolioProject.createMany({
+    data: [
+      {
+        title: 'Edificio 4.000 m²',
+        description: 'Montaje eléctrico confirmation, tableros generales y documentación final.',
+        tags: serializeStringArray(['Obra comercial', 'Tableros']),
+        locationText: 'CABA · Villa Ortúzar',
+        images: serializeStringArray([
+          'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80',
+        ]),
+      },
+      {
+        title: 'Smart Fit',
+        description: 'Adecuaciones eléctricas con tiempos de respuesta rápidos y reportes semanales.',
+        tags: serializeStringArray(['Retail', 'Mantenimiento']),
+        locationText: 'CABA · Microcentro',
+        images: serializeStringArray([
+          'https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1200&q=80',
+        ]),
+      },
+    ],
+    skipDuplicates: true,
+  })
+
+  await prisma.blogPost.createMany({
+    data: blogPosts.map((post) => ({
+      title: post.title,
+      slug: post.slug,
+      excerpt: post.excerpt,
+      content: post.content,
+      publishedAt: new Date(post.publishedAt),
+    })),
+    skipDuplicates: true,
   })
 
   console.log('Seed completado')

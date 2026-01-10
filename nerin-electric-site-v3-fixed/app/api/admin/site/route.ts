@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
-import { readSite, writeSite } from '@/lib/content'
+import { getSiteContent, saveSiteContent } from '@/lib/site-content'
 import { requireAdmin } from '@/lib/auth'
 
 export async function GET() {
@@ -14,13 +14,14 @@ export async function GET() {
     throw error
   }
 
-  return NextResponse.json(readSite())
+  const site = await getSiteContent()
+  return NextResponse.json(site)
 }
 
 export async function POST(req: Request) {
   await requireAdmin()
   const body = await req.json()
-  writeSite(body)
+  await saveSiteContent(body)
   revalidatePath('/')
   revalidatePath('/contacto')
   revalidatePath('/empresa')

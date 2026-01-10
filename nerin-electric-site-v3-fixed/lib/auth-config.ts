@@ -9,6 +9,8 @@ import { authLogger } from './auth-logger'
 import { createAuthAdapter } from './auth-adapter'
 import { resendClient } from './resend'
 import { sanitizeError } from './logging'
+import { ensureAdminUser, getAdminUserByEmail } from './admin-users'
+import { compare } from 'bcryptjs'
 
 type ExtendedJWT = JWT & {
   id?: string
@@ -113,7 +115,23 @@ export function createAdminCredentialsProvider(): AdminCredentialsProvider {
         return null
       }
 
-      if (!safeCompare(email, normalizedAdminEmail) || !safeCompare(password, adminPassword)) {
+      await ensureAdminUser({
+        email: normalizedAdminEmail,
+        password: adminPassword,
+        displayName: adminDisplayName,
+      })
+
+      if (!safeCompare(email, normalizedAdminEmail)) {
+        return null
+      }
+
+      const adminRecord = await getAdminUserByEmail(email)
+      if (!adminRecord) {
+        return null
+      }
+
+      const passwordMatches = await compare(password, adminRecord.passwordHash)
+      if (!passwordMatches) {
         return null
       }
 

@@ -4,8 +4,8 @@ import { getSiteContent } from '@/lib/site-content'
 
 export const revalidate = 60
 
-export function generateMetadata() {
-  const site = getSiteContent()
+export async function generateMetadata() {
+  const site = await getSiteContent()
   return {
     title: 'Mantenimiento eléctrico para consorcios | NERIN',
     description:

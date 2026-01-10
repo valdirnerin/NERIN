@@ -4,8 +4,8 @@ import { PresupuestoForm } from './PresupuestoForm'
 
 export const revalidate = 60
 
-export function generateMetadata() {
-  const site = getSiteContent()
+export async function generateMetadata() {
+  const site = await getSiteContent()
   return {
     title: 'Presupuesto eléctrico rápido | NERIN',
     description:
@@ -24,12 +24,12 @@ export function generateMetadata() {
   }
 }
 
-export default function PresupuestoPage({
+export default async function PresupuestoPage({
   searchParams,
 }: {
   searchParams?: { tipo?: string; plan?: string }
 }) {
-  const site = getSiteContent()
+  const site = await getSiteContent()
   const leadType = searchParams?.tipo
   const plan = searchParams?.plan
 

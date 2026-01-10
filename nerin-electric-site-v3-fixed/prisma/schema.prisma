@@ -202,10 +202,20 @@ model Lead {
   workType   String
   urgency    String
   details    String
+  reason     String?
   leadType   String?
   plan       String?
   hasFiles   Boolean  @default(false)
   consent    Boolean  @default(false)
+  utmSource  String?
+  utmMedium  String?
+  utmCampaign String?
+  utmTerm    String?
+  utmContent String?
+  fbclid     String?
+  gclid      String?
+  landingPage String?
+  referrer   String?
   createdAt  DateTime @default(now())
 }
 
@@ -301,10 +311,73 @@ model TicketMessage {
 
 model SiteSetting {
   id               String   @id @default(cuid())
+  companyName      String   @default("NERIN · Ingeniería Eléctrica")
+  industry         String   @default("Instalaciones eléctricas")
   whatsappNumber   String   @default("5491100000000")
   whatsappMessage  String   @default("Hola, soy [Nombre]. Quiero cotizar un servicio eléctrico con NERIN.")
   direccionOficina String   @default("CABA, Argentina")
   emailContacto    String   @default("hola@nerin.com.ar")
+  zone             String   @default("CABA y GBA")
+  schedule         String   @default("Lunes a viernes de 08:00 a 18:00")
+  primaryCopy      String   @default("Instalaciones eléctricas de alta performance.")
+  metrics          String   @default("[]")
+  siteExperience   String   @default("{}")
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         String   @default("ADMIN")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model ContentPage {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  title          String
+  description    String?
+  sections       String   @default("[]")
+  seoTitle       String?
+  seoDescription String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model ContentService {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PortfolioProject {
+  id           String   @id @default(cuid())
+  title        String
+  description  String
+  tags         String   @default("[]")
+  locationText String?
+  images       String   @default("[]")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model BlogPost {
+  id             String   @id @default(cuid())
+  title          String
+  slug           String   @unique
+  excerpt        String
+  content        String
+  coverImage     String?
+  publishedAt    DateTime?
+  seoTitle       String?
+  seoDescription String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }

@@ -38,9 +38,9 @@ export const SITE_DEFAULTS: SiteExperience = {
     backgroundImage:
       'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=900&q=80',
     caption: 'Tablero general edificio 4.000 m² · Ensayos y certificaciones completas.',
-    primaryCta: { label: 'Pedir presupuesto (2 minutos)', href: '/presupuesto' },
-    secondaryCta: { label: 'Agendar visita técnica', href: '/presupuesto?tipo=visita' },
-    tertiaryCta: { label: 'Hablar ahora', href: '[whatsapp]' },
+    primaryCta: { label: 'Quiero una visita técnica', href: '/contacto?motivo=Visita técnica' },
+    secondaryCta: { label: 'Necesito presupuesto de obra', href: '/contacto?motivo=Presupuesto de obra' },
+    tertiaryCta: { label: 'Pedir mantenimiento', href: '/contacto?motivo=Mantenimiento' },
     highlights: [
       {
         title: 'Experiencia en locales y edificios',

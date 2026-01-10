@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { AttributionFields } from '@/components/tracking/AttributionFields'
+import { readAttribution, trackLeadEvent } from '@/lib/tracking'
 
 const clientTypes = [
   { value: 'consorcio', label: 'Consorcio' },
@@ -67,6 +69,7 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
       : false
 
     const nameValue = String(formData.get('nombre') ?? '')
+    const attribution = readAttribution()
     const payload = {
       name: nameValue,
       phone: String(formData.get('telefono') ?? ''),
@@ -80,7 +83,17 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
       consent: Boolean(formData.get('consentimiento')),
       leadType: leadType || undefined,
       plan: plan || undefined,
+      reason: leadType || plan || undefined,
       hasFiles,
+      utmSource: attribution.utmSource,
+      utmMedium: attribution.utmMedium,
+      utmCampaign: attribution.utmCampaign,
+      utmTerm: attribution.utmTerm,
+      utmContent: attribution.utmContent,
+      fbclid: attribution.fbclid,
+      gclid: attribution.gclid,
+      landingPage: attribution.landingPage,
+      referrer: attribution.referrer,
     }
 
     try {
@@ -100,6 +113,7 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
       setStatus('success')
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('lead_submitted', { detail: { leadId: data.leadId } }))
+        trackLeadEvent()
       }
       form.reset()
     } catch (error) {
@@ -130,6 +144,7 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 rounded-3xl border border-border bg-white p-8 shadow-subtle">
+      <AttributionFields />
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <Label htmlFor="nombre">Nombre y Apellido *</Label>

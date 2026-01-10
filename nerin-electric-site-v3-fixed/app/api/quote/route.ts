@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
-import { getStorageDir, readSite } from '@/lib/content'
+import { getStorageDir } from '@/lib/content'
+import { getSiteContent } from '@/lib/site-content'
 import fs from 'fs'
 import path from 'path'
 
@@ -10,7 +11,7 @@ export async function POST(req: Request){
   if (!clientName || !Array.isArray(items) || items.length===0) {
     return NextResponse.json({ error: 'Faltan datos' }, { status: 400 })
   }
-  const site = readSite()
+  const site = await getSiteContent()
   const total = items.reduce((a:any,b:any)=> a + (Number(b.qty)||0) * (Number(b.price)||0), 0)
 
   const storage = getStorageDir()

@@ -4,6 +4,7 @@ import { headers } from 'next/headers'
 import { z } from 'zod'
 import { rateLimit } from '@/lib/security'
 import { sendTransactionalEmail } from '@/lib/resend'
+import { getContentStore } from '@/lib/content-store'
 
 const ContactSchema = z.object({
   nombre: z.string().min(2),
@@ -15,6 +16,16 @@ const ContactSchema = z.object({
   servicio: z.string(),
   urgencia: z.enum(['48hs', '7dias', 'planificado']),
   mensaje: z.string().optional(),
+  reason: z.string().optional(),
+  utmSource: z.string().optional(),
+  utmMedium: z.string().optional(),
+  utmCampaign: z.string().optional(),
+  utmTerm: z.string().optional(),
+  utmContent: z.string().optional(),
+  fbclid: z.string().optional(),
+  gclid: z.string().optional(),
+  landingPage: z.string().optional(),
+  referrer: z.string().optional(),
 })
 
 export async function submitContact(formData: FormData) {
@@ -28,6 +39,16 @@ export async function submitContact(formData: FormData) {
     servicio: formData.get('servicio'),
     urgencia: formData.get('urgencia'),
     mensaje: formData.get('mensaje') || undefined,
+    reason: formData.get('reason') || undefined,
+    utmSource: formData.get('utmSource') || undefined,
+    utmMedium: formData.get('utmMedium') || undefined,
+    utmCampaign: formData.get('utmCampaign') || undefined,
+    utmTerm: formData.get('utmTerm') || undefined,
+    utmContent: formData.get('utmContent') || undefined,
+    fbclid: formData.get('fbclid') || undefined,
+    gclid: formData.get('gclid') || undefined,
+    landingPage: formData.get('landingPage') || undefined,
+    referrer: formData.get('referrer') || undefined,
   })
 
   const ip = headers().get('x-forwarded-for') ?? 'unknown'
@@ -47,6 +68,31 @@ export async function submitContact(formData: FormData) {
     <p><strong>Urgencia:</strong> ${payload.urgencia}</p>
     <p><strong>Detalle:</strong> ${payload.mensaje ?? 'Sin comentarios'}</p>
   `
+
+  const store = getContentStore()
+  await store.createLead({
+    name: payload.nombre,
+    phone: payload.telefono,
+    email: payload.email,
+    clientType: payload.empresa ?? 'contacto',
+    location: payload.direccion ?? 'Sin ubicación',
+    address: payload.direccion ?? null,
+    workType: payload.servicio,
+    urgency: payload.urgencia,
+    details: payload.mensaje ?? 'Consulta desde contacto',
+    reason: payload.reason ?? payload.servicio,
+    leadType: 'contacto',
+    consent: true,
+    utmSource: payload.utmSource,
+    utmMedium: payload.utmMedium,
+    utmCampaign: payload.utmCampaign,
+    utmTerm: payload.utmTerm,
+    utmContent: payload.utmContent,
+    fbclid: payload.fbclid,
+    gclid: payload.gclid,
+    landingPage: payload.landingPage,
+    referrer: payload.referrer,
+  })
 
   await sendTransactionalEmail({
     to: [process.env.RESEND_CONTACT_TO || 'hola@nerin.com.ar', payload.email],

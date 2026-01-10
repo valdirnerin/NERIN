@@ -5,9 +5,9 @@ import { getSiteContent } from '@/lib/site-content'
 
 export const revalidate = 3600
 
-export default function BlogPage() {
-  const site = getSiteContent()
-  const posts = getBlogPosts()
+export default async function BlogPage() {
+  const site = await getSiteContent()
+  const posts = await getBlogPosts()
   return (
     <div className="space-y-8">
       <header className="space-y-4">
