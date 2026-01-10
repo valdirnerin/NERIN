@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server'
-import { getContentStore } from '@/lib/content-store'
+import { getSettings } from '@/lib/siteSettings'
 
 export async function GET() {
-  const store = getContentStore()
-  const settings = await store.getSettings()
+  const settings = await getSettings()
   return NextResponse.json({
     companyName: settings.companyName,
     industry: settings.industry,

@@ -2,6 +2,7 @@ import fs from 'node:fs/promises'
 import fsSync from 'node:fs'
 import path from 'node:path'
 import { prisma } from '@/lib/db'
+import { DB_ENABLED } from '@/lib/dbMode'
 import { parseJson, parseStringArray, serializeJson, serializeStringArray } from '@/lib/serialization'
 import type { SiteExperience } from '@/types/site'
 import { SITE_DEFAULTS } from '@/lib/content'
@@ -620,6 +621,15 @@ export function getContentStore(): ContentStore {
   }
 
   const storeType = (process.env.CONTENT_STORE || 'postgres').toLowerCase()
+  if (!DB_ENABLED) {
+    try {
+      fsSync.mkdirSync(contentDir, { recursive: true })
+      return (cachedStore = buildFileStore())
+    } catch (error) {
+      console.warn('[CONTENT] No persistent disk found, falling back to memory store.')
+      return (cachedStore = memoryStore)
+    }
+  }
   if (storeType === 'file') {
     try {
       fsSync.mkdirSync(contentDir, { recursive: true })
@@ -634,7 +644,7 @@ export function getContentStore(): ContentStore {
 }
 
 export async function ensureContentStorage() {
-  if ((process.env.CONTENT_STORE || 'postgres').toLowerCase() !== 'file') {
+  if (!DB_ENABLED || (process.env.CONTENT_STORE || 'postgres').toLowerCase() !== 'file') {
     return
   }
   try {

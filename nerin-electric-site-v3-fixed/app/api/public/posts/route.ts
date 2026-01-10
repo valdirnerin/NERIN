@@ -1,10 +1,8 @@
 import { NextResponse } from 'next/server'
-import { getContentStore } from '@/lib/content-store'
+import { mockPosts } from '@/lib/mockData'
 
 export async function GET() {
-  const store = getContentStore()
-  const posts = await store.listPosts()
-  const published = posts
+  const published = mockPosts
     .filter((post) => post.publishedAt)
     .map((post) => ({
       ...post,

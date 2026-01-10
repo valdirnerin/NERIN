@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
-import { getContentStore } from '@/lib/content-store'
+import { mockServices } from '@/lib/mockData'
 
 export async function GET() {
-  const store = getContentStore()
-  const services = await store.listServices()
-  return NextResponse.json(services.filter((service) => service.active))
+  return NextResponse.json(mockServices.filter((service) => service.active))
 }

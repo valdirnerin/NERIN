@@ -2,6 +2,7 @@ import { SITE_DEFAULTS } from '@/lib/content'
 import type { SiteExperience } from '@/types/site'
 import { getContentStore } from '@/lib/content-store'
 import { fetchPublicJson } from '@/lib/public-api'
+import { getSettings } from '@/lib/siteSettings'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -51,8 +52,7 @@ export async function getSiteContent(): Promise<SiteExperience> {
     const site = await fetchPublicJson<SiteExperience>('/api/public/site')
     return mergeSite(SITE_DEFAULTS, site)
   } catch (error) {
-    const store = getContentStore()
-    const settings = await store.getSettings()
+    const settings = await getSettings()
     const raw = settings?.siteExperience ?? SITE_DEFAULTS
     return mergeSite(SITE_DEFAULTS, raw)
   }

@@ -9,6 +9,7 @@ import { getSiteContent, getWhatsappHref } from '@/lib/site-content'
 import { AttributionFields } from '@/components/tracking/AttributionFields'
 
 export const revalidate = 60
+export const dynamic = 'force-dynamic'
 
 export default async function ContactoPage({
   searchParams,

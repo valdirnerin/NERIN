@@ -4,6 +4,7 @@ import Link from 'next/link'
 import dynamicImport from 'next/dynamic'
 import { prisma } from '@/lib/db'
 import { getSiteContent } from '@/lib/site-content'
+import { DB_ENABLED } from '@/lib/dbMode'
 import { createAdditional, createCertificate } from '../actions'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -24,6 +25,16 @@ const AdminPacks = dynamicImport(() => import('./AdminPacks'), { ssr: false })
 export const revalidate = 0
 
 export default async function AdminPage() {
+  if (!DB_ENABLED) {
+    return (
+      <div className="space-y-4">
+        <Badge>Panel administrativo</Badge>
+        <h1>Panel no configurado</h1>
+        <p className="text-sm text-slate-600">La base de datos está deshabilitada. Activala para gestionar contenido.</p>
+      </div>
+    )
+  }
+
   const site = await getSiteContent()
   const [packs, adicionales, plans, projects, brands] = await Promise.all([
     prisma.pack.findMany({ orderBy: { createdAt: 'desc' } }),
