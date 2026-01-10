@@ -36,10 +36,9 @@ export async function POST(req: Request){
 <body style="font-family:Arial, sans-serif; color:#0a0a0a;">
   <div style="max-width:900px;margin:40px auto;">
     <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
-      <img src="${site.logo || '/logo-placeholder.svg'}" alt="logo" style="height:48px"/>
       <div>
-        <div style="font-size:22px;font-weight:800;">${site.siteName || 'NERIN Ingeniería Eléctrica'}</div>
-        <div style="font-size:12px;color:#555;">${site.primaryEmail || ''} · ${site.primaryPhone || ''} · ${site.address || ''}</div>
+        <div style="font-size:22px;font-weight:800;">${site.name || 'NERIN Ingeniería Eléctrica'}</div>
+        <div style="font-size:12px;color:#555;">${site.contact.email || ''} · ${site.contact.phone || ''} · ${site.contact.address || ''}</div>
       </div>
     </div>
     <h1 style="font-size:26px;margin:16px 0;">Presupuesto</h1>
