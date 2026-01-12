@@ -132,7 +132,7 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
         <p className="text-sm text-slate-600">
           Recibimos tu pedido. Tu ID de solicitud es <strong>{leadId}</strong>. Te respondemos en 24–48 h.
         </p>
-        <Button asChild size="pill">
+        <Button asChild size="lg">
           <a href={whatsappHref} target="_blank" rel="noreferrer">
             Continuar por WhatsApp
           </a>
@@ -246,7 +246,7 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
         Acepto contacto por WhatsApp/Email.
       </label>
       {status === 'error' && <p className="text-sm text-red-600">{errorMessage}</p>}
-      <Button type="submit" size="pill" disabled={status === 'submitting'}>
+      <Button type="submit" size="lg" disabled={status === 'submitting'}>
         {status === 'submitting' ? 'Enviando...' : 'Enviar solicitud'}
       </Button>
     </form>

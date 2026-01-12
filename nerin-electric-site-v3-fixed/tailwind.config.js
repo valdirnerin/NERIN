@@ -39,8 +39,8 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ['"Inter"', 'system-ui', 'sans-serif'],
-        display: ['"Sora"', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-plex)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-plex-condensed)', 'var(--font-plex)', 'system-ui', 'sans-serif'],
       },
       spacing: {
         18: '4.5rem',
@@ -48,11 +48,11 @@ module.exports = {
         26: '6.5rem',
       },
       boxShadow: {
-        subtle: '0 20px 45px -30px rgba(15, 23, 42, 0.45)',
+        subtle: 'var(--shadowMin)',
       },
       borderRadius: {
-        xl: '1rem',
-        '2xl': '1.5rem',
+        xl: 'var(--radius)',
+        '2xl': 'calc(var(--radius) + 4px)',
       },
     },
   },

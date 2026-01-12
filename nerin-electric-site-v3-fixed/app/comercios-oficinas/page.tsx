@@ -34,7 +34,7 @@ export default function ComerciosOficinasPage() {
           Adecuaciones, tableros y puesta a tierra con mínima interferencia en la operación. Cumplimos normativa y
           entregamos documentación completa.
         </p>
-        <Button asChild size="pill">
+        <Button asChild size="lg">
           <a href="/presupuesto?tipo=comercio">Pedir presupuesto para comercio u oficina</a>
         </Button>
       </header>
@@ -81,7 +81,7 @@ export default function ComerciosOficinasPage() {
         <p className="mt-3 text-slate-600">
           Coordinemos una visita técnica y diseñemos un plan de trabajo seguro y rápido.
         </p>
-        <Button asChild size="pill" className="mt-6">
+        <Button asChild size="lg" className="mt-6">
           <a href="/presupuesto?tipo=comercio">Solicitar presupuesto</a>
         </Button>
       </section>
