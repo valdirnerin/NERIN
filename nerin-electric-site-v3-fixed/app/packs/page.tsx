@@ -18,7 +18,7 @@ export default async function PacksPage() {
         <Badge>Packs de mano de obra</Badge>
         <h1>{site.packsPage.introTitle}</h1>
         <p className="text-lg text-slate-600">{site.packsPage.introDescription}</p>
-        <Button asChild size="pill">
+        <Button asChild size="lg">
           <Link href="/presupuestador">Configurar pack online</Link>
         </Button>
         <p className="text-sm text-slate-500">{site.packsPage.note}</p>

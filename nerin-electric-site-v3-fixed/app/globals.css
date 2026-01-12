@@ -1,35 +1,43 @@
+@import '../styles/tokens.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
   color-scheme: light;
-  --color-background: #f8f9fb;
-  --color-foreground: #0f172a;
-  --color-primary: #111827;
-  --color-primary-foreground: #f8fafc;
-  --color-secondary: #e2e8f0;
-  --color-secondary-foreground: #111827;
-  --color-muted: #f1f5f9;
-  --color-muted-foreground: #475569;
-  --color-border: #e2e8f0;
-  --color-accent: #0ea5e9;
-  --color-accent-foreground: #f8fafc;
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
+  --color-primary: var(--text);
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #111827;
+  --color-secondary-foreground: #ffffff;
+  --color-muted: var(--border);
+  --color-muted-foreground: var(--muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-foreground: #0b0f14;
 }
 
 body {
   background: var(--color-background);
   color: var(--color-foreground);
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-plex), system-ui, sans-serif;
 }
 
 a {
-  transition: color 0.2s ease, opacity 0.2s ease;
+  transition: color 0.2s ease, opacity 0.2s ease, text-decoration-color 0.2s ease;
 }
 
-a:hover,
-a:focus-visible {
-  color: var(--color-accent);
+a:hover:not(.no-underline),
+a:focus-visible:not(.no-underline) {
+  color: var(--accentHover);
+  text-decoration: underline;
+  text-decoration-color: var(--accentHover);
+}
+
+a.no-underline {
+  text-decoration: none;
 }
 
 main {
@@ -38,33 +46,36 @@ main {
 
 .focus-ring {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.35);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3);
 }
 
 ::selection {
-  background: rgba(14, 165, 233, 0.3);
+  background: rgba(251, 191, 36, 0.3);
 }
 
 @layer base {
   h1 {
-    @apply font-display text-4xl md:text-5xl font-semibold tracking-tight;
+    @apply font-display text-4xl md:text-6xl font-semibold tracking-tight text-foreground;
   }
   h2 {
-    @apply font-display text-3xl md:text-4xl font-semibold tracking-tight;
+    @apply font-display text-3xl md:text-4xl font-semibold tracking-tight text-foreground;
   }
   h3 {
-    @apply font-display text-2xl font-semibold;
+    @apply font-display text-2xl font-semibold text-foreground;
   }
   p {
-    @apply text-base leading-relaxed text-slate-600;
+    @apply text-base leading-relaxed text-muted-foreground;
+  }
+  .container {
+    max-width: var(--container);
   }
 }
 
 @layer components {
   .card {
-    @apply rounded-2xl border border-border bg-white shadow-subtle transition hover:-translate-y-1 hover:shadow-lg;
+    @apply rounded-[var(--radius)] border border-border bg-white transition;
   }
   .pill {
-    @apply inline-flex items-center gap-2 rounded-full bg-muted px-4 py-2 text-sm font-medium text-muted-foreground;
+    @apply inline-flex items-center gap-2 rounded-[var(--radius)] border border-border bg-muted px-3 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground;
   }
 }

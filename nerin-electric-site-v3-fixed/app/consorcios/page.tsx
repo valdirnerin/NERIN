@@ -34,7 +34,7 @@ export default function ConsorciosPage() {
           Evitá cortes, inspecciones fallidas y reclamos. NERIN gestiona mantenimiento eléctrico con tiempos de respuesta
           claros, reportes y cumplimiento normativo.
         </p>
-        <Button asChild size="pill">
+        <Button asChild size="lg">
           <a href="/presupuesto?tipo=consorcio">Solicitar presupuesto para consorcio</a>
         </Button>
       </header>
@@ -81,7 +81,7 @@ export default function ConsorciosPage() {
         <p className="mt-3 text-slate-600">
           Coordinamos una visita técnica y armamos una propuesta con SLA y alcance operativo.
         </p>
-        <Button asChild size="pill" className="mt-6">
+        <Button asChild size="lg" className="mt-6">
           <a href="/presupuesto?tipo=consorcio">Pedir presupuesto</a>
         </Button>
       </section>

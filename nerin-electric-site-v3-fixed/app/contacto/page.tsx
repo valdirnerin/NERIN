@@ -94,7 +94,7 @@ export default async function ContactoPage({
               placeholder="Adjuntá datos de potencia, planos o comentarios relevantes."
             />
           </div>
-          <Button type="submit" size="pill">
+          <Button type="submit" size="lg">
             Enviar consulta
           </Button>
           <p className="text-xs text-slate-500">

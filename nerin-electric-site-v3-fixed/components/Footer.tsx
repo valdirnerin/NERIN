@@ -24,17 +24,15 @@ export function Footer({ site }: FooterProps) {
     <footer className="border-t border-border bg-white">
       <div className="container grid gap-12 py-14 md:grid-cols-4">
         <div className="space-y-3">
-          <p className="text-sm uppercase tracking-[0.35em] text-slate-400">NERIN</p>
-          <p className="text-sm text-slate-500">
-            {site.tagline}
-          </p>
-          <p className="text-sm text-slate-500">{site.contact.schedule}</p>
-          <p className="text-sm text-slate-500">{site.contact.phone}</p>
-          <p className="text-sm text-slate-500">{site.socials.linkedin}</p>
+          <p className="text-sm uppercase tracking-[0.35em] text-muted-foreground">NERIN</p>
+          <p className="text-sm text-muted-foreground">{site.tagline}</p>
+          <p className="text-sm text-muted-foreground">{site.contact.schedule}</p>
+          <p className="text-sm text-muted-foreground">{site.contact.phone}</p>
+          <p className="text-sm text-muted-foreground">{site.socials.linkedin}</p>
         </div>
         <div>
-          <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Servicios</h4>
-          <ul className="mt-3 space-y-2 text-sm text-slate-600">
+          <h4 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Servicios</h4>
+          <ul className="mt-3 space-y-2 text-sm text-foreground">
             {quickLinks.map((item) => (
               <li key={item.href}>
                 <Link className="hover:text-foreground" href={item.href}>
@@ -45,8 +43,8 @@ export function Footer({ site }: FooterProps) {
           </ul>
         </div>
         <div>
-          <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Contacto</h4>
-          <ul className="mt-3 space-y-2 text-sm text-slate-600">
+          <h4 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Contacto</h4>
+          <ul className="mt-3 space-y-2 text-sm text-foreground">
             <li>
               <a href={whatsappHref} className="hover:text-foreground">
                 WhatsApp directo
@@ -65,8 +63,8 @@ export function Footer({ site }: FooterProps) {
           </ul>
         </div>
         <div>
-          <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Legales</h4>
-          <ul className="mt-3 space-y-2 text-sm text-slate-600">
+          <h4 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Legales</h4>
+          <ul className="mt-3 space-y-2 text-sm text-foreground">
             {legalLinks.map((item) => (
               <li key={item.href}>
                 <Link className="hover:text-foreground" href={item.href}>
@@ -77,10 +75,15 @@ export function Footer({ site }: FooterProps) {
           </ul>
         </div>
       </div>
-      <div className="border-t border-border bg-muted/60 py-6">
-        <div className="container flex flex-col gap-3 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
+      <div className="border-t border-border bg-muted py-6">
+        <div className="container flex flex-col gap-3 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
           <span>© {new Date().getFullYear()} NERIN Electric. Todos los derechos reservados.</span>
-          <span>Desarrollado con foco en performance, accesibilidad AA y cumplimiento normativo AEA 90364-7-771.</span>
+          <div className="flex flex-col gap-2 md:items-end">
+            <span>Desarrollado con foco en performance, accesibilidad AA y cumplimiento normativo AEA 90364-7-771.</span>
+            <Link href="/admin" className="text-xs uppercase tracking-[0.3em] text-muted-foreground hover:text-foreground">
+              Panel admin
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
