@@ -7,9 +7,38 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { getSiteContent, getWhatsappHref } from '@/lib/site-content'
 import { AttributionFields } from '@/components/tracking/AttributionFields'
+import { TrackEventOnLoad } from '@/components/tracking/TrackEventOnLoad'
 
 export const revalidate = 60
 export const dynamic = 'force-dynamic'
+
+export async function generateMetadata() {
+  const site = await getSiteContent()
+  const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
+  const title = 'Contacto | NERIN'
+  const description = 'Coordiná tu obra eléctrica con un técnico senior. Respuesta en 24 horas hábiles.'
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: '/contacto',
+    },
+    openGraph: {
+      title,
+      description,
+      url: `${siteUrl}/contacto`,
+      siteName: site.name,
+      images: [{ url: '/nerin/og-cover.png', width: 1200, height: 630, alt: 'NERIN Electric' }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ['/nerin/og-cover.png'],
+    },
+  }
+}
 
 export default async function ContactoPage({
   searchParams,
@@ -33,9 +62,15 @@ export default async function ContactoPage({
         <h1>{site.contactPage.introTitle}</h1>
         <p className="text-lg text-slate-600">{site.contactPage.introDescription}</p>
         {searchParams?.enviado === '1' && (
-          <p className="rounded-2xl border border-accent/30 bg-accent/10 p-4 text-sm text-slate-700">
-            ¡Listo! Recibimos tu consulta. Te contactamos por mail dentro de las próximas 24 horas hábiles.
-          </p>
+          <>
+            <TrackEventOnLoad
+              eventName="generate_lead"
+              payload={{ content_name: 'Contacto', content_type: 'form', channel: 'contact' }}
+            />
+            <p className="rounded-2xl border border-accent/30 bg-accent/10 p-4 text-sm text-slate-700">
+              ¡Listo! Recibimos tu consulta. Te contactamos por mail dentro de las próximas 24 horas hábiles.
+            </p>
+          </>
         )}
         <form action={action} className="space-y-6 rounded-3xl border border-border bg-white p-8 shadow-subtle">
           <AttributionFields />
@@ -140,7 +175,7 @@ export default async function ContactoPage({
             </div>
           )}
           <Button asChild size="sm" variant="secondary" className="mt-4">
-            <a href={whatsappHref} target="_blank" rel="noreferrer">
+            <a href={whatsappHref} target="_blank" rel="noreferrer" data-track="whatsapp" data-content-name="WhatsApp contacto">
               Iniciar conversación
             </a>
           </Button>

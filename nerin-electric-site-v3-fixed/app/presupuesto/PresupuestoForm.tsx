@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { AttributionFields } from '@/components/tracking/AttributionFields'
-import { readAttribution, trackLeadEvent } from '@/lib/tracking'
+import { readAttribution, trackEvent } from '@/lib/tracking'
 
 const clientTypes = [
   { value: 'consorcio', label: 'Consorcio' },
@@ -113,7 +113,14 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
       setStatus('success')
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('lead_submitted', { detail: { leadId: data.leadId } }))
-        trackLeadEvent()
+        const eventName = leadType === 'visita' ? 'book_appointment' : 'generate_lead'
+        trackEvent(eventName, {
+          content_name: leadType ? `Presupuesto ${leadType}` : 'Presupuesto',
+          content_type: 'form',
+          plan_tier: plan || undefined,
+          channel: leadType === 'visita' ? 'schedule' : 'form',
+          user_data: { email: payload.email, phone: payload.phone },
+        })
       }
       form.reset()
     } catch (error) {
@@ -133,7 +140,7 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
           Recibimos tu pedido. Tu ID de solicitud es <strong>{leadId}</strong>. Te respondemos en 24–48 h.
         </p>
         <Button asChild size="lg">
-          <a href={whatsappHref} target="_blank" rel="noreferrer">
+          <a href={whatsappHref} target="_blank" rel="noreferrer" data-track="whatsapp" data-content-name="WhatsApp presupuesto">
             Continuar por WhatsApp
           </a>
         </Button>

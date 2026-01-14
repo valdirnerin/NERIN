@@ -4,11 +4,14 @@ import Script from 'next/script'
 
 type TrackingScriptsProps = {
   gtmId?: string | null
-  ga4Id?: string | null
+  ga4MeasurementId?: string | null
+  googleAdsConversionId?: string | null
   metaPixelId?: string | null
 }
 
-export function TrackingScripts({ gtmId, ga4Id, metaPixelId }: TrackingScriptsProps) {
+export function TrackingScripts({ gtmId, ga4MeasurementId, googleAdsConversionId, metaPixelId }: TrackingScriptsProps) {
+  const gtagId = ga4MeasurementId || googleAdsConversionId
+
   return (
     <>
       {gtmId ? (
@@ -22,15 +25,16 @@ export function TrackingScripts({ gtmId, ga4Id, metaPixelId }: TrackingScriptsPr
           `}
         </Script>
       ) : null}
-      {ga4Id ? (
+      {gtagId ? (
         <>
-          <Script src={`https://www.googletagmanager.com/gtag/js?id=${ga4Id}`} strategy="afterInteractive" />
-          <Script id="ga4-init" strategy="afterInteractive">
+          <Script src={`https://www.googletagmanager.com/gtag/js?id=${gtagId}`} strategy="afterInteractive" />
+          <Script id="gtag-init" strategy="afterInteractive">
             {`
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
-              gtag('config', '${ga4Id}');
+              ${ga4MeasurementId ? `gtag('config', '${ga4MeasurementId}');` : ''}
+              ${googleAdsConversionId ? `gtag('config', '${googleAdsConversionId}');` : ''}
             `}
           </Script>
         </>

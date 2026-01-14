@@ -6,20 +6,29 @@ export const revalidate = 60
 
 export async function generateMetadata() {
   const site = await getSiteContent()
+  const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
+  const title = 'Electricidad para comercios y oficinas | NERIN'
+  const description =
+    'Instalaciones y adecuaciones eléctricas para comercios y oficinas en CABA. Tableros, puesta a tierra y cumplimiento normativo.'
+
   return {
-    title: 'Electricidad para comercios y oficinas | NERIN',
-    description:
-      'Instalaciones y adecuaciones eléctricas para comercios y oficinas en CABA. Tableros, puesta a tierra y cumplimiento normativo.',
+    title,
+    description,
+    alternates: {
+      canonical: '/comercios-oficinas',
+    },
     openGraph: {
-      title: 'Electricidad para comercios y oficinas | NERIN',
-      description:
-        'Instalaciones y adecuaciones eléctricas para comercios y oficinas en CABA. Tableros, puesta a tierra y cumplimiento normativo.',
+      title,
+      description,
+      url: `${siteUrl}/comercios-oficinas`,
       siteName: site.name,
+      images: [{ url: '/nerin/og-cover.png', width: 1200, height: 630, alt: 'NERIN Electric' }],
     },
     twitter: {
-      title: 'Electricidad para comercios y oficinas | NERIN',
-      description:
-        'Instalaciones y adecuaciones eléctricas para comercios y oficinas en CABA. Tableros, puesta a tierra y cumplimiento normativo.',
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ['/nerin/og-cover.png'],
     },
   }
 }
@@ -35,7 +44,7 @@ export default function ComerciosOficinasPage() {
           entregamos documentación completa.
         </p>
         <Button asChild size="lg">
-          <a href="/presupuesto?tipo=comercio">Pedir presupuesto para comercio u oficina</a>
+          <a href="/presupuesto?tipo=comercio" data-track="lead" data-content-name="Presupuesto comercio">Pedir presupuesto para comercio u oficina</a>
         </Button>
       </header>
 
@@ -82,7 +91,7 @@ export default function ComerciosOficinasPage() {
           Coordinemos una visita técnica y diseñemos un plan de trabajo seguro y rápido.
         </p>
         <Button asChild size="lg" className="mt-6">
-          <a href="/presupuesto?tipo=comercio">Solicitar presupuesto</a>
+          <a href="/presupuesto?tipo=comercio" data-track="lead" data-content-name="Solicitar presupuesto comercio">Solicitar presupuesto</a>
         </Button>
       </section>
     </div>

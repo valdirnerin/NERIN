@@ -5,6 +5,32 @@ import { ConfiguratorWizard } from '@/components/configurator/ConfiguratorWizard
 
 export const revalidate = 60
 
+export async function generateMetadata() {
+  const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
+  const title = 'Configurador de packs eléctricos | NERIN'
+  const description = 'Configurá tu pack eléctrico en cuatro pasos y generá un PDF de cotización.'
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: '/presupuestador',
+    },
+    openGraph: {
+      title,
+      description,
+      url: `${siteUrl}/presupuestador`,
+      images: [{ url: '/nerin/og-cover.png', width: 1200, height: 630, alt: 'NERIN Electric' }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ['/nerin/og-cover.png'],
+    },
+  }
+}
+
 export default async function PresupuestadorPage({ searchParams }: { searchParams: { pack?: string } }) {
   const { packs, adicionales } = await getConfiguratorData()
   const defaultPack = searchParams.pack

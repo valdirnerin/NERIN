@@ -8,6 +8,34 @@ import { getSiteContent } from '@/lib/site-content'
 
 export const revalidate = 60
 
+export async function generateMetadata() {
+  const site = await getSiteContent()
+  const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
+  const title = 'Planes de mantenimiento eléctrico | NERIN'
+  const description = 'Planes de mantenimiento eléctrico con visitas programadas, SLAs y reportes mensuales.'
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: '/mantenimiento',
+    },
+    openGraph: {
+      title,
+      description,
+      url: `${siteUrl}/mantenimiento`,
+      siteName: site.name,
+      images: [{ url: '/nerin/og-cover.png', width: 1200, height: 630, alt: 'NERIN Electric' }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ['/nerin/og-cover.png'],
+    },
+  }
+}
+
 export default async function MantenimientoPage() {
   const plans = await getMaintenancePlansForMarketing()
   const site = await getSiteContent()
@@ -41,10 +69,10 @@ export default async function MantenimientoPage() {
               </p>
               <div className="flex flex-col gap-2">
                 <Button asChild>
-                  <Link href={`/presupuesto?tipo=mantenimiento&plan=${plan.slug}`}>Solicitar alta del plan</Link>
+                  <Link href={`/presupuesto?tipo=mantenimiento&plan=${plan.slug}`} data-track="lead" data-content-name={plan.nombre} data-plan-tier={plan.slug} data-value={Number(plan.precioMensual)} data-currency="ARS">Solicitar alta del plan</Link>
                 </Button>
                 <Button asChild variant="secondary">
-                  <Link href="/presupuesto?tipo=mantenimiento">Hablar con un asesor</Link>
+                  <Link href="/presupuesto?tipo=mantenimiento" data-track="lead" data-content-name="Hablar con un asesor">Hablar con un asesor</Link>
                 </Button>
               </div>
             </CardContent>

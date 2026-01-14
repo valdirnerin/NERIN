@@ -8,18 +8,73 @@ import { getSiteContent } from '@/lib/site-content'
 
 export const revalidate = 60
 
+export async function generateMetadata() {
+  const site = await getSiteContent()
+  const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
+  const title = 'Packs eléctricos | NERIN'
+  const description = 'Packs de mano de obra eléctrica para viviendas con alcance claro y configurador online.'
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: '/packs',
+    },
+    openGraph: {
+      title,
+      description,
+      url: `${siteUrl}/packs`,
+      siteName: site.name,
+      images: [{ url: '/nerin/og-cover.png', width: 1200, height: 630, alt: 'NERIN Electric' }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ['/nerin/og-cover.png'],
+    },
+  }
+}
+
 export default async function PacksPage() {
   const packs = await getPacksForMarketing()
   const site = await getSiteContent()
+  const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
+  const servicesSchema = {
+    '@context': 'https://schema.org',
+    '@graph': packs.map((pack) => ({
+      '@type': 'Service',
+      name: pack.name,
+      description: pack.description,
+      provider: {
+        '@type': 'LocalBusiness',
+        name: site.name,
+        url: siteUrl,
+      },
+      areaServed: site.contact.serviceArea,
+      offers: {
+        '@type': 'Offer',
+        priceCurrency: 'ARS',
+        price: Number(pack.basePrice),
+        availability: 'https://schema.org/InStock',
+        url: `${siteUrl}/packs#${pack.slug}`,
+      },
+    })),
+  }
 
   return (
-    <div className="space-y-16">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(servicesSchema) }}
+      />
+      <div className="space-y-16">
       <header className="space-y-6">
         <Badge>Packs de mano de obra</Badge>
         <h1>{site.packsPage.introTitle}</h1>
         <p className="text-lg text-slate-600">{site.packsPage.introDescription}</p>
         <Button asChild size="lg">
-          <Link href="/presupuestador">Configurar pack online</Link>
+          <Link href="/presupuestador" data-track="view_pack" data-content-name="Configurar pack online">Configurar pack online</Link>
         </Button>
         <p className="text-sm text-slate-500">{site.packsPage.note}</p>
       </header>
@@ -64,7 +119,7 @@ export default async function PacksPage() {
                   <p className="mt-2">Podés sumar adicionales críticos desde el configurador online.</p>
                 </div>
                 <Button variant="secondary" asChild>
-                  <Link href={`/presupuestador?pack=${pack.slug}`}>Elegir este pack</Link>
+                  <Link href={`/presupuestador?pack=${pack.slug}`} data-track="view_pack" data-content-name={pack.name} data-value={Number(pack.basePrice)} data-currency="ARS">Elegir este pack</Link>
                 </Button>
                 <p className="text-xs text-slate-500">
                   Proyecto eléctrico se cobra aparte (base $500.000). Coordinamos marcas como Schneider, Prysmian, Gimsa,
@@ -76,5 +131,6 @@ export default async function PacksPage() {
         ))}
       </section>
     </div>
+    </>
   )
 }

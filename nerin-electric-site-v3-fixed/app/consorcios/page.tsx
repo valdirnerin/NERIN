@@ -6,20 +6,29 @@ export const revalidate = 60
 
 export async function generateMetadata() {
   const site = await getSiteContent()
+  const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
+  const title = 'Mantenimiento eléctrico para consorcios | NERIN'
+  const description =
+    'Mantenimiento eléctrico para consorcios con SLAs reales, reportes y guardias. Respuesta rápida en CABA.'
+
   return {
-    title: 'Mantenimiento eléctrico para consorcios | NERIN',
-    description:
-      'Mantenimiento eléctrico para consorcios con SLAs reales, reportes y guardias. Respuesta rápida en CABA.',
+    title,
+    description,
+    alternates: {
+      canonical: '/consorcios',
+    },
     openGraph: {
-      title: 'Mantenimiento eléctrico para consorcios | NERIN',
-      description:
-        'Mantenimiento eléctrico para consorcios con SLAs reales, reportes y guardias. Respuesta rápida en CABA.',
+      title,
+      description,
+      url: `${siteUrl}/consorcios`,
       siteName: site.name,
+      images: [{ url: '/nerin/og-cover.png', width: 1200, height: 630, alt: 'NERIN Electric' }],
     },
     twitter: {
-      title: 'Mantenimiento eléctrico para consorcios | NERIN',
-      description:
-        'Mantenimiento eléctrico para consorcios con SLAs reales, reportes y guardias. Respuesta rápida en CABA.',
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ['/nerin/og-cover.png'],
     },
   }
 }
@@ -35,7 +44,7 @@ export default function ConsorciosPage() {
           claros, reportes y cumplimiento normativo.
         </p>
         <Button asChild size="lg">
-          <a href="/presupuesto?tipo=consorcio">Solicitar presupuesto para consorcio</a>
+          <a href="/presupuesto?tipo=consorcio" data-track="lead" data-content-name="Presupuesto consorcio">Solicitar presupuesto para consorcio</a>
         </Button>
       </header>
 
@@ -82,7 +91,7 @@ export default function ConsorciosPage() {
           Coordinamos una visita técnica y armamos una propuesta con SLA y alcance operativo.
         </p>
         <Button asChild size="lg" className="mt-6">
-          <a href="/presupuesto?tipo=consorcio">Pedir presupuesto</a>
+          <a href="/presupuesto?tipo=consorcio" data-track="lead" data-content-name="Pedir presupuesto consorcio">Pedir presupuesto</a>
         </Button>
       </section>
     </div>
