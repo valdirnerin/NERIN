@@ -6,20 +6,29 @@ export const revalidate = 60
 
 export async function generateMetadata() {
   const site = await getSiteContent()
+  const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
+  const title = 'Presupuesto eléctrico rápido | NERIN'
+  const description =
+    'Completá el formulario y recibí un presupuesto eléctrico en 24–48 h. Respuesta rápida para obras, comercios y consorcios.'
+
   return {
-    title: 'Presupuesto eléctrico rápido | NERIN',
-    description:
-      'Completá el formulario y recibí un presupuesto eléctrico en 24–48 h. Respuesta rápida para obras, comercios y consorcios.',
+    title,
+    description,
+    alternates: {
+      canonical: '/presupuesto',
+    },
     openGraph: {
-      title: 'Presupuesto eléctrico rápido | NERIN',
-      description:
-        'Completá el formulario y recibí un presupuesto eléctrico en 24–48 h. Respuesta rápida para obras, comercios y consorcios.',
+      title,
+      description,
+      url: `${siteUrl}/presupuesto`,
       siteName: site.name,
+      images: [{ url: '/nerin/og-cover.png', width: 1200, height: 630, alt: 'NERIN Electric' }],
     },
     twitter: {
-      title: 'Presupuesto eléctrico rápido | NERIN',
-      description:
-        'Completá el formulario y recibí un presupuesto eléctrico en 24–48 h. Respuesta rápida para obras, comercios y consorcios.',
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ['/nerin/og-cover.png'],
     },
   }
 }

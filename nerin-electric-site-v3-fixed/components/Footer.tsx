@@ -35,7 +35,7 @@ export function Footer({ site }: FooterProps) {
           <ul className="mt-3 space-y-2 text-sm text-foreground">
             {quickLinks.map((item) => (
               <li key={item.href}>
-                <Link className="hover:text-foreground" href={item.href}>
+                <Link className="hover:text-foreground" href={item.href} data-track={item.href === "/presupuesto" ? "lead" : undefined} data-content-name={item.href === "/presupuesto" ? "Pedir presupuesto footer" : undefined}>
                   {item.label}
                 </Link>
               </li>
@@ -46,7 +46,7 @@ export function Footer({ site }: FooterProps) {
           <h4 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Contacto</h4>
           <ul className="mt-3 space-y-2 text-sm text-foreground">
             <li>
-              <a href={whatsappHref} className="hover:text-foreground">
+              <a href={whatsappHref} className="hover:text-foreground" data-track="whatsapp" data-content-name="WhatsApp footer">
                 WhatsApp directo
               </a>
             </li>
@@ -56,7 +56,7 @@ export function Footer({ site }: FooterProps) {
               </a>
             </li>
             <li>
-              <Link href="/presupuesto?tipo=visita" className="hover:text-foreground">
+              <Link href="/presupuesto?tipo=visita" className="hover:text-foreground" data-track="schedule" data-content-name="Agendar visita footer">
                 Agendar visita técnica
               </Link>
             </li>
@@ -67,7 +67,7 @@ export function Footer({ site }: FooterProps) {
           <ul className="mt-3 space-y-2 text-sm text-foreground">
             {legalLinks.map((item) => (
               <li key={item.href}>
-                <Link className="hover:text-foreground" href={item.href}>
+                <Link className="hover:text-foreground" href={item.href} data-track={item.href === "/presupuesto" ? "lead" : undefined} data-content-name={item.href === "/presupuesto" ? "Pedir presupuesto footer" : undefined}>
                   {item.label}
                 </Link>
               </li>

@@ -9,6 +9,7 @@ import { Providers } from '@/components/Providers'
 import { cn } from '@/lib/utils'
 import { TrackingScripts } from '@/components/tracking/TrackingScripts'
 import { AttributionCapture } from '@/components/tracking/AttributionCapture'
+import { TrackingProvider } from '@/components/tracking/TrackingProvider'
 
 const plexSans = IBM_Plex_Sans({ subsets: ['latin'], variable: '--font-plex', weight: ['400', '500', '600', '700'] })
 const plexCondensed = IBM_Plex_Sans_Condensed({
@@ -19,9 +20,10 @@ const plexCondensed = IBM_Plex_Sans_Condensed({
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSiteContent()
+  const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
 
   return {
-    metadataBase: new URL('https://nerin-electric.render.com'),
+    metadataBase: new URL(siteUrl),
     title: {
       default: site.seo.metaTitle,
       template: `%s · ${site.name}`,
@@ -34,7 +36,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title: site.seo.metaTitle,
       description: site.seo.metaDescription,
-      url: 'https://www.nerin.com.ar',
+      url: siteUrl,
       siteName: 'NERIN Electric',
       locale: 'es_AR',
       type: 'website',
@@ -52,14 +54,60 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const site = await getSiteContent()
   const whatsappHref = getWhatsappHref(site)
-  const gtmId = process.env.NEXT_PUBLIC_GTM_ID || process.env.GTM_ID
-  const ga4Id = process.env.NEXT_PUBLIC_GA4_ID || process.env.GA4_ID
-  const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID || process.env.META_PIXEL_ID
+  const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
+  const gtmId = process.env.GTM_ID || process.env.NEXT_PUBLIC_GTM_ID
+  const ga4Id = process.env.GA4_MEASUREMENT_ID || process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID
+  const googleAdsConversionId =
+    process.env.GOOGLE_ADS_CONVERSION_ID || process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_ID
+  const metaPixelId = process.env.META_PIXEL_ID || process.env.NEXT_PUBLIC_META_PIXEL_ID
+  const metaCapiEnabled = Boolean(process.env.META_CAPI_ACCESS_TOKEN)
+  const siteCurrency = process.env.CURRENCY
 
   return (
     <html lang="es-AR" className={cn(plexSans.variable, plexCondensed.variable)}>
+      <head>
+        <TrackingScripts
+          gtmId={gtmId}
+          ga4MeasurementId={ga4Id}
+          googleAdsConversionId={googleAdsConversionId}
+          metaPixelId={metaPixelId}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'LocalBusiness',
+              name: site.name,
+              url: siteUrl,
+              telephone: site.contact.phone || site.contact.whatsappNumber,
+              email: site.contact.email,
+              areaServed: 'CABA',
+              address: {
+                '@type': 'PostalAddress',
+                streetAddress: site.contact.address,
+                addressLocality: 'CABA',
+                addressRegion: 'CABA',
+                addressCountry: 'AR',
+              },
+            }),
+          }}
+        />
+      </head>
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
-        <TrackingScripts gtmId={gtmId} ga4Id={ga4Id} metaPixelId={metaPixelId} />
+        <TrackingProvider
+          config={{
+            gtmId,
+            ga4MeasurementId: ga4Id,
+            metaPixelId,
+            metaCapiEnabled,
+            googleAdsConversionId,
+            googleAdsConversionLabelLead: process.env.GOOGLE_ADS_CONVERSION_LABEL_LEAD,
+            googleAdsConversionLabelSchedule: process.env.GOOGLE_ADS_CONVERSION_LABEL_SCHEDULE,
+            googleAdsConversionLabelWhatsapp: process.env.GOOGLE_ADS_CONVERSION_LABEL_WHATSAPP,
+            currency: siteCurrency,
+          }}
+        />
         {gtmId ? (
           <noscript>
             <iframe
@@ -89,6 +137,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             rel="noreferrer"
             aria-label="Hablar con NERIN por WhatsApp"
             title="WhatsApp"
+            data-track="whatsapp"
+            data-content-name="WhatsApp flotante"
           >
             <svg aria-hidden viewBox="0 0 24 24" className="h-5 w-5 fill-current">
               <path d="M12 4.2a7.8 7.8 0 0 0-6.75 11.7L4 20l4.2-1.1A7.8 7.8 0 1 0 12 4.2Zm0 1.6a6.2 6.2 0 0 1 0 12.4 6.1 6.1 0 0 1-3.1-.9l-.4-.2-2.5.7.7-2.4-.3-.4a6.2 6.2 0 0 1 5.6-9.2Zm-2.4 3.3c-.2 0-.4 0-.5.2-.2.2-.7.7-.7 1.6s.7 2 1 2.3c.2.3 1.4 2.1 3.5 2.9 1.7.7 2 .5 2.3.5.3 0 1-.5 1.1-.9.1-.4.1-.8.1-.9s0-.2-.2-.2l-1.1-.5c-.2-.1-.3 0-.4.1-.1.2-.5.9-.6 1-.1.2-.2.2-.5.1-.2-.1-1-.4-1.9-1.2-.7-.6-1.1-1.4-1.2-1.6-.1-.2 0-.3.1-.4l.3-.3.2-.3c.1-.1.1-.3 0-.4l-.5-1.1c-.1-.2-.2-.2-.4-.2Z" />

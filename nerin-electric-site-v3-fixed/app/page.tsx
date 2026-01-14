@@ -13,19 +13,29 @@ export const revalidate = 60
 
 export async function generateMetadata() {
   const site = await getSiteContent()
+  const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
+  const title = 'Contratista eléctrico en CABA | Presupuestos en 24-48 h'
+  const description =
+    'Contratista eléctrico para obras, comercios y consorcios en CABA. Presupuesto en 24–48 h, cumplimiento normativo y experiencia real en obra.'
+
   return {
-    title: 'Contratista eléctrico en CABA | Presupuestos en 24-48 h',
-    description:
-      'Contratista eléctrico para obras, comercios y consorcios en CABA. Presupuesto en 24–48 h, cumplimiento normativo y experiencia real en obra.',
+    title,
+    description,
+    alternates: {
+      canonical: '/',
+    },
     openGraph: {
-      title: 'Contratista eléctrico en CABA | Presupuestos en 24-48 h',
-      description:
-        'Contratista eléctrico para obras, comercios y consorcios en CABA. Presupuesto en 24–48 h, cumplimiento normativo y experiencia real en obra.',
+      title,
+      description,
+      url: siteUrl,
+      siteName: site.name,
+      images: [{ url: '/nerin/og-cover.png', width: 1200, height: 630, alt: 'NERIN Electric' }],
     },
     twitter: {
-      title: 'Contratista eléctrico en CABA | Presupuestos en 24-48 h',
-      description:
-        'Contratista eléctrico para obras, comercios y consorcios en CABA. Presupuesto en 24–48 h, cumplimiento normativo y experiencia real en obra.',
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ['/nerin/og-cover.png'],
     },
   }
 }
@@ -56,21 +66,6 @@ export default async function HomePage() {
 
   return (
     <div className="space-y-24">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'Electrician',
-            name: site.name,
-            url: 'https://www.nerin.com.ar',
-            telephone: site.contact.whatsappNumber,
-            areaServed: site.contact.serviceArea,
-            serviceType: site.services.items.map((item) => item.title),
-          }),
-        }}
-      />
-
       <section className="grid gap-12 lg:grid-cols-[1.1fr_1fr]">
         <div className="space-y-6">
           <Badge>{site.hero.badge}</Badge>
@@ -78,10 +73,10 @@ export default async function HomePage() {
           <p className="max-w-xl text-lg text-muted-foreground">{site.hero.subtitle}</p>
           <div className="flex flex-wrap gap-4">
             <Button size="lg" asChild>
-              <Link href="/presupuesto">Pedir presupuesto</Link>
+              <Link href="/presupuesto" data-track="lead" data-content-name="Hero presupuesto">Pedir presupuesto</Link>
             </Button>
             <Button size="lg" variant="secondary" asChild>
-              <Link href="/contacto?motivo=Visita%20t%C3%A9cnica">Agendar visita técnica</Link>
+              <Link href="/contacto?motivo=Visita%20t%C3%A9cnica" data-track="schedule" data-content-name="Hero visita técnica">Agendar visita técnica</Link>
             </Button>
             <Link
               href="/mantenimiento"
@@ -169,7 +164,7 @@ export default async function HomePage() {
             <p>{site.packs.description}</p>
           </div>
           <Button variant="secondary" asChild>
-            <a href={site.packs.ctaHref}>{site.packs.ctaLabel}</a>
+            <a href={site.packs.ctaHref} data-track="view_pack" data-content-name="Configurar pack home">{site.packs.ctaLabel}</a>
           </Button>
         </div>
         <div className="grid gap-6 md:grid-cols-3">
@@ -195,7 +190,7 @@ export default async function HomePage() {
                   ))}
                 </ul>
                 <Button variant="ghost" asChild>
-                  <a href={`/packs#${pack.slug}`}>Ver alcance completo</a>
+                  <a href={`/packs#${pack.slug}`} data-track="view_pack" data-content-name={pack.name}>Ver alcance completo</a>
                 </Button>
               </CardContent>
             </Card>
@@ -345,10 +340,10 @@ export default async function HomePage() {
           </div>
           <div className="flex flex-wrap gap-4 md:justify-end">
             <Button size="lg" variant="accent" asChild>
-              <a href={site.closingCta.primary.href}>{site.closingCta.primary.label}</a>
+              <a href={site.closingCta.primary.href} data-track="lead" data-content-name="Solicitar alta del plan" data-plan-tier="mantenimiento">{site.closingCta.primary.label}</a>
             </Button>
             <Button size="lg" variant="secondary" asChild>
-              <a href={site.closingCta.secondary.href}>{site.closingCta.secondary.label}</a>
+              <a href={site.closingCta.secondary.href} data-track="lead" data-content-name="Pedir presupuesto cierre">{site.closingCta.secondary.label}</a>
             </Button>
           </div>
         </div>
