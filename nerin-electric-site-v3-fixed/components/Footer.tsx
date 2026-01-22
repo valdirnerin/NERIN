@@ -67,7 +67,7 @@ export function Footer({ site }: FooterProps) {
           <ul className="mt-3 space-y-2 text-sm text-foreground">
             {legalLinks.map((item) => (
               <li key={item.href}>
-                <Link className="hover:text-foreground" href={item.href} data-track={item.href === "/presupuesto" ? "lead" : undefined} data-content-name={item.href === "/presupuesto" ? "Pedir presupuesto footer" : undefined}>
+                <Link className="hover:text-foreground" href={item.href} data-track="legal" data-content-name={item.label}>
                   {item.label}
                 </Link>
               </li>
