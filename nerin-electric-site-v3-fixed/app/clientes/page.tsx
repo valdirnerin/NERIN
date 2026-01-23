@@ -30,6 +30,7 @@ export default async function ClienteDashboard() {
   }
 
   const displayName = session.user.name?.trim() || session.user.email || 'usuario'
+  const opsEmail = session.user.email?.trim()
 
   const client = await prisma.client.findUnique({
     where: { userId: session.user.id },
@@ -42,6 +43,21 @@ export default async function ClienteDashboard() {
       },
     },
   })
+
+  const opsClient = opsEmail
+    ? await prisma.opsClient.findUnique({
+        where: { email: opsEmail },
+        include: {
+          projects: {
+            include: {
+              certificates: true,
+              additionals: true,
+              photos: true,
+            },
+          },
+        },
+      })
+    : null
 
   const normalizedClient = client
     ? {
@@ -177,6 +193,46 @@ export default async function ClienteDashboard() {
           </CardHeader>
           <CardContent className="text-sm text-slate-600">
             <p>Cuando asignemos un proyecto a tu cuenta vas a poder ver el detalle completo acá.</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {opsClient?.projects.length ? (
+        <section className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-semibold text-foreground">Obras operativas</h2>
+            <p className="text-sm text-slate-500">Seguimiento de obra y pagos en línea.</p>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2">
+            {opsClient.projects.map((project) => (
+              <Card key={project.id}>
+                <CardHeader>
+                  <CardTitle>{project.title}</CardTitle>
+                  <p className="text-sm text-slate-500">
+                    Estado: {project.status} · Progreso {project.progressPercent}%
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-3 text-sm text-slate-600">
+                  {project.address && <p>Dirección: {project.address}</p>}
+                  {project.city && <p>Ciudad: {project.city}</p>}
+                  <p>Certificados: {project.certificates.length}</p>
+                  <p>Adicionales: {project.additionals.length}</p>
+                  <p>Fotos: {project.photos.length}</p>
+                  <Button asChild size="sm" variant="secondary">
+                    <Link href={`/clientes/obra/${project.id}`}>Ver detalle</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>Sin obras operativas</CardTitle>
+          </CardHeader>
+          <CardContent className="text-sm text-slate-600">
+            <p>Cuando asignemos una obra operativa a tu correo vas a verla en esta sección.</p>
           </CardContent>
         </Card>
       )}

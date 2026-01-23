@@ -60,6 +60,9 @@ export default async function AdminPage() {
           <Button variant="outline" asChild>
             <Link href="/admin/packs">Gestionar packs comerciales</Link>
           </Button>
+          <Button variant="outline" asChild>
+            <Link href="/admin/ops">Admin operativo</Link>
+          </Button>
         </div>
       </header>
 

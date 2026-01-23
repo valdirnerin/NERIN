@@ -359,6 +359,76 @@ async function main() {
     skipDuplicates: true,
   })
 
+  const opsClientExists = await prisma.opsClient.findFirst()
+  if (!opsClientExists) {
+    const opsClient = await prisma.opsClient.create({
+      data: {
+        name: 'Consorcio Torre Norte',
+        email: 'obra@demo.com',
+        phone: '+54 9 11 4000 0000',
+        companyName: 'Consorcio Torre Norte',
+        cuit: '30-12345678-9',
+      },
+    })
+
+    const opsProject = await prisma.opsProject.create({
+      data: {
+        clientId: opsClient.id,
+        title: 'Obra Edificio Torre Norte',
+        address: 'Av. Cabildo 2400',
+        city: 'CABA',
+        areaM2: 4200,
+        electrificationLevel: 'Alta demanda',
+        status: 'IN_PROGRESS',
+        progressPercent: 25,
+        notes: 'Proyecto en fase de canalizaciones.',
+      },
+    })
+
+    const catalogItem = await prisma.additionalCatalogItem.create({
+      data: {
+        name: 'Bocas adicionales',
+        description: 'Instalación de bocas adicionales por ambiente.',
+        unit: 'unidad',
+        laborUnitPrice: 18000,
+        active: true,
+      },
+    })
+
+    await prisma.opsProgressCertificate.create({
+      data: {
+        projectId: opsProject.id,
+        percentToAdd: 15,
+        percentAfter: 40,
+        amount: 42000000,
+        status: 'DRAFT',
+        description: 'Certificado parcial de avance.',
+      },
+    })
+
+    await prisma.opsProjectAdditionalItem.create({
+      data: {
+        projectId: opsProject.id,
+        catalogItemId: catalogItem.id,
+        name: catalogItem.name,
+        description: catalogItem.description,
+        unit: catalogItem.unit,
+        unitPrice: catalogItem.laborUnitPrice,
+        quantity: 6,
+        status: 'APPROVED',
+      },
+    })
+
+    await prisma.opsProjectPhoto.create({
+      data: {
+        projectId: opsProject.id,
+        title: 'Avance tablero principal',
+        url: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80',
+        takenAt: new Date(),
+      },
+    })
+  }
+
   console.log('Seed completado')
 }
 
