@@ -381,3 +381,104 @@ model BlogPost {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
+
+model OpsClient {
+  id          String   @id @default(cuid())
+  name        String
+  email       String   @unique
+  phone       String?
+  companyName String?
+  cuit        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  projects    OpsProject[]
+}
+
+model OpsProject {
+  id                   String                   @id @default(cuid())
+  clientId             String
+  title                String
+  address              String?
+  city                 String?
+  areaM2               Float?
+  electrificationLevel String?
+  status               String                   @default("PLANNING")
+  progressPercent      Int                      @default(0)
+  cacIndex             Float?
+  notes                String?
+  createdAt            DateTime                 @default(now())
+  updatedAt            DateTime                 @updatedAt
+  client               OpsClient                @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  certificates         OpsProgressCertificate[]
+  additionals          OpsProjectAdditionalItem[]
+  photos               OpsProjectPhoto[]
+}
+
+model OpsProgressCertificate {
+  id                       String               @id @default(cuid())
+  projectId                String
+  percentToAdd             Int
+  percentAfter             Int
+  amount                   Int
+  currency                 String               @default("ARS")
+  description              String?
+  status                   String               @default("DRAFT")
+  mercadoPagoPreferenceId  String?
+  mercadoPagoInitPoint     String?
+  createdAt                DateTime             @default(now())
+  updatedAt                DateTime             @updatedAt
+  paidAt                   DateTime?
+  project                  OpsProject           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model AdditionalCatalogItem {
+  id             String                   @id @default(cuid())
+  name           String
+  description    String?
+  unit           String
+  laborUnitPrice Int
+  active         Boolean                  @default(true)
+  projectItems   OpsProjectAdditionalItem[]
+}
+
+model OpsProjectAdditionalItem {
+  id                       String             @id @default(cuid())
+  projectId                String
+  catalogItemId            String?
+  name                     String
+  description              String?
+  unit                     String
+  unitPrice                Int
+  quantity                 Float
+  status                   String             @default("QUOTED")
+  mercadoPagoPreferenceId  String?
+  mercadoPagoInitPoint     String?
+  createdAt                DateTime           @default(now())
+  updatedAt                DateTime           @updatedAt
+  paidAt                   DateTime?
+  project                  OpsProject         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  catalogItem              AdditionalCatalogItem? @relation(fields: [catalogItemId], references: [id])
+}
+
+model OpsProjectPhoto {
+  id        String    @id @default(cuid())
+  projectId String
+  title     String?
+  url       String
+  takenAt   DateTime?
+  createdAt DateTime  @default(now())
+  project   OpsProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model PaymentEvent {
+  id          String             @id @default(cuid())
+  provider    String
+  externalId  String
+  status      String
+  raw         String
+  relatedType String
+  relatedId   String
+  createdAt   DateTime           @default(now())
+
+  @@unique([provider, externalId])
+}
