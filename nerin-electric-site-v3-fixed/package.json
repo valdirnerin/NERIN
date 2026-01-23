@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "next dev -p 3000",
-    "build": "prisma generate && next build",
+    "build": "node scripts/prisma-push-if-enabled.mjs && prisma generate && next build",
     "start": "export DATABASE_URL=\"${DATABASE_URL:-file:/var/data/nerin.db}\" && prisma db push && next start",
     "lint": "next lint",
     "format": "prettier --write .",
