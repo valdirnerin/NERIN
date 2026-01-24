@@ -4,8 +4,8 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "next dev -p 3000",
-    "build": "node scripts/prisma-push-if-enabled.mjs && prisma generate && next build",
-    "start": "export DATABASE_URL=\"${DATABASE_URL:-file:/var/data/nerin.db}\" && prisma db push && next start",
+    "build": "export DATABASE_URL=${DATABASE_URL:-$( [ -d /var/data ] && echo file:/var/data/nerin.db || echo file:/tmp/nerin.db )} && prisma generate && prisma db push && next build",
+    "start": "export DATABASE_URL=${DATABASE_URL:-$( [ -d /var/data ] && echo file:/var/data/nerin.db || echo file:/tmp/nerin.db )} && prisma db push && next start -p $PORT",
     "lint": "next lint",
     "format": "prettier --write .",
     "test": "vitest run",

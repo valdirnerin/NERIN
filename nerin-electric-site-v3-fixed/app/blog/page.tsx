@@ -15,24 +15,30 @@ export default async function BlogPage() {
         <h1>{site.blog.title}</h1>
         <p className="text-lg text-slate-600">{site.blog.description}</p>
       </header>
-      <div className="grid gap-6 md:grid-cols-2">
-        {posts.map((post) => (
-          <article key={post.slug} className="rounded-3xl border border-border bg-white p-6 shadow-subtle">
-            <p className="text-xs uppercase tracking-wide text-slate-400">
-              {new Date(post.publishedAt).toLocaleDateString('es-AR', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric',
-              })}
-            </p>
-            <h2 className="mt-3 text-2xl font-semibold text-foreground">{post.title}</h2>
-            <p className="mt-2 text-sm text-slate-600">{post.excerpt}</p>
-            <Link className="mt-4 inline-flex text-accent" href={`/blog/${post.slug}`}>
-              Leer más →
-            </Link>
-          </article>
-        ))}
-      </div>
+      {posts.length === 0 ? (
+        <div className="rounded-3xl border border-dashed border-border bg-white p-8 text-center text-sm text-slate-500">
+          Todavía no hay publicaciones disponibles. Volvé a visitar esta sección en unas horas.
+        </div>
+      ) : (
+        <div className="grid gap-6 md:grid-cols-2">
+          {posts.map((post) => (
+            <article key={post.slug} className="rounded-3xl border border-border bg-white p-6 shadow-subtle">
+              <p className="text-xs uppercase tracking-wide text-slate-400">
+                {new Date(post.publishedAt).toLocaleDateString('es-AR', {
+                  day: '2-digit',
+                  month: 'short',
+                  year: 'numeric',
+                })}
+              </p>
+              <h2 className="mt-3 text-2xl font-semibold text-foreground">{post.title}</h2>
+              <p className="mt-2 text-sm text-slate-600">{post.excerpt}</p>
+              <Link className="mt-4 inline-flex text-accent" href={`/blog/${post.slug}`}>
+                Leer más →
+              </Link>
+            </article>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

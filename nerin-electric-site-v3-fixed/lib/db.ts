@@ -4,17 +4,22 @@ import { existsSync } from 'node:fs'
 import { PrismaClient } from '@prisma/client'
 
 const VAR_DATA_DB_URL = 'file:/var/data/nerin.db'
+const TMP_DB_URL = 'file:/tmp/nerin.db'
 const DEV_DB_URL = 'file:./dev.db'
 
 const isDatabaseUrlMissing =
   !process.env.DATABASE_URL || process.env.DATABASE_URL.trim().length === 0
 
-if (isDatabaseUrlMissing && existsSync('/var/data')) {
-  process.env.DATABASE_URL = VAR_DATA_DB_URL
+if (isDatabaseUrlMissing) {
+  if (existsSync('/var/data')) {
+    process.env.DATABASE_URL = VAR_DATA_DB_URL
+  } else {
+    process.env.DATABASE_URL = process.env.NODE_ENV === 'development' ? DEV_DB_URL : TMP_DB_URL
+  }
 }
 
 const databaseUrl = process.env.DATABASE_URL?.trim()
-const resolvedDatabaseUrl = databaseUrl && databaseUrl.length > 0 ? databaseUrl : DEV_DB_URL
+const resolvedDatabaseUrl = databaseUrl && databaseUrl.length > 0 ? databaseUrl : TMP_DB_URL
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
