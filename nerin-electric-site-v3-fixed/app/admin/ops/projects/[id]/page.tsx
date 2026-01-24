@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { prisma } from '@/lib/db'
 import { DB_ENABLED } from '@/lib/dbMode'
+import { isMissingTableError } from '@/lib/prisma-errors'
 import { createOpsAdditional, createOpsCertificate, createOpsPhoto, updateOpsProject } from '../../actions'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -30,24 +31,47 @@ export default async function AdminOpsProjectDetail({
     )
   }
 
-  const project = await prisma.opsProject.findUnique({
-    where: { id: params.id },
-    include: {
-      client: true,
-      certificates: { orderBy: { createdAt: 'desc' } },
-      additionals: { orderBy: { createdAt: 'desc' } },
-      photos: { orderBy: { createdAt: 'desc' } },
-    },
-  })
+  let project: Awaited<ReturnType<typeof prisma.opsProject.findUnique>> | null = null
+  let catalogItems: Awaited<ReturnType<typeof prisma.additionalCatalogItem.findMany>> = []
+
+  try {
+    ;[project, catalogItems] = await Promise.all([
+      prisma.opsProject.findUnique({
+        where: { id: params.id },
+        include: {
+          client: true,
+          certificates: { orderBy: { createdAt: 'desc' } },
+          additionals: { orderBy: { createdAt: 'desc' } },
+          photos: { orderBy: { createdAt: 'desc' } },
+        },
+      }),
+      prisma.additionalCatalogItem.findMany({
+        where: { active: true },
+        orderBy: { name: 'asc' },
+      }),
+    ])
+  } catch (error) {
+    if (isMissingTableError(error)) {
+      console.warn('[DB] Missing ops tables, rendering empty project detail.')
+      return (
+        <div className="space-y-4">
+          <Badge>Admin operativo</Badge>
+          <h1>DB no inicializada</h1>
+          <p className="text-sm text-slate-600">
+            La base de datos todavía no está lista. Ejecutá la inicialización y recargá para empezar a operar.
+          </p>
+          <Button variant="secondary" asChild>
+            <Link href="/admin/ops">Volver al tablero</Link>
+          </Button>
+        </div>
+      )
+    }
+    throw error
+  }
 
   if (!project) {
     notFound()
   }
-
-  const catalogItems = await prisma.additionalCatalogItem.findMany({
-    where: { active: true },
-    orderBy: { name: 'asc' },
-  })
 
   const returnTo = `/admin/ops/projects/${project.id}`
 

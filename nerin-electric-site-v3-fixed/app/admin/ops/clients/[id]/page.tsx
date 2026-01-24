@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/db'
 import { DB_ENABLED } from '@/lib/dbMode'
+import { isMissingTableError } from '@/lib/prisma-errors'
 import { createOpsProject, updateOpsClient } from '../../actions'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -24,10 +25,31 @@ export default async function AdminOpsClientDetail({ params }: { params: { id: s
     )
   }
 
-  const client = await prisma.opsClient.findUnique({
-    where: { id: params.id },
-    include: { projects: true },
-  })
+  let client: Awaited<ReturnType<typeof prisma.opsClient.findUnique>> | null = null
+
+  try {
+    client = await prisma.opsClient.findUnique({
+      where: { id: params.id },
+      include: { projects: true },
+    })
+  } catch (error) {
+    if (isMissingTableError(error)) {
+      console.warn('[DB] Missing ops tables, rendering empty client detail.')
+      return (
+        <div className="space-y-4">
+          <Badge>Admin operativo</Badge>
+          <h1>DB no inicializada</h1>
+          <p className="text-sm text-slate-600">
+            La base de datos todavía no está lista. Ejecutá la inicialización y recargá para empezar a operar.
+          </p>
+          <Button variant="secondary" asChild>
+            <Link href="/admin/ops">Volver al tablero</Link>
+          </Button>
+        </div>
+      )
+    }
+    throw error
+  }
 
   if (!client) {
     notFound()
