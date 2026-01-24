@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 import Link from 'next/link'
 import { prisma } from '@/lib/db'
 import { DB_ENABLED } from '@/lib/dbMode'
+import { isMissingTableError } from '@/lib/prisma-errors'
 import { createAdditionalCatalogItem } from './actions'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -22,12 +23,33 @@ export default async function AdminOpsDashboard() {
     )
   }
 
-  const [clients, projects, certificates, additionals] = await Promise.all([
-    prisma.opsClient.count(),
-    prisma.opsProject.count(),
-    prisma.opsProgressCertificate.count(),
-    prisma.opsProjectAdditionalItem.count(),
-  ])
+  let clients = 0
+  let projects = 0
+  let certificates = 0
+  let additionals = 0
+
+  try {
+    ;[clients, projects, certificates, additionals] = await Promise.all([
+      prisma.opsClient.count(),
+      prisma.opsProject.count(),
+      prisma.opsProgressCertificate.count(),
+      prisma.opsProjectAdditionalItem.count(),
+    ])
+  } catch (error) {
+    if (isMissingTableError(error)) {
+      console.warn('[DB] Missing ops tables, rendering empty admin operativo dashboard.')
+      return (
+        <div className="space-y-4">
+          <Badge>Admin operativo</Badge>
+          <h1>DB no inicializada</h1>
+          <p className="text-sm text-slate-600">
+            La base de datos todavía no está lista. Ejecutá la inicialización y recargá para empezar a operar.
+          </p>
+        </div>
+      )
+    }
+    throw error
+  }
 
   const mpConfigured = Boolean(process.env.MERCADOPAGO_ACCESS_TOKEN && process.env.PUBLIC_BASE_URL)
 

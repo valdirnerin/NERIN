@@ -2,6 +2,7 @@ import fs from 'node:fs/promises'
 import fsSync from 'node:fs'
 import path from 'node:path'
 import { prisma } from '@/lib/db'
+import { isMissingTableError } from '@/lib/prisma-errors'
 import { DB_ENABLED } from '@/lib/dbMode'
 import { parseJson, parseStringArray, serializeJson, serializeStringArray } from '@/lib/serialization'
 import type { SiteExperience } from '@/types/site'
@@ -295,29 +296,44 @@ function buildFileStore(): ContentStore {
   }
 }
 
+function handleMissingTable(error: unknown, table: string, fallback: string): boolean {
+  if (!isMissingTableError(error)) {
+    return false
+  }
+  console.warn(`[DB] Missing table ${table}, ${fallback}`)
+  return true
+}
+
 function buildPrismaStore(): ContentStore {
   return {
     getSettings: async () => {
-      const record = await prisma.siteSetting.findFirst()
-      if (!record) {
-        return memoryStore.getSettings()
-      }
+      try {
+        const record = await prisma.siteSetting.findFirst()
+        if (!record) {
+          return memoryStore.getSettings()
+        }
 
-      const siteExperience = parseJson<SiteExperience>(record.siteExperience) ?? SITE_DEFAULTS
-      const metrics = parseJson<Array<{ label: string; value: string }>>(record.metrics) ?? []
+        const siteExperience = parseJson<SiteExperience>(record.siteExperience) ?? SITE_DEFAULTS
+        const metrics = parseJson<Array<{ label: string; value: string }>>(record.metrics) ?? []
 
-      return {
-        id: record.id,
-        companyName: record.companyName,
-        industry: record.industry,
-        whatsappNumber: record.whatsappNumber,
-        whatsappMessage: record.whatsappMessage,
-        emailContacto: record.emailContacto,
-        zone: record.zone,
-        schedule: record.schedule,
-        primaryCopy: record.primaryCopy,
-        metrics,
-        siteExperience,
+        return {
+          id: record.id,
+          companyName: record.companyName,
+          industry: record.industry,
+          whatsappNumber: record.whatsappNumber,
+          whatsappMessage: record.whatsappMessage,
+          emailContacto: record.emailContacto,
+          zone: record.zone,
+          schedule: record.schedule,
+          primaryCopy: record.primaryCopy,
+          metrics,
+          siteExperience,
+        }
+      } catch (error) {
+        if (handleMissingTable(error, 'SiteSetting', 'returning defaults')) {
+          return memoryStore.getSettings()
+        }
+        throw error
       }
     },
     saveSettings: async (settings: ContentSettings) => {
@@ -333,37 +349,58 @@ function buildPrismaStore(): ContentStore {
         metrics: serializeJson(settings.metrics),
         siteExperience: serializeJson(settings.siteExperience),
       }
-      if (settings.id) {
-        await prisma.siteSetting.update({ where: { id: settings.id }, data })
-        return
+      try {
+        if (settings.id) {
+          await prisma.siteSetting.update({ where: { id: settings.id }, data })
+          return
+        }
+        await prisma.siteSetting.create({ data })
+      } catch (error) {
+        if (handleMissingTable(error, 'SiteSetting', 'skipping save')) {
+          return
+        }
+        throw error
       }
-      await prisma.siteSetting.create({ data })
     },
     listPages: async () => {
-      const pages = await prisma.contentPage.findMany({ orderBy: { updatedAt: 'desc' } })
-      return pages.map((page) => ({
-        id: page.id,
-        slug: page.slug,
-        title: page.title,
-        description: page.description,
-        sections: parseJson<Array<Record<string, unknown>>>(page.sections) ?? [],
-        seoTitle: page.seoTitle,
-        seoDescription: page.seoDescription,
-      }))
+      try {
+        const pages = await prisma.contentPage.findMany({ orderBy: { updatedAt: 'desc' } })
+        return pages.map((page) => ({
+          id: page.id,
+          slug: page.slug,
+          title: page.title,
+          description: page.description,
+          sections: parseJson<Array<Record<string, unknown>>>(page.sections) ?? [],
+          seoTitle: page.seoTitle,
+          seoDescription: page.seoDescription,
+        }))
+      } catch (error) {
+        if (handleMissingTable(error, 'ContentPage', 'returning empty list')) {
+          return []
+        }
+        throw error
+      }
     },
     getPage: async (slug: string) => {
-      const page = await prisma.contentPage.findUnique({ where: { slug } })
-      if (!page) {
-        return null
-      }
-      return {
-        id: page.id,
-        slug: page.slug,
-        title: page.title,
-        description: page.description,
-        sections: parseJson<Array<Record<string, unknown>>>(page.sections) ?? [],
-        seoTitle: page.seoTitle,
-        seoDescription: page.seoDescription,
+      try {
+        const page = await prisma.contentPage.findUnique({ where: { slug } })
+        if (!page) {
+          return null
+        }
+        return {
+          id: page.id,
+          slug: page.slug,
+          title: page.title,
+          description: page.description,
+          sections: parseJson<Array<Record<string, unknown>>>(page.sections) ?? [],
+          seoTitle: page.seoTitle,
+          seoDescription: page.seoDescription,
+        }
+      } catch (error) {
+        if (handleMissingTable(error, 'ContentPage', 'returning null page')) {
+          return null
+        }
+        throw error
       }
     },
     upsertPage: async (page: ContentPage) => {
@@ -375,41 +412,62 @@ function buildPrismaStore(): ContentStore {
         seoTitle: page.seoTitle ?? null,
         seoDescription: page.seoDescription ?? null,
       }
-      if (page.id) {
-        const updated = await prisma.contentPage.update({ where: { id: page.id }, data })
-        return {
-          id: updated.id,
-          slug: updated.slug,
-          title: updated.title,
-          description: updated.description,
-          sections: page.sections,
-          seoTitle: updated.seoTitle,
-          seoDescription: updated.seoDescription,
+      try {
+        if (page.id) {
+          const updated = await prisma.contentPage.update({ where: { id: page.id }, data })
+          return {
+            id: updated.id,
+            slug: updated.slug,
+            title: updated.title,
+            description: updated.description,
+            sections: page.sections,
+            seoTitle: updated.seoTitle,
+            seoDescription: updated.seoDescription,
+          }
         }
-      }
-      const created = await prisma.contentPage.create({ data })
-      return {
-        id: created.id,
-        slug: created.slug,
-        title: created.title,
-        description: created.description,
-        sections: page.sections,
-        seoTitle: created.seoTitle,
-        seoDescription: created.seoDescription,
+        const created = await prisma.contentPage.create({ data })
+        return {
+          id: created.id,
+          slug: created.slug,
+          title: created.title,
+          description: created.description,
+          sections: page.sections,
+          seoTitle: created.seoTitle,
+          seoDescription: created.seoDescription,
+        }
+      } catch (error) {
+        if (handleMissingTable(error, 'ContentPage', 'returning draft page')) {
+          return { ...page, id: page.id ?? crypto.randomUUID() }
+        }
+        throw error
       }
     },
     deletePage: async (id: string) => {
-      await prisma.contentPage.delete({ where: { id } })
+      try {
+        await prisma.contentPage.delete({ where: { id } })
+      } catch (error) {
+        if (handleMissingTable(error, 'ContentPage', 'skipping delete')) {
+          return
+        }
+        throw error
+      }
     },
     listServices: async () => {
-      const services = await prisma.contentService.findMany({ orderBy: [{ order: 'asc' }, { createdAt: 'desc' }] })
-      return services.map((service) => ({
-        id: service.id,
-        title: service.title,
-        description: service.description,
-        order: service.order,
-        active: service.active,
-      }))
+      try {
+        const services = await prisma.contentService.findMany({ orderBy: [{ order: 'asc' }, { createdAt: 'desc' }] })
+        return services.map((service) => ({
+          id: service.id,
+          title: service.title,
+          description: service.description,
+          order: service.order,
+          active: service.active,
+        }))
+      } catch (error) {
+        if (handleMissingTable(error, 'ContentService', 'returning empty list')) {
+          return []
+        }
+        throw error
+      }
     },
     upsertService: async (service: ContentService) => {
       const data = {
@@ -418,38 +476,59 @@ function buildPrismaStore(): ContentStore {
         order: service.order,
         active: service.active,
       }
-      if (service.id) {
-        const updated = await prisma.contentService.update({ where: { id: service.id }, data })
-        return {
-          id: updated.id,
-          title: updated.title,
-          description: updated.description,
-          order: updated.order,
-          active: updated.active,
+      try {
+        if (service.id) {
+          const updated = await prisma.contentService.update({ where: { id: service.id }, data })
+          return {
+            id: updated.id,
+            title: updated.title,
+            description: updated.description,
+            order: updated.order,
+            active: updated.active,
+          }
         }
-      }
-      const created = await prisma.contentService.create({ data })
-      return {
-        id: created.id,
-        title: created.title,
-        description: created.description,
-        order: created.order,
-        active: created.active,
+        const created = await prisma.contentService.create({ data })
+        return {
+          id: created.id,
+          title: created.title,
+          description: created.description,
+          order: created.order,
+          active: created.active,
+        }
+      } catch (error) {
+        if (handleMissingTable(error, 'ContentService', 'returning draft service')) {
+          return { ...service, id: service.id ?? crypto.randomUUID() }
+        }
+        throw error
       }
     },
     deleteService: async (id: string) => {
-      await prisma.contentService.delete({ where: { id } })
+      try {
+        await prisma.contentService.delete({ where: { id } })
+      } catch (error) {
+        if (handleMissingTable(error, 'ContentService', 'skipping delete')) {
+          return
+        }
+        throw error
+      }
     },
     listProjects: async () => {
-      const projects = await prisma.portfolioProject.findMany({ orderBy: { createdAt: 'desc' } })
-      return projects.map((project) => ({
-        id: project.id,
-        title: project.title,
-        description: project.description,
-        tags: parseStringArray(project.tags),
-        locationText: project.locationText,
-        images: parseStringArray(project.images),
-      }))
+      try {
+        const projects = await prisma.portfolioProject.findMany({ orderBy: { createdAt: 'desc' } })
+        return projects.map((project) => ({
+          id: project.id,
+          title: project.title,
+          description: project.description,
+          tags: parseStringArray(project.tags),
+          locationText: project.locationText,
+          images: parseStringArray(project.images),
+        }))
+      } catch (error) {
+        if (handleMissingTable(error, 'PortfolioProject', 'returning empty list')) {
+          return []
+        }
+        throw error
+      }
     },
     upsertProject: async (project: PortfolioProject) => {
       const data = {
@@ -459,59 +538,87 @@ function buildPrismaStore(): ContentStore {
         locationText: project.locationText ?? null,
         images: serializeStringArray(project.images),
       }
-      if (project.id) {
-        const updated = await prisma.portfolioProject.update({ where: { id: project.id }, data })
+      try {
+        if (project.id) {
+          const updated = await prisma.portfolioProject.update({ where: { id: project.id }, data })
+          return {
+            id: updated.id,
+            title: updated.title,
+            description: updated.description,
+            tags: project.tags,
+            locationText: updated.locationText,
+            images: project.images,
+          }
+        }
+        const created = await prisma.portfolioProject.create({ data })
         return {
-          id: updated.id,
-          title: updated.title,
-          description: updated.description,
+          id: created.id,
+          title: created.title,
+          description: created.description,
           tags: project.tags,
-          locationText: updated.locationText,
+          locationText: created.locationText,
           images: project.images,
         }
-      }
-      const created = await prisma.portfolioProject.create({ data })
-      return {
-        id: created.id,
-        title: created.title,
-        description: created.description,
-        tags: project.tags,
-        locationText: created.locationText,
-        images: project.images,
+      } catch (error) {
+        if (handleMissingTable(error, 'PortfolioProject', 'returning draft project')) {
+          return { ...project, id: project.id ?? crypto.randomUUID() }
+        }
+        throw error
       }
     },
     deleteProject: async (id: string) => {
-      await prisma.portfolioProject.delete({ where: { id } })
+      try {
+        await prisma.portfolioProject.delete({ where: { id } })
+      } catch (error) {
+        if (handleMissingTable(error, 'PortfolioProject', 'skipping delete')) {
+          return
+        }
+        throw error
+      }
     },
     listPosts: async () => {
-      const posts = await prisma.blogPost.findMany({ orderBy: { createdAt: 'desc' } })
-      return posts.map((post) => ({
-        id: post.id,
-        title: post.title,
-        slug: post.slug,
-        excerpt: post.excerpt,
-        content: post.content,
-        coverImage: post.coverImage,
-        publishedAt: post.publishedAt ? post.publishedAt.toISOString() : null,
-        seoTitle: post.seoTitle,
-        seoDescription: post.seoDescription,
-      }))
+      try {
+        const posts = await prisma.blogPost.findMany({ orderBy: { createdAt: 'desc' } })
+        return posts.map((post) => ({
+          id: post.id,
+          title: post.title,
+          slug: post.slug,
+          excerpt: post.excerpt,
+          content: post.content,
+          coverImage: post.coverImage,
+          publishedAt: post.publishedAt ? post.publishedAt.toISOString() : null,
+          seoTitle: post.seoTitle,
+          seoDescription: post.seoDescription,
+        }))
+      } catch (error) {
+        if (handleMissingTable(error, 'BlogPost', 'returning empty list')) {
+          return []
+        }
+        throw error
+      }
     },
     getPost: async (slug: string) => {
-      const post = await prisma.blogPost.findUnique({ where: { slug } })
-      if (!post) {
-        return null
-      }
-      return {
-        id: post.id,
-        title: post.title,
-        slug: post.slug,
-        excerpt: post.excerpt,
-        content: post.content,
-        coverImage: post.coverImage,
-        publishedAt: post.publishedAt ? post.publishedAt.toISOString() : null,
-        seoTitle: post.seoTitle,
-        seoDescription: post.seoDescription,
+      try {
+        const post = await prisma.blogPost.findUnique({ where: { slug } })
+        if (!post) {
+          return null
+        }
+        return {
+          id: post.id,
+          title: post.title,
+          slug: post.slug,
+          excerpt: post.excerpt,
+          content: post.content,
+          coverImage: post.coverImage,
+          publishedAt: post.publishedAt ? post.publishedAt.toISOString() : null,
+          seoTitle: post.seoTitle,
+          seoDescription: post.seoDescription,
+        }
+      } catch (error) {
+        if (handleMissingTable(error, 'BlogPost', 'returning null post')) {
+          return null
+        }
+        throw error
       }
     },
     upsertPost: async (post: ContentPost) => {
@@ -525,89 +632,110 @@ function buildPrismaStore(): ContentStore {
         seoTitle: post.seoTitle ?? null,
         seoDescription: post.seoDescription ?? null,
       }
-      if (post.id) {
-        const updated = await prisma.blogPost.update({ where: { id: post.id }, data })
-        return {
-          id: updated.id,
-          title: updated.title,
-          slug: updated.slug,
-          excerpt: updated.excerpt,
-          content: updated.content,
-          coverImage: updated.coverImage,
-          publishedAt: updated.publishedAt ? updated.publishedAt.toISOString() : null,
-          seoTitle: updated.seoTitle,
-          seoDescription: updated.seoDescription,
+      try {
+        if (post.id) {
+          const updated = await prisma.blogPost.update({ where: { id: post.id }, data })
+          return {
+            id: updated.id,
+            title: updated.title,
+            slug: updated.slug,
+            excerpt: updated.excerpt,
+            content: updated.content,
+            coverImage: updated.coverImage,
+            publishedAt: updated.publishedAt ? updated.publishedAt.toISOString() : null,
+            seoTitle: updated.seoTitle,
+            seoDescription: updated.seoDescription,
+          }
         }
-      }
-      const created = await prisma.blogPost.create({ data })
-      return {
-        id: created.id,
-        title: created.title,
-        slug: created.slug,
-        excerpt: created.excerpt,
-        content: created.content,
-        coverImage: created.coverImage,
-        publishedAt: created.publishedAt ? created.publishedAt.toISOString() : null,
-        seoTitle: created.seoTitle,
-        seoDescription: created.seoDescription,
+        const created = await prisma.blogPost.create({ data })
+        return {
+          id: created.id,
+          title: created.title,
+          slug: created.slug,
+          excerpt: created.excerpt,
+          content: created.content,
+          coverImage: created.coverImage,
+          publishedAt: created.publishedAt ? created.publishedAt.toISOString() : null,
+          seoTitle: created.seoTitle,
+          seoDescription: created.seoDescription,
+        }
+      } catch (error) {
+        if (handleMissingTable(error, 'BlogPost', 'returning draft post')) {
+          return { ...post, id: post.id ?? crypto.randomUUID() }
+        }
+        throw error
       }
     },
     deletePost: async (id: string) => {
-      await prisma.blogPost.delete({ where: { id } })
+      try {
+        await prisma.blogPost.delete({ where: { id } })
+      } catch (error) {
+        if (handleMissingTable(error, 'BlogPost', 'skipping delete')) {
+          return
+        }
+        throw error
+      }
     },
     createLead: async (payload: LeadPayload) => {
-      const lead = await prisma.lead.create({
-        data: {
-          name: payload.name,
-          phone: payload.phone,
-          email: payload.email,
-          clientType: payload.clientType,
-          location: payload.location,
-          address: payload.address ?? null,
-          workType: payload.workType,
-          urgency: payload.urgency,
-          details: payload.details,
-          reason: payload.reason ?? null,
-          leadType: payload.leadType ?? null,
-          plan: payload.plan ?? null,
-          hasFiles: payload.hasFiles ?? false,
-          consent: payload.consent,
-          utmSource: payload.utmSource ?? null,
-          utmMedium: payload.utmMedium ?? null,
-          utmCampaign: payload.utmCampaign ?? null,
-          utmTerm: payload.utmTerm ?? null,
-          utmContent: payload.utmContent ?? null,
-          fbclid: payload.fbclid ?? null,
-          gclid: payload.gclid ?? null,
-          landingPage: payload.landingPage ?? null,
-          referrer: payload.referrer ?? null,
-        },
-      })
-      return {
-        id: lead.id,
-        name: lead.name,
-        phone: lead.phone,
-        email: lead.email,
-        clientType: lead.clientType,
-        location: lead.location,
-        address: lead.address,
-        workType: lead.workType,
-        urgency: lead.urgency,
-        details: lead.details,
-        reason: lead.reason,
-        leadType: lead.leadType,
-        plan: lead.plan,
-        hasFiles: lead.hasFiles,
-        consent: lead.consent,
-        utmSource: lead.utmSource,
-        utmMedium: lead.utmMedium,
-        utmCampaign: lead.utmCampaign,
-        utmTerm: lead.utmTerm,
-        utmContent: lead.utmContent,
-        fbclid: lead.fbclid,
-        gclid: lead.gclid,
-        landingPage: lead.landingPage,
-        referrer: lead.referrer,
+      try {
+        const lead = await prisma.lead.create({
+          data: {
+            name: payload.name,
+            phone: payload.phone,
+            email: payload.email,
+            clientType: payload.clientType,
+            location: payload.location,
+            address: payload.address ?? null,
+            workType: payload.workType,
+            urgency: payload.urgency,
+            details: payload.details,
+            reason: payload.reason ?? null,
+            leadType: payload.leadType ?? null,
+            plan: payload.plan ?? null,
+            hasFiles: payload.hasFiles ?? false,
+            consent: payload.consent,
+            utmSource: payload.utmSource ?? null,
+            utmMedium: payload.utmMedium ?? null,
+            utmCampaign: payload.utmCampaign ?? null,
+            utmTerm: payload.utmTerm ?? null,
+            utmContent: payload.utmContent ?? null,
+            fbclid: payload.fbclid ?? null,
+            gclid: payload.gclid ?? null,
+            landingPage: payload.landingPage ?? null,
+            referrer: payload.referrer ?? null,
+          },
+        })
+        return {
+          id: lead.id,
+          name: lead.name,
+          phone: lead.phone,
+          email: lead.email,
+          clientType: lead.clientType,
+          location: lead.location,
+          address: lead.address,
+          workType: lead.workType,
+          urgency: lead.urgency,
+          details: lead.details,
+          reason: lead.reason,
+          leadType: lead.leadType,
+          plan: lead.plan,
+          hasFiles: lead.hasFiles,
+          consent: lead.consent,
+          utmSource: lead.utmSource,
+          utmMedium: lead.utmMedium,
+          utmCampaign: lead.utmCampaign,
+          utmTerm: lead.utmTerm,
+          utmContent: lead.utmContent,
+          fbclid: lead.fbclid,
+          gclid: lead.gclid,
+          landingPage: lead.landingPage,
+          referrer: lead.referrer,
+        }
+      } catch (error) {
+        if (handleMissingTable(error, 'Lead', 'returning in-memory lead')) {
+          return { id: crypto.randomUUID(), ...payload }
+        }
+        throw error
       }
     },
   }
