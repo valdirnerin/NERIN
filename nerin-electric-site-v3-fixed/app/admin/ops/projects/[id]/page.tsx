@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import type { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
 import { DB_ENABLED } from '@/lib/dbMode'
 import { isMissingTableError } from '@/lib/prisma-errors'
@@ -31,7 +32,14 @@ export default async function AdminOpsProjectDetail({
     )
   }
 
-  let project: Awaited<ReturnType<typeof prisma.opsProject.findUnique>> | null = null
+  let project: Prisma.OpsProjectGetPayload<{
+    include: {
+      client: true
+      certificates: { orderBy: { createdAt: 'desc' } }
+      additionals: { orderBy: { createdAt: 'desc' } }
+      photos: { orderBy: { createdAt: 'desc' } }
+    }
+  }> | null = null
   let catalogItems: Awaited<ReturnType<typeof prisma.additionalCatalogItem.findMany>> = []
 
   try {

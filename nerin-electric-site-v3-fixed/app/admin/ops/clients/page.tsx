@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
+import type { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
 import { DB_ENABLED } from '@/lib/dbMode'
 import { isMissingTableError } from '@/lib/prisma-errors'
@@ -23,7 +24,7 @@ export default async function AdminOpsClientsPage() {
     )
   }
 
-  let clients: Awaited<ReturnType<typeof prisma.opsClient.findMany>> = []
+  let clients: Prisma.OpsClientGetPayload<{ include: { projects: true } }>[] = []
 
   try {
     clients = await prisma.opsClient.findMany({
