@@ -45,6 +45,9 @@ export default async function AdminOpsDashboard() {
           <p className="text-sm text-slate-600">
             La base de datos todavía no está lista. Ejecutá la inicialización y recargá para empezar a operar.
           </p>
+          <Button variant="secondary" asChild>
+            <Link href="/admin/ops">Reintentar</Link>
+          </Button>
         </div>
       )
     }

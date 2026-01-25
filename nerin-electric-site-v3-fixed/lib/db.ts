@@ -3,16 +3,20 @@ import { existsSync } from 'node:fs'
 
 import { PrismaClient } from '@prisma/client'
 
-const VAR_DATA_DB_URL = 'file:/var/data/nerin.db'
 const TMP_DB_URL = 'file:/tmp/nerin.db'
 const DEV_DB_URL = 'file:./dev.db'
 
+const dbEnabledEnv = (process.env.DB_ENABLED || '').toLowerCase()
+const dbExplicitlyDisabled = dbEnabledEnv === 'false'
+const storageDir = process.env.STORAGE_DIR?.trim() || (existsSync('/var/data') ? '/var/data' : '')
+const storageDirAvailable = storageDir.length > 0 && existsSync(storageDir)
+const persistentUrl = storageDirAvailable ? `file:${storageDir}/nerin.db` : null
 const isDatabaseUrlMissing =
   !process.env.DATABASE_URL || process.env.DATABASE_URL.trim().length === 0
 
-if (isDatabaseUrlMissing) {
-  if (existsSync('/var/data')) {
-    process.env.DATABASE_URL = VAR_DATA_DB_URL
+if (isDatabaseUrlMissing && !dbExplicitlyDisabled) {
+  if (persistentUrl) {
+    process.env.DATABASE_URL = persistentUrl
   } else {
     process.env.DATABASE_URL = process.env.NODE_ENV === 'development' ? DEV_DB_URL : TMP_DB_URL
   }
