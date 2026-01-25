@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
+import type { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
 import { DB_ENABLED } from '@/lib/dbMode'
 import { isMissingTableError } from '@/lib/prisma-errors'
@@ -25,7 +26,9 @@ export default async function AdminOpsCertificatesPage({
   }
 
   let projects: Awaited<ReturnType<typeof prisma.opsProject.findMany>> = []
-  let certificates: Awaited<ReturnType<typeof prisma.opsProgressCertificate.findMany>> = []
+  let certificates: Prisma.OpsProgressCertificateGetPayload<{
+    include: { project: true }
+  }>[] = []
 
   try {
     ;[projects, certificates] = await Promise.all([
@@ -127,7 +130,15 @@ export default async function AdminOpsCertificatesPage({
               {certificates.map((certificate) => (
                 <TableRow key={certificate.id}>
                   <TableCell>{new Date(certificate.createdAt).toLocaleDateString('es-AR')}</TableCell>
-                  <TableCell>{certificate.project.title}</TableCell>
+                  <TableCell>
+                    {(certificate.project as { title?: string; name?: string; nombre?: string } | null)
+                      ?.title ??
+                      (certificate.project as { title?: string; name?: string; nombre?: string } | null)
+                        ?.name ??
+                      (certificate.project as { title?: string; name?: string; nombre?: string } | null)
+                        ?.nombre ??
+                      '-'}
+                  </TableCell>
                   <TableCell>
                     +{certificate.percentToAdd}% → {certificate.percentAfter}%
                   </TableCell>

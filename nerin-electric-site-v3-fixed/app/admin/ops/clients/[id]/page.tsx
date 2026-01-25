@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
+import type { Prisma } from '@prisma/client'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/db'
 import { DB_ENABLED } from '@/lib/dbMode'
@@ -25,7 +26,7 @@ export default async function AdminOpsClientDetail({ params }: { params: { id: s
     )
   }
 
-  let client: Awaited<ReturnType<typeof prisma.opsClient.findUnique>> | null = null
+  let client: Prisma.OpsClientGetPayload<{ include: { projects: true } }> | null = null
 
   try {
     client = await prisma.opsClient.findUnique({
