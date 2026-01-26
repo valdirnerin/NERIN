@@ -93,6 +93,12 @@ model Project {
   normativasAplicadas  String   @default("[]")
   fechaInicio          DateTime?
   fechaFinEstimada     DateTime?
+  valorObraBase        Decimal  @default(0)
+  ivaPorcentaje        Int      @default(21)
+  cacInicial           Decimal  @default(0)
+  cacUltimo            Decimal  @default(0)
+  avanceCertificado    Int      @default(0)
+  avancePagado         Int      @default(0)
   createdAt            DateTime        @default(now())
   updatedAt            DateTime        @updatedAt
   client               Client          @relation(fields: [clientId], references: [id], onDelete: Cascade)
@@ -101,6 +107,7 @@ model Project {
   progressCertificates ProgressCertificate[]
   invoices             Invoice[]
   tickets              Ticket[]
+  photos               ProjectPhoto[]
 }
 
 model Pack {
@@ -239,10 +246,31 @@ model ProgressCertificate {
   estado          String   @default("pendiente")
   mpPreferenceId  String?
   mpInitPointUrl  String?
+  cacAnterior     Decimal  @default(0)
+  cacActual       Decimal  @default(0)
+  factorCAC       Decimal  @default(1)
+  montoBase       Decimal  @default(0)
+  ajusteCAC       Decimal  @default(0)
+  subtotalSinIVA  Decimal  @default(0)
+  ivaMonto        Decimal  @default(0)
+  totalConIVA     Decimal  @default(0)
+  pagadoAt        DateTime?
   paidAt          DateTime?
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
   project         Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model ProjectPhoto {
+  id         String   @id @default(cuid())
+  projectId  String
+  title      String?
+  filename   String
+  mimeType   String
+  size       Int
+  storedPath String
+  createdAt  DateTime @default(now())
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
 
 model Invoice {

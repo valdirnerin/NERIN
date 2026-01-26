@@ -63,6 +63,9 @@ export default async function AdminPage() {
           <Button variant="outline" asChild>
             <Link href="/admin/ops">Admin operativo</Link>
           </Button>
+          <Button variant="outline" asChild>
+            <Link href="/admin/operativo">Admin operativo (CAC/IVA)</Link>
+          </Button>
         </div>
       </header>
 
@@ -159,10 +162,14 @@ export default async function AdminPage() {
                   <Input id="porcentaje" name="porcentaje" type="number" required />
                 </div>
                 <div>
-                  <Label htmlFor="monto">Monto</Label>
-                  <Input id="monto" name="monto" type="number" required />
+                  <Label htmlFor="cacActual">CAC actual</Label>
+                  <Input id="cacActual" name="cacActual" type="number" step="0.01" required />
                 </div>
               </div>
+              <label className="flex items-center gap-2 text-sm text-slate-600">
+                <input type="checkbox" name="aplicaIVA" defaultChecked />
+                Aplicar IVA
+              </label>
               <Button type="submit">Crear certificado</Button>
             </form>
             <p className="text-xs text-slate-500">

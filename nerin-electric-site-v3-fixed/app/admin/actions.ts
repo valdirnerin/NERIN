@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
+import { DB_ENABLED } from '@/lib/dbMode'
 import { serializeStringArray } from '@/lib/serialization'
 import { makeUniqueSlug } from '@/lib/slug'
 import type {
@@ -176,24 +177,128 @@ export async function upsertCaseStudy(
 const CertificateSchema = z.object({
   projectId: z.string(),
   porcentaje: z.coerce.number().min(1).max(100),
-  monto: z.coerce.number().min(0),
+  cacActual: z.coerce.number().min(0),
+  aplicaIVA: z.coerce.boolean().optional(),
 })
 
 export async function createCertificate(formData: FormData) {
+  if (!DB_ENABLED) {
+    throw new Error('DB_DISABLED')
+  }
+
   const payload = CertificateSchema.parse({
     projectId: formData.get('projectId'),
     porcentaje: formData.get('porcentaje'),
-    monto: formData.get('monto'),
+    cacActual: formData.get('cacActual'),
+    aplicaIVA: formData.get('aplicaIVA'),
   })
 
-  await prisma.progressCertificate.create({
+  const project = await prisma.project.findUnique({
+    where: { id: payload.projectId },
+  })
+
+  if (!project) {
+    throw new Error('PROJECT_NOT_FOUND')
+  }
+
+  const valorObraBase = project.valorObraBase ?? new Prisma.Decimal(0)
+  const ivaPorcentaje = project.ivaPorcentaje ?? 21
+  const cacAnterior = project.cacUltimo ?? project.cacInicial ?? new Prisma.Decimal(0)
+  const cacActual = new Prisma.Decimal(payload.cacActual)
+  const porcentajeDecimal = new Prisma.Decimal(payload.porcentaje).div(100)
+  const factor = cacAnterior.equals(0) ? new Prisma.Decimal(1) : cacActual.div(cacAnterior)
+  const montoBase = valorObraBase.mul(porcentajeDecimal)
+  const ajusteCAC = montoBase.mul(factor.minus(1))
+  const subtotal = montoBase.plus(ajusteCAC)
+  const ivaMonto = payload.aplicaIVA
+    ? subtotal.mul(new Prisma.Decimal(ivaPorcentaje).div(100))
+    : new Prisma.Decimal(0)
+  const total = subtotal.plus(ivaMonto)
+
+  const [certificate, percentSum] = await prisma.$transaction([
+    prisma.progressCertificate.create({
+      data: {
+        projectId: payload.projectId,
+        porcentaje: payload.porcentaje,
+        monto: total,
+        estado: 'pendiente',
+        cacAnterior,
+        cacActual,
+        factorCAC: factor,
+        montoBase,
+        ajusteCAC,
+        subtotalSinIVA: subtotal,
+        ivaMonto,
+        totalConIVA: total,
+      },
+    }),
+    prisma.progressCertificate.aggregate({
+      where: { projectId: payload.projectId },
+      _sum: { porcentaje: true },
+    }),
+  ])
+
+  const newPercent = Math.min(100, percentSum._sum.porcentaje ?? 0)
+
+  await prisma.project.update({
+    where: { id: payload.projectId },
     data: {
-      projectId: payload.projectId,
-      porcentaje: payload.porcentaje,
-      monto: new Prisma.Decimal(payload.monto),
-      estado: 'pendiente',
+      cacUltimo: cacActual,
+      avanceCertificado: newPercent,
     },
   })
 
   revalidatePath('/admin')
+  revalidatePath('/admin/operativo')
+  revalidatePath(`/admin/operativo`)
+
+  return certificate
+}
+
+const MarkPaidSchema = z.object({
+  certificateId: z.string(),
+})
+
+export async function markCertificatePaid(formData: FormData) {
+  if (!DB_ENABLED) {
+    throw new Error('DB_DISABLED')
+  }
+
+  const payload = MarkPaidSchema.parse({
+    certificateId: formData.get('certificateId'),
+  })
+
+  const certificate = await prisma.progressCertificate.findUnique({
+    where: { id: payload.certificateId },
+    include: { project: true },
+  })
+
+  if (!certificate) {
+    throw new Error('CERTIFICATE_NOT_FOUND')
+  }
+
+  await prisma.progressCertificate.update({
+    where: { id: payload.certificateId },
+    data: {
+      estado: 'pagado',
+      pagadoAt: new Date(),
+      paidAt: new Date(),
+    },
+  })
+
+  const paidSum = await prisma.progressCertificate.aggregate({
+    where: { projectId: certificate.projectId, estado: 'pagado' },
+    _sum: { porcentaje: true },
+  })
+
+  const newPaidPercent = Math.min(100, paidSum._sum.porcentaje ?? 0)
+
+  await prisma.project.update({
+    where: { id: certificate.projectId },
+    data: { avancePagado: newPaidPercent },
+  })
+
+  revalidatePath('/admin')
+  revalidatePath('/admin/operativo')
+  revalidatePath(`/admin/operativo`)
 }

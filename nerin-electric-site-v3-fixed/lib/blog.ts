@@ -33,19 +33,24 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
       }))
       .sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1))
   } catch (error) {
-    const store = getContentStore()
-    const posts = await store.listPosts()
-    return posts
-      .filter((post) => post.publishedAt)
-      .map((post) => ({
-        slug: post.slug,
-        title: post.title,
-        excerpt: post.excerpt,
-        publishedAt: post.publishedAt ?? new Date().toISOString(),
-        content: post.content,
-        heroImage: post.coverImage ?? undefined,
-      }))
-      .sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1))
+    try {
+      const store = getContentStore()
+      const posts = await store.listPosts()
+      return posts
+        .filter((post) => post.publishedAt)
+        .map((post) => ({
+          slug: post.slug,
+          title: post.title,
+          excerpt: post.excerpt,
+          publishedAt: post.publishedAt ?? new Date().toISOString(),
+          content: post.content,
+          heroImage: post.coverImage ?? undefined,
+        }))
+        .sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1))
+    } catch (storeError) {
+      console.warn('[BLOG] Unable to list posts, returning empty list.', storeError)
+      return []
+    }
   }
 }
 

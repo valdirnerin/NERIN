@@ -577,6 +577,9 @@ function buildPrismaStore(): ContentStore {
       }
     },
     listPosts: async () => {
+      if (!DB_ENABLED) {
+        return []
+      }
       try {
         const posts = await prisma.blogPost.findMany({ orderBy: { createdAt: 'desc' } })
         return posts.map((post) => ({
@@ -594,7 +597,8 @@ function buildPrismaStore(): ContentStore {
         if (handleMissingTable(error, 'BlogPost', 'returning empty list')) {
           return []
         }
-        throw error
+        console.warn('[CONTENT] Failed to list posts from Prisma, returning empty list.', error)
+        return []
       }
     },
     getPost: async (slug: string) => {
