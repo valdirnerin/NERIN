@@ -181,7 +181,7 @@ const CertificateSchema = z.object({
   aplicaIVA: z.coerce.boolean().optional(),
 })
 
-export async function createCertificate(formData: FormData) {
+export async function createCertificate(formData: FormData): Promise<void> {
   if (!DB_ENABLED) {
     throw new Error('DB_DISABLED')
   }
@@ -215,7 +215,7 @@ export async function createCertificate(formData: FormData) {
     : new Prisma.Decimal(0)
   const total = subtotal.plus(ivaMonto)
 
-  const [certificate, percentSum] = await prisma.$transaction([
+  const [, percentSum] = await prisma.$transaction([
     prisma.progressCertificate.create({
       data: {
         projectId: payload.projectId,
@@ -252,7 +252,6 @@ export async function createCertificate(formData: FormData) {
   revalidatePath('/admin/operativo')
   revalidatePath(`/admin/operativo`)
 
-  return certificate
 }
 
 const MarkPaidSchema = z.object({
