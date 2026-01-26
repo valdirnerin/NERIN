@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
 import { prisma } from '@/lib/db'
+import { Prisma } from '@prisma/client'
 import { DB_ENABLED } from '@/lib/dbMode'
 import { isMissingTableError } from '@/lib/prisma-errors'
 import { createCertificate, markCertificatePaid } from '../actions'
@@ -19,6 +20,14 @@ const formatCurrency = (value: number) =>
     maximumFractionDigits: 2,
   })
 
+type ProjectWithDetails = Prisma.ProjectGetPayload<{
+  include: {
+    client: { include: { user: true } }
+    progressCertificates: true
+    photos: true
+  }
+}>
+
 export default async function AdminOperativoPage() {
   if (!DB_ENABLED) {
     return (
@@ -30,16 +39,16 @@ export default async function AdminOperativoPage() {
     )
   }
 
-  let projects: Awaited<ReturnType<typeof prisma.project.findMany>> = []
+  let projects: ProjectWithDetails[] = []
 
   try {
     projects = await prisma.project.findMany({
+      orderBy: { createdAt: 'desc' },
       include: {
         client: { include: { user: true } },
         progressCertificates: { orderBy: { createdAt: 'desc' } },
         photos: { orderBy: { createdAt: 'desc' } },
       },
-      orderBy: { createdAt: 'desc' },
     })
   } catch (error) {
     if (isMissingTableError(error)) {
