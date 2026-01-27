@@ -13,7 +13,7 @@ const toNumber = (value: FormDataEntryValue | null, fallback = 0) => {
   return Number.isNaN(parsed) ? fallback : parsed
 }
 
-const toCents = (value: FormDataEntryValue | null) => Math.round(toNumber(value, 0) * 100)
+const toCentsBigInt = (value: FormDataEntryValue | null) => BigInt(Math.round(toNumber(value, 0) * 100))
 
 const ensureDb = () => {
   if (!DB_ENABLED) {
@@ -116,7 +116,7 @@ export async function createAdditionalCatalogItem(formData: FormData) {
       name,
       description: String(formData.get('description') || '').trim() || null,
       unit,
-      laborUnitPrice: toCents(formData.get('laborUnitPrice')),
+      laborUnitPrice: toCentsBigInt(formData.get('laborUnitPrice')),
       active: formData.get('active') === 'on',
     },
   })
@@ -131,11 +131,15 @@ export async function createOpsCertificate(formData: FormData) {
 
   const returnTo = String(formData.get('returnTo') || `/admin/ops/projects/${projectId}`)
   const percentToAdd = Math.round(toNumber(formData.get('percentToAdd'), 0))
-  const amountCents = toCents(formData.get('amount'))
+  const amountCents = toCentsBigInt(formData.get('amount'))
   const description = String(formData.get('description') || '').trim() || null
 
   const project = await prisma.opsProject.findUnique({ where: { id: projectId } })
   if (!project) return
+  if (amountCents <= 0n) {
+    revalidatePath(returnTo)
+    redirect(`${returnTo}?mpError=1`)
+  }
 
   const percentAfter = Math.min(100, project.progressPercent + percentToAdd)
   const certificate = await prisma.opsProgressCertificate.create({
@@ -152,9 +156,10 @@ export async function createOpsCertificate(formData: FormData) {
   try {
     const baseUrl = process.env.PUBLIC_BASE_URL
     if (!baseUrl) throw new Error('PUBLIC_BASE_URL missing')
+    const mpAmount = Number(amountCents) / 100
     const preference = await createPreference({
       title: `Certificado de avance - ${project.title}`,
-      amount: amountCents / 100,
+      amount: mpAmount,
       externalRef: `cert:${certificate.id}`,
       notificationUrl: `${baseUrl}/api/mercadopago/webhook`,
       backUrls: {
@@ -214,7 +219,7 @@ export async function createOpsAdditional(formData: FormData) {
   let name = String(formData.get('name') || '').trim()
   let description = String(formData.get('description') || '').trim() || null
   let unit = String(formData.get('unit') || '').trim()
-  let unitPriceCents = toCents(formData.get('unitPrice'))
+  let unitPriceCents = toCentsBigInt(formData.get('unitPrice'))
   let resolvedCatalogId: string | null = null
 
   if (catalogItemId) {
@@ -228,7 +233,7 @@ export async function createOpsAdditional(formData: FormData) {
     }
   }
 
-  if (!name || !unit || unitPriceCents <= 0) {
+  if (!name || !unit || unitPriceCents <= 0n) {
     revalidatePath(returnTo)
     redirect(`${returnTo}?mpError=1`)
   }
@@ -250,9 +255,10 @@ export async function createOpsAdditional(formData: FormData) {
     try {
       const baseUrl = process.env.PUBLIC_BASE_URL
       if (!baseUrl) throw new Error('PUBLIC_BASE_URL missing')
+      const mpAmount = (Number(unitPriceCents) * quantity) / 100
       const preference = await createPreference({
         title: `Adicional - ${name}`,
-        amount: (unitPriceCents * quantity) / 100,
+        amount: mpAmount,
         externalRef: `add:${additional.id}`,
         notificationUrl: `${baseUrl}/api/mercadopago/webhook`,
         backUrls: {

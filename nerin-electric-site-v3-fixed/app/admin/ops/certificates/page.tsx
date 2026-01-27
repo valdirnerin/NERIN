@@ -142,7 +142,7 @@ export default async function AdminOpsCertificatesPage({
                   <TableCell>
                     +{certificate.percentToAdd}% → {certificate.percentAfter}%
                   </TableCell>
-                  <TableCell>${(certificate.amount / 100).toLocaleString('es-AR')}</TableCell>
+                  <TableCell>${(Number(certificate.amount) / 100).toLocaleString('es-AR')}</TableCell>
                   <TableCell>
                     <Badge className="bg-slate-100 text-slate-600">{certificate.status}</Badge>
                   </TableCell>

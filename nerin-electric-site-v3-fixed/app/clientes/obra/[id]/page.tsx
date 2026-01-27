@@ -50,12 +50,12 @@ export default async function ClienteObraPage({ params }: { params: { id: string
     ...project.certificates.map((item) => ({
       type: 'Certificado',
       date: item.createdAt,
-      label: `+${item.percentToAdd}% · $${(item.amount / 100).toLocaleString('es-AR')} · ${item.status}`,
+      label: `+${item.percentToAdd}% · $${(Number(item.amount) / 100).toLocaleString('es-AR')} · ${item.status}`,
     })),
     ...project.additionals.map((item) => ({
       type: 'Adicional',
       date: item.createdAt,
-      label: `${item.name} · ${item.quantity} ${item.unit} · $${(item.unitPrice / 100).toLocaleString('es-AR')}`,
+      label: `${item.name} · ${item.quantity} ${item.unit} · $${(Number(item.unitPrice) / 100).toLocaleString('es-AR')}`,
     })),
   ].sort((a, b) => b.date.getTime() - a.date.getTime())
 
@@ -93,7 +93,7 @@ export default async function ClienteObraPage({ params }: { params: { id: string
                   <TableRow key={certificate.id}>
                     <TableCell>{new Date(certificate.createdAt).toLocaleDateString('es-AR')}</TableCell>
                     <TableCell>+{certificate.percentToAdd}%</TableCell>
-                    <TableCell>${(certificate.amount / 100).toLocaleString('es-AR')}</TableCell>
+                    <TableCell>${(Number(certificate.amount) / 100).toLocaleString('es-AR')}</TableCell>
                     <TableCell>
                       <Badge className="bg-slate-100 text-slate-600">{certificate.status}</Badge>
                     </TableCell>
@@ -135,7 +135,7 @@ export default async function ClienteObraPage({ params }: { params: { id: string
                     <TableCell>{additional.name}</TableCell>
                     <TableCell>
                       {additional.quantity} {additional.unit} · $
-                      {(additional.unitPrice / 100).toLocaleString('es-AR')}
+                      {(Number(additional.unitPrice) / 100).toLocaleString('es-AR')}
                     </TableCell>
                     <TableCell>
                       <Badge className="bg-slate-100 text-slate-600">{additional.status}</Badge>
