@@ -356,7 +356,8 @@ function buildPrismaStore(): ContentStore {
         }
         await prisma.siteSetting.create({ data })
       } catch (error) {
-        if (handleMissingTable(error, 'SiteSetting', 'skipping save')) {
+        if (handleMissingTable(error, 'SiteSetting', 'saving to memory store')) {
+          await memoryStore.saveSettings(settings)
           return
         }
         throw error
