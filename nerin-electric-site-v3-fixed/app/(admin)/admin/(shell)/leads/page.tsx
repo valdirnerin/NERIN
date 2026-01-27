@@ -2,6 +2,7 @@ import { prisma } from '@/lib/db'
 import { Button } from '@/components/ui/button'
 import { requireAdmin } from '@/lib/auth'
 import { DB_ENABLED } from '@/lib/dbMode'
+import { FormSection } from '@/components/admin/ui/FormSection'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -56,7 +57,7 @@ export default async function LeadsPage({ searchParams }: { searchParams?: Searc
         </div>
       </div>
 
-      <div className="rounded-3xl border border-border bg-white p-6 shadow-subtle">
+      <FormSection title="Listado de leads" description="Filtrá por urgencia para priorizar la atención.">
         <div className="flex flex-wrap gap-2 text-xs text-slate-500">
           <span>Filtro urgencia:</span>
           <a className="underline" href="/admin/leads?urgencia=hoy">
@@ -121,7 +122,7 @@ export default async function LeadsPage({ searchParams }: { searchParams?: Searc
             </div>
           ))}
         </div>
-      </div>
+      </FormSection>
     </div>
   )
 }

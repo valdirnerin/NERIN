@@ -5,13 +5,14 @@ import dynamicImport from 'next/dynamic'
 import { prisma } from '@/lib/db'
 import { getSiteContent } from '@/lib/site-content'
 import { DB_ENABLED } from '@/lib/dbMode'
-import { createAdditional, createCertificate } from '../actions'
+import { createAdditional, createCertificate } from '../../actions'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { StatCard } from '@/components/admin/ui/StatCard'
 import { CaseStudyForm } from './case-study-form'
 import { MaintenanceForm } from './maintenance-form'
 import { SiteExperienceDesigner } from './SiteExperienceDesigner'
@@ -179,12 +180,14 @@ export default async function AdminPage() {
         </Card>
       </section>
 
-      <section className="grid gap-4 text-sm text-slate-600">
+      <section className="space-y-4">
         <h2 className="text-lg font-semibold text-foreground">Resumen actual</h2>
-        <p>Packs publicados: {packs.length}</p>
-        <p>Adicionales disponibles: {adicionales.length}</p>
-        <p>Planes de mantenimiento: {plans.length}</p>
-        <p>
+        <div className="grid gap-4 md:grid-cols-3">
+          <StatCard label="Packs publicados" value={packs.length} />
+          <StatCard label="Adicionales" value={adicionales.length} />
+          <StatCard label="Planes de mantenimiento" value={plans.length} />
+        </div>
+        <p className="text-sm text-slate-600">
           Exportar datos →{' '}
           <Link className="text-accent" href="/api/admin/export?resource=proyectos">
             Descargar CSV de proyectos

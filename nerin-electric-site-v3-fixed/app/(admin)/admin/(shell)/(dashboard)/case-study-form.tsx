@@ -2,7 +2,7 @@
 
 import { useFormState } from 'react-dom'
 
-import { upsertCaseStudy } from '../actions'
+import { upsertCaseStudy } from '../../actions'
 import { initialCaseStudyState } from '../constants'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'

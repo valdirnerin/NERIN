@@ -19,6 +19,7 @@ export async function fetchPublicJson<T>(path: string, init?: RequestInit): Prom
   const baseUrl = getPublicBaseUrl()
   const response = await fetch(`${baseUrl}${path}`, {
     ...init,
+    cache: 'no-store',
     headers: {
       'Content-Type': 'application/json',
       ...(init?.headers ?? {}),
