@@ -10,6 +10,11 @@ interface HeaderProps {
     whatsappHref: string
     whatsappLabel: string
   }
+  logo: {
+    title: string
+    subtitle: string
+    imageUrl?: string | null
+  }
 }
 
 const navigation = [
@@ -23,13 +28,13 @@ const navigation = [
 
 const clientDashboardRoute = '/clientes' as const
 
-export function Header({ contact }: HeaderProps) {
+export function Header({ contact, logo }: HeaderProps) {
   const { data: session } = useSession()
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/80 bg-white/95 backdrop-blur">
       <div className="container flex items-center justify-between gap-6 py-3">
-        <Logo />
+        <Logo title={logo.title} subtitle={logo.subtitle} imageUrl={logo.imageUrl} />
         <nav className="hidden items-center gap-6 text-sm font-medium text-muted-foreground lg:flex">
           {navigation.map((item) => (
             <Link key={item.href} href={item.href} className="hover:text-foreground">

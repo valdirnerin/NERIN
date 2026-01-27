@@ -1,8 +1,6 @@
 import type { SiteExperience } from '@/types/site'
 import { SITE_DEFAULTS } from '@/lib/content'
-import { DB_ENABLED } from '@/lib/dbMode'
-import { prisma } from '@/lib/db'
-import { parseJson } from '@/lib/serialization'
+import { getContentStore } from '@/lib/content-store'
 
 export type SiteSetting = {
   id?: string
@@ -32,34 +30,9 @@ export const DEFAULT_SETTINGS: SiteSetting = {
 }
 
 export async function getSettings(): Promise<SiteSetting> {
-  if (!DB_ENABLED) {
-    return DEFAULT_SETTINGS
-  }
-
   try {
-    const record = await prisma.siteSetting.findFirst()
-    if (!record) {
-      return DEFAULT_SETTINGS
-    }
-
-    const siteExperience =
-      parseJson<SiteExperience>(record.siteExperience) ?? DEFAULT_SETTINGS.siteExperience
-    const metrics =
-      parseJson<Array<{ label: string; value: string }>>(record.metrics) ?? DEFAULT_SETTINGS.metrics
-
-    return {
-      id: record.id,
-      companyName: record.companyName,
-      industry: record.industry,
-      whatsappNumber: record.whatsappNumber,
-      whatsappMessage: record.whatsappMessage,
-      emailContacto: record.emailContacto,
-      zone: record.zone,
-      schedule: record.schedule,
-      primaryCopy: record.primaryCopy,
-      metrics,
-      siteExperience,
-    }
+    const store = getContentStore()
+    return await store.getSettings()
   } catch (error) {
     return DEFAULT_SETTINGS
   }

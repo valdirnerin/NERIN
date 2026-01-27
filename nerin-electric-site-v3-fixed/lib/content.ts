@@ -15,6 +15,11 @@ const SITE_FILE = 'site.json'
 export const SITE_DEFAULTS: SiteExperience = {
   name: 'NERIN · Ingeniería Eléctrica',
   tagline: 'Instalaciones de alta performance con trazabilidad completa.',
+  logo: {
+    title: 'NERIN',
+    subtitle: 'Ingeniería Eléctrica',
+    imageUrl: '',
+  },
   accent: '#f59e0b',
   socials: {
     instagram: 'https://www.instagram.com/nerin.electric',
