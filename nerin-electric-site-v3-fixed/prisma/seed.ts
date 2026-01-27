@@ -390,7 +390,7 @@ async function main() {
         name: 'Bocas adicionales',
         description: 'Instalación de bocas adicionales por ambiente.',
         unit: 'unidad',
-        laborUnitPrice: 18000,
+        laborUnitPrice: 18000n,
         active: true,
       },
     })
@@ -400,7 +400,7 @@ async function main() {
         projectId: opsProject.id,
         percentToAdd: 15,
         percentAfter: 40,
-        amount: 42000000,
+        amount: 42000000n,
         status: 'DRAFT',
         description: 'Certificado parcial de avance.',
       },

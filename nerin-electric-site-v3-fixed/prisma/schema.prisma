@@ -447,7 +447,7 @@ model OpsProgressCertificate {
   projectId                String
   percentToAdd             Int
   percentAfter             Int
-  amount                   Int
+  amount                   BigInt
   currency                 String               @default("ARS")
   description              String?
   status                   String               @default("DRAFT")
@@ -464,7 +464,7 @@ model AdditionalCatalogItem {
   name           String
   description    String?
   unit           String
-  laborUnitPrice Int
+  laborUnitPrice BigInt
   active         Boolean                  @default(true)
   projectItems   OpsProjectAdditionalItem[]
 }
@@ -476,7 +476,7 @@ model OpsProjectAdditionalItem {
   name                     String
   description              String?
   unit                     String
-  unitPrice                Int
+  unitPrice                BigInt
   quantity                 Float
   status                   String             @default("QUOTED")
   mercadoPagoPreferenceId  String?
