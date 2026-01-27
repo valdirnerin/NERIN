@@ -1,6 +1,8 @@
+import type { Route } from 'next'
+
 export type AdminNavItem = {
   title: string
-  href: string
+  href: Route
 }
 
 export type AdminNavSection = {
@@ -12,36 +14,36 @@ export const adminNav: AdminNavSection[] = [
   {
     label: 'Dashboard',
     items: [
-      { title: 'Dashboard', href: '/admin' },
-      { title: 'Leads', href: '/admin/leads' },
+      { title: 'Dashboard', href: '/admin' as Route },
+      { title: 'Leads', href: '/admin/leads' as Route },
     ],
   },
   {
     label: 'Operaciones (Ops)',
     items: [
-      { title: 'Panel Ops', href: '/admin/ops' },
-      { title: 'Proyectos', href: '/admin/ops/projects' },
-      { title: 'Certificados', href: '/admin/ops/certificates' },
-      { title: 'Adicionales', href: '/admin/ops/projects?tab=adicionales' },
-      { title: 'Clientes', href: '/admin/ops/clients' },
+      { title: 'Panel Ops', href: '/admin/ops' as Route },
+      { title: 'Proyectos', href: '/admin/ops/projects' as Route },
+      { title: 'Certificados', href: '/admin/ops/certificates' as Route },
+      { title: 'Adicionales', href: '/admin/ops/projects?tab=adicionales' as Route },
+      { title: 'Clientes', href: '/admin/ops/clients' as Route },
     ],
   },
   {
     label: 'Packs',
-    items: [{ title: 'Packs comerciales', href: '/admin/packs' }],
+    items: [{ title: 'Packs comerciales', href: '/admin/packs' as Route }],
   },
   {
     label: 'Contenido',
     items: [
-      { title: 'Textos del sitio', href: '/admin' },
-      { title: 'Noticias', href: '/admin/noticias' },
+      { title: 'Textos del sitio', href: '/admin' as Route },
+      { title: 'Noticias', href: '/admin/noticias' as Route },
     ],
   },
   {
     label: 'Ajustes',
     items: [
-      { title: 'Config general', href: '/admin/ajustes' },
-      { title: 'CAC/IVA operativo', href: '/admin/operativo' },
+      { title: 'Config general', href: '/admin/ajustes' as Route },
+      { title: 'CAC/IVA operativo', href: '/admin/operativo' as Route },
     ],
   },
 ]
