@@ -1,6 +1,11 @@
 export interface SiteExperience {
   name: string
   tagline: string
+  logo: {
+    title: string
+    subtitle: string
+    imageUrl: string
+  }
   accent: string
   socials: {
     instagram: string

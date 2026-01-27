@@ -140,9 +140,49 @@ export function SiteExperienceDesigner({ initialData }: SiteExperienceDesignerPr
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Identidad y contacto</CardTitle>
+          <CardTitle>Identidad y contacto</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div className="grid gap-2">
+              <Label htmlFor="site-logo-title">Texto principal del logo</Label>
+              <Input
+                id="site-logo-title"
+                value={form.logo.title}
+                onChange={(event) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    logo: { ...prev.logo, title: event.target.value },
+                  }))
+                }
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="site-logo-subtitle">Texto secundario del logo</Label>
+              <Input
+                id="site-logo-subtitle"
+                value={form.logo.subtitle}
+                onChange={(event) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    logo: { ...prev.logo, subtitle: event.target.value },
+                  }))
+                }
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="site-logo-url">Logo (URL)</Label>
+              <Input
+                id="site-logo-url"
+                value={form.logo.imageUrl}
+                onChange={(event) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    logo: { ...prev.logo, imageUrl: event.target.value },
+                  }))
+                }
+                placeholder="https://..."
+              />
+            </div>
             <div className="grid gap-2">
               <Label htmlFor="site-name">Nombre comercial</Label>
               <Input

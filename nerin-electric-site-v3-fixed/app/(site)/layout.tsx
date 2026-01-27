@@ -115,6 +115,11 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
           whatsappHref,
           whatsappLabel: site.contact.whatsappCtaLabel,
         }}
+        logo={{
+          title: site.logo.title,
+          subtitle: site.logo.subtitle,
+          imageUrl: site.logo.imageUrl,
+        }}
       />
       <main className="container pb-24 pt-14">{children}</main>
       <Footer site={site} />
