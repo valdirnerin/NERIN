@@ -144,12 +144,13 @@ export function SiteExperienceDesigner({ initialData }: SiteExperienceDesignerPr
         throw new Error('No se pudo subir el logo')
       }
       const payload = (await response.json()) as { ok?: boolean; url?: string }
-      if (!payload.url) {
+      const url = payload.url
+      if (typeof url !== 'string' || url.trim().length === 0) {
         throw new Error('Respuesta inválida al subir el logo')
       }
       setForm((prev) => ({
         ...prev,
-        logo: { ...prev.logo, imageUrl: payload.url },
+        logo: { ...prev.logo, imageUrl: url },
       }))
     } catch (error) {
       console.error('Error uploading logo', error)
