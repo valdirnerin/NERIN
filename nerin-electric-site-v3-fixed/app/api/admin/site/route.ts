@@ -22,6 +22,7 @@ export async function POST(req: Request) {
   await requireAdmin()
   const body = await req.json()
   await saveSiteContent(body)
+  revalidatePath('/admin')
   revalidatePath('/')
   revalidatePath('/contacto')
   revalidatePath('/empresa')
@@ -29,5 +30,5 @@ export async function POST(req: Request) {
   revalidatePath('/blog')
   revalidatePath('/packs')
   revalidatePath('/mantenimiento')
-  return NextResponse.json({ ok: true })
+  return NextResponse.json({ ok: true, site: body })
 }
