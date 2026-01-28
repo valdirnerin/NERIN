@@ -2,6 +2,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import type { SiteExperience } from '@/types/site'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
@@ -73,6 +74,7 @@ function formatList(items: string[]): string {
 }
 
 export function SiteExperienceDesigner({ initialData }: SiteExperienceDesignerProps) {
+  const router = useRouter()
   const [form, setForm] = useState<SiteExperience>(initialData)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<MessageState>(null)
@@ -105,7 +107,12 @@ export function SiteExperienceDesigner({ initialData }: SiteExperienceDesignerPr
       if (!response.ok) {
         throw new Error('No se pudo guardar la configuración')
       }
+      const payload = (await response.json()) as { ok: boolean; site?: SiteExperience }
+      if (payload.site) {
+        setForm(payload.site)
+      }
       setMessage({ type: 'success', message: 'Configuración guardada correctamente.' })
+      router.refresh()
     } catch (error) {
       console.error('Error saving site configuration', error)
       setMessage({ type: 'error', message: 'Ocurrió un error al guardar. Intentá nuevamente.' })
