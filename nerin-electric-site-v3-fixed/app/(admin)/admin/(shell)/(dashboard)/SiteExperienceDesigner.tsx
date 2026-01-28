@@ -78,6 +78,8 @@ export function SiteExperienceDesigner({ initialData }: SiteExperienceDesignerPr
   const [form, setForm] = useState<SiteExperience>(initialData)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<MessageState>(null)
+  const [logoUploading, setLogoUploading] = useState(false)
+  const [logoUploadError, setLogoUploadError] = useState<string | null>(null)
 
   const heroStatsText = useMemo(() => formatPairs(form.hero.stats), [form.hero.stats])
   const heroHighlightsText = useMemo(() => formatPairs(form.hero.highlights, 'title'), [form.hero.highlights])
@@ -124,6 +126,37 @@ export function SiteExperienceDesigner({ initialData }: SiteExperienceDesignerPr
   function handleReset() {
     setForm(initialData)
     setMessage(null)
+  }
+
+  async function handleLogoUpload(file: File) {
+    setLogoUploading(true)
+    setLogoUploadError(null)
+    try {
+      const formData = new FormData()
+      const filename = `logo-${Date.now()}-${file.name}`
+      formData.append('file', file)
+      formData.append('name', filename)
+      const response = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formData,
+      })
+      if (!response.ok) {
+        throw new Error('No se pudo subir el logo')
+      }
+      const payload = (await response.json()) as { ok?: boolean; url?: string }
+      if (!payload.url) {
+        throw new Error('Respuesta inválida al subir el logo')
+      }
+      setForm((prev) => ({
+        ...prev,
+        logo: { ...prev.logo, imageUrl: payload.url },
+      }))
+    } catch (error) {
+      console.error('Error uploading logo', error)
+      setLogoUploadError('No se pudo subir el logo. Intentá nuevamente.')
+    } finally {
+      setLogoUploading(false)
+    }
   }
 
   return (
@@ -177,18 +210,31 @@ export function SiteExperienceDesigner({ initialData }: SiteExperienceDesignerPr
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="site-logo-url">Logo (URL)</Label>
+              <Label htmlFor="site-logo-file">Logo (archivo)</Label>
               <Input
-                id="site-logo-url"
-                value={form.logo.imageUrl}
-                onChange={(event) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    logo: { ...prev.logo, imageUrl: event.target.value },
-                  }))
-                }
-                placeholder="https://..."
+                id="site-logo-file"
+                type="file"
+                accept="image/*"
+                onChange={(event) => {
+                  const file = event.target.files?.[0]
+                  if (file) {
+                    void handleLogoUpload(file)
+                  }
+                }}
               />
+              <p className="text-xs text-slate-500">Formatos recomendados: PNG o SVG. Tamaño sugerido: 256×256.</p>
+              {logoUploading && <p className="text-xs text-slate-500">Subiendo logo...</p>}
+              {logoUploadError && <p className="text-xs text-red-600">{logoUploadError}</p>}
+              {form.logo.imageUrl && !logoUploading && (
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-slate-500">Logo cargado:</span>
+                  <img
+                    src={form.logo.imageUrl}
+                    alt="Logo cargado"
+                    className="h-10 w-10 rounded-md border border-border bg-white object-contain"
+                  />
+                </div>
+              )}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="site-name">Nombre comercial</Label>
