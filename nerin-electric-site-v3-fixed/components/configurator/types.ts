@@ -1,5 +1,6 @@
 export type QuoteMode = 'EXPRESS' | 'ASSISTED' | 'PROFESSIONAL'
 export type ServiceFlow = 'ONLINE' | 'SURVEY'
+export type ServicePath = 'PUNTUAL' | 'OBRA'
 export type ZoneTier = 'PRIORITY' | 'SECONDARY' | 'REVIEW'
 export type PriceKind = 'UNIT' | 'PER_POINT' | 'FIXED'
 
@@ -29,6 +30,7 @@ export interface QuoteService {
   name: string
   description: string
   flow: ServiceFlow
+  path: ServicePath
   basePrice: number
   minPrice?: number
   includes: string[]
@@ -47,6 +49,7 @@ export interface QuoteCatalogItem {
 export interface WizardSummary {
   mode: QuoteMode
   serviceId: string
+  serviceUnits: number
   zoneTier: ZoneTier
   urgencyMultiplier: number
   difficultyMultiplier: number

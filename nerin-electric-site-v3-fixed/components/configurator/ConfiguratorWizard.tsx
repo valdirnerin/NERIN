@@ -8,23 +8,45 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Progress } from '@/components/ui/progress'
 import { Textarea } from '@/components/ui/textarea'
 import { createConfiguratorQuote } from './actions'
-
-const steps = ['Modo y servicio', 'Definición técnica', 'Ajustes comerciales', 'Resumen']
 
 interface Props {
   packs: WizardPack[]
   adicionales: WizardAdditional[]
   defaultPackId?: string
+  initialMode?: WizardSummary['mode']
 }
 
-export function ConfiguratorWizard({ packs, adicionales, defaultPackId }: Props) {
-  const [step, setStep] = useState(0)
-  const [summary, setSummary] = useState<WizardSummary>({
+const modeCards: Array<{ mode: WizardSummary['mode']; title: string; description: string }> = [
+  {
     mode: 'EXPRESS',
-    serviceId: quoteServices[0].id,
+    title: 'Servicio puntual',
+    description: 'Para contratar tareas directas con alcance claro y precio desde.',
+  },
+  {
+    mode: 'ASSISTED',
+    title: 'Cotización guiada',
+    description: 'Para instalación, obra o reforma con supuestos editables y relevamiento.',
+  },
+  {
+    mode: 'PROFESSIONAL',
+    title: 'Cotización profesional',
+    description: 'Para clientes técnicos con carga manual por ítems de obra.',
+  },
+]
+
+export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialMode = 'EXPRESS' }: Props) {
+  const defaultServiceByMode = {
+    EXPRESS: quoteServices.find((service) => service.path === 'PUNTUAL')?.id ?? quoteServices[0]?.id ?? '',
+    ASSISTED: quoteServices.find((service) => service.path === 'OBRA')?.id ?? quoteServices[0]?.id ?? '',
+    PROFESSIONAL: quoteServices.find((service) => service.path === 'OBRA')?.id ?? quoteServices[0]?.id ?? '',
+  }
+
+  const [summary, setSummary] = useState<WizardSummary>({
+    mode: initialMode,
+    serviceId: defaultServiceByMode[initialMode],
+    serviceUnits: 1,
     zoneTier: 'PRIORITY',
     urgencyMultiplier: 1,
     difficultyMultiplier: 1,
@@ -37,15 +59,44 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId }: Props)
       .map((item) => ({ id: item.id, cantidad: item.suggestedQty ?? 0 })),
     comentarios: '',
   })
+
   const [contacto, setContacto] = useState({ nombre: '', email: '' })
   const [pdfUrl, setPdfUrl] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
-  const selectedPack = useMemo(() => packs.find((pack) => pack.id === summary.packId) ?? packs[0] ?? null, [packs, summary.packId])
-  const totals = useMemo(() => calculateTotals({ pack: selectedPack, adicionales, summary, services: quoteServices, catalog: professionalCatalog }), [selectedPack, adicionales, summary])
+  const selectedPack = useMemo(
+    () => packs.find((pack) => pack.id === summary.packId) ?? packs[0] ?? null,
+    [packs, summary.packId],
+  )
 
-  const next = () => setStep((prev) => Math.min(prev + 1, steps.length - 1))
-  const back = () => setStep((prev) => Math.max(prev - 1, 0))
+  const totals = useMemo(
+    () =>
+      calculateTotals({
+        pack: selectedPack,
+        adicionales,
+        summary,
+        services: quoteServices,
+        catalog: professionalCatalog,
+      }),
+    [selectedPack, adicionales, summary],
+  )
+
+  const visibleServices = quoteServices.filter((service) => {
+    if (summary.mode === 'EXPRESS') return service.path === 'PUNTUAL'
+    return service.path === 'OBRA'
+  })
+
+  const selectedService = quoteServices.find((service) => service.id === summary.serviceId)
+
+  const updateMode = (mode: WizardSummary['mode']) => {
+    setSummary((prev) => ({
+      ...prev,
+      mode,
+      serviceId: defaultServiceByMode[mode],
+      serviceUnits: 1,
+    }))
+    setPdfUrl(null)
+  }
 
   const updateItems = (id: string, cantidad: number, key: 'adicionales' | 'professionalItems') => {
     setSummary((prev) => {
@@ -55,138 +106,211 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId }: Props)
     })
   }
 
-  const handleSubmit = () => {
+  const submitQuote = () => {
     startTransition(async () => {
-      const result = await createConfiguratorQuote({ ...summary, nombre: contacto.nombre || undefined, email: contacto.email || undefined })
+      const result = await createConfiguratorQuote({
+        ...summary,
+        nombre: contacto.nombre || undefined,
+        email: contacto.email || undefined,
+      })
       setPdfUrl(result.pdfUrl)
-      setStep(3)
     })
   }
 
-  const service = quoteServices.find((item) => item.id === summary.serviceId)
-
   return (
     <div className="space-y-8">
-      <div>
-        <div className="flex items-center justify-between text-sm text-slate-500">
-          <span>Paso {step + 1} de {steps.length}</span>
-          <span>{steps[step]}</span>
-        </div>
-        <Progress value={((step + 1) / steps.length) * 100} />
-      </div>
+      <section className="grid gap-4 md:grid-cols-3">
+        {modeCards.map((card) => (
+          <button
+            key={card.mode}
+            type="button"
+            onClick={() => updateMode(card.mode)}
+            className={`rounded-2xl border p-5 text-left transition ${
+              summary.mode === card.mode ? 'border-accent bg-accent/5' : 'border-border bg-white'
+            }`}
+          >
+            <p className="text-base font-semibold text-foreground">{card.title}</p>
+            <p className="mt-2 text-sm text-slate-600">{card.description}</p>
+          </button>
+        ))}
+      </section>
 
-      {step === 0 && (
-        <section className="grid gap-6 lg:grid-cols-2">
-          <Card>
-            <CardHeader><CardTitle>Modo de presupuesto</CardTitle></CardHeader>
-            <CardContent className="space-y-4">
-              {['EXPRESS', 'ASSISTED', 'PROFESSIONAL'].map((mode) => (
-                <label key={mode} className="flex items-center gap-3 rounded-xl border p-3">
-                  <input type="radio" name="mode" checked={summary.mode === mode} onChange={() => setSummary((prev) => ({ ...prev, mode: mode as WizardSummary['mode'] }))} />
-                  <span>{mode === 'EXPRESS' ? 'Modo Express' : mode === 'ASSISTED' ? 'Modo Asistido' : 'Modo Profesional'}</span>
-                </label>
-              ))}
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader><CardTitle>Servicio</CardTitle></CardHeader>
-            <CardContent className="space-y-3">
-              <select className="h-11 w-full rounded-xl border border-border bg-white px-4 text-sm" value={summary.serviceId} onChange={(event) => setSummary((prev) => ({ ...prev, serviceId: event.target.value }))}>
-                {quoteServices.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-              </select>
-              <p className="text-sm text-slate-600">{service?.description}</p>
-              <p className="text-sm">Flujo: <b>{service?.flow === 'ONLINE' ? 'Contratable online' : 'Requiere relevamiento'}</b></p>
-            </CardContent>
-          </Card>
-        </section>
-      )}
-
-      {step === 1 && summary.mode !== 'PROFESSIONAL' && (
-        <section className="grid gap-6 lg:grid-cols-2">
-          <Card>
-            <CardHeader><CardTitle>{summary.mode === 'EXPRESS' ? 'Alcance Express' : 'Supuestos asistidos editables'}</CardTitle></CardHeader>
-            <CardContent className="space-y-4">
-              <div><Label>Ambientes</Label><Input type="number" value={summary.ambientes} onChange={(e) => setSummary((p) => ({ ...p, ambientes: Number(e.target.value) || 0 }))} /></div>
-              <div><Label>Bocas extra</Label><Input type="number" value={summary.bocasExtra} onChange={(e) => setSummary((p) => ({ ...p, bocasExtra: Number(e.target.value) || 0 }))} /></div>
-              <div><Label>Comentarios</Label><Textarea value={summary.comentarios} onChange={(e) => setSummary((p) => ({ ...p, comentarios: e.target.value }))} /></div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader><CardTitle>Ítems ajustables</CardTitle></CardHeader>
-            <CardContent className="space-y-3">
-              {adicionales.slice(0, 8).map((item) => (
-                <div key={item.id} className="grid grid-cols-[1fr_90px] items-center gap-3">
-                  <span className="text-sm">{item.nombre}</span>
-                  <Input type="number" min={0} value={summary.adicionales.find((it) => it.id === item.id)?.cantidad ?? 0} onChange={(e) => updateItems(item.id, Number(e.target.value) || 0, 'adicionales')} />
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </section>
-      )}
-
-      {step === 1 && summary.mode === 'PROFESSIONAL' && (
+      <section className="grid gap-6 lg:grid-cols-[1.45fr_0.9fr]">
         <Card>
-          <CardHeader><CardTitle>Carga profesional por rubro e ítem</CardTitle></CardHeader>
-          <CardContent className="grid gap-3 md:grid-cols-2">
-            {professionalCatalog.map((item) => (
-              <div key={item.id} className="grid grid-cols-[1fr_88px] items-center gap-3">
-                <span className="text-sm">{item.name}</span>
-                <Input type="number" min={0} value={summary.professionalItems.find((it) => it.id === item.id)?.cantidad ?? 0} onChange={(e) => updateItems(item.id, Number(e.target.value) || 0, 'professionalItems')} />
+          <CardHeader>
+            <CardTitle>
+              {summary.mode === 'EXPRESS' && 'Contratar servicio puntual'}
+              {summary.mode === 'ASSISTED' && 'Cotización guiada para instalación / obra'}
+              {summary.mode === 'PROFESSIONAL' && 'Cotización profesional por ítems'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid gap-3">
+              {visibleServices.map((service) => (
+                <button
+                  key={service.id}
+                  type="button"
+                  onClick={() => setSummary((prev) => ({ ...prev, serviceId: service.id }))}
+                  className={`rounded-xl border p-4 text-left ${summary.serviceId === service.id ? 'border-accent bg-accent/5' : 'border-border'}`}
+                >
+                  <p className="font-semibold text-foreground">{service.name}</p>
+                  <p className="mt-1 text-sm text-slate-600">{service.description}</p>
+                  <p className="mt-2 text-sm font-medium text-foreground">
+                    Desde ${Number(service.minPrice ?? service.basePrice).toLocaleString('es-AR')}
+                  </p>
+                </button>
+              ))}
+            </div>
+
+            {summary.mode === 'EXPRESS' && (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <Label>Unidades de servicio</Label>
+                  <Input
+                    type="number"
+                    min={1}
+                    value={summary.serviceUnits}
+                    onChange={(event) => setSummary((prev) => ({ ...prev, serviceUnits: Number(event.target.value) || 1 }))}
+                  />
+                </div>
+                <div>
+                  <Label>Urgencia</Label>
+                  <select
+                    className="h-11 w-full rounded-xl border border-border bg-white px-4 text-sm"
+                    value={summary.urgencyMultiplier}
+                    onChange={(event) => setSummary((prev) => ({ ...prev, urgencyMultiplier: Number(event.target.value) || 1 }))}
+                  >
+                    <option value={1}>Normal</option>
+                    <option value={1.1}>Prioridad 72 h</option>
+                    <option value={1.2}>Urgente 24 h</option>
+                  </select>
+                </div>
               </div>
-            ))}
+            )}
+
+            {summary.mode === 'ASSISTED' && (
+              <>
+                <div className="grid gap-4 sm:grid-cols-3">
+                  <div>
+                    <Label>Ambientes</Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      value={summary.ambientes}
+                      onChange={(event) => setSummary((prev) => ({ ...prev, ambientes: Number(event.target.value) || 1 }))}
+                    />
+                  </div>
+                  <div>
+                    <Label>Bocas extra</Label>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={summary.bocasExtra}
+                      onChange={(event) => setSummary((prev) => ({ ...prev, bocasExtra: Number(event.target.value) || 0 }))}
+                    />
+                  </div>
+                  <div>
+                    <Label>Base técnica</Label>
+                    <select
+                      className="h-11 w-full rounded-xl border border-border bg-white px-4 text-sm"
+                      value={summary.packId}
+                      onChange={(event) => setSummary((prev) => ({ ...prev, packId: event.target.value }))}
+                    >
+                      {packs.map((pack) => (
+                        <option key={pack.id} value={pack.id}>
+                          {pack.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-foreground">Ajustes editables</p>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    {adicionales.slice(0, 8).map((item) => (
+                      <div key={item.id} className="grid grid-cols-[1fr_92px] items-center gap-3">
+                        <span className="text-sm text-slate-600">{item.nombre}</span>
+                        <Input
+                          type="number"
+                          min={0}
+                          value={summary.adicionales.find((it) => it.id === item.id)?.cantidad ?? 0}
+                          onChange={(event) => updateItems(item.id, Number(event.target.value) || 0, 'adicionales')}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {summary.mode === 'PROFESSIONAL' && (
+              <div className="grid gap-3 md:grid-cols-2">
+                {professionalCatalog.map((item) => (
+                  <div key={item.id} className="grid grid-cols-[1fr_90px] items-center gap-3">
+                    <span className="text-sm text-slate-600">{item.name}</span>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={summary.professionalItems.find((it) => it.id === item.id)?.cantidad ?? 0}
+                      onChange={(event) => updateItems(item.id, Number(event.target.value) || 0, 'professionalItems')}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div>
+              <Label>Comentarios para el equipo técnico</Label>
+              <Textarea
+                value={summary.comentarios}
+                onChange={(event) => setSummary((prev) => ({ ...prev, comentarios: event.target.value }))}
+              />
+            </div>
           </CardContent>
         </Card>
-      )}
 
-      {step === 2 && (
-        <section className="grid gap-6 lg:grid-cols-2">
-          <Card>
-            <CardHeader><CardTitle>Zona y recargos</CardTitle></CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label>Zona</Label>
-                <select className="h-11 w-full rounded-xl border border-border bg-white px-4 text-sm" value={summary.zoneTier} onChange={(e) => setSummary((p) => ({ ...p, zoneTier: e.target.value as WizardSummary['zoneTier'] }))}>
-                  <option value="PRIORITY">Prioritaria</option>
-                  <option value="SECONDARY">Secundaria</option>
-                  <option value="REVIEW">Revisión manual</option>
-                </select>
-              </div>
-              <div><Label>Recargo urgencia</Label><Input type="number" min={1} step={0.05} value={summary.urgencyMultiplier} onChange={(e) => setSummary((p) => ({ ...p, urgencyMultiplier: Number(e.target.value) || 1 }))} /></div>
-              <div><Label>Recargo dificultad</Label><Input type="number" min={1} step={0.05} value={summary.difficultyMultiplier} onChange={(e) => setSummary((p) => ({ ...p, difficultyMultiplier: Number(e.target.value) || 1 }))} /></div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader><CardTitle>Contacto</CardTitle></CardHeader>
-            <CardContent className="space-y-4">
-              <Input placeholder="Nombre" value={contacto.nombre} onChange={(e) => setContacto((p) => ({ ...p, nombre: e.target.value }))} />
-              <Input placeholder="Email" type="email" value={contacto.email} onChange={(e) => setContacto((p) => ({ ...p, email: e.target.value }))} />
-            </CardContent>
-          </Card>
-        </section>
-      )}
-
-      {step === 3 && (
         <Card>
-          <CardHeader><CardTitle>Resumen</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>Resumen comercial</CardTitle>
+          </CardHeader>
           <CardContent className="space-y-3 text-sm">
-            <p>Servicio: <b>{service?.name}</b></p>
-            <p>Flujo: <b>{totals.requiresSurvey ? 'Relevamiento / presupuesto' : 'Express con contratación online'}</b></p>
+            <p>
+              Servicio: <b>{selectedService?.name}</b>
+            </p>
+            <p>
+              Flujo:{' '}
+              <b>{totals.requiresSurvey ? 'Relevamiento técnico previo' : 'Contratación directa con validación'}</b>
+            </p>
             <p>Subtotal base: ${totals.subtotalBase.toLocaleString('es-AR')}</p>
             <p>Recargo zona: ${totals.recargoZona.toLocaleString('es-AR')}</p>
             <p>Recargo urgencia: ${totals.recargoUrgencia.toLocaleString('es-AR')}</p>
-            <p>Recargo dificultad: ${totals.recargoDificultad.toLocaleString('es-AR')}</p>
             <p className="text-lg font-semibold">Total estimado: ${totals.totalManoObra.toLocaleString('es-AR')}</p>
             {totals.warning && <p className="text-amber-600">{totals.warning}</p>}
-            {!pdfUrl ? <Button onClick={handleSubmit} disabled={isPending}>{isPending ? 'Guardando...' : 'Guardar cotización'}</Button> : <a className="text-accent" href={pdfUrl} target="_blank">Descargar PDF</a>}
+
+            <div className="space-y-3 border-t border-border pt-3">
+              <Input
+                placeholder="Nombre"
+                value={contacto.nombre}
+                onChange={(event) => setContacto((prev) => ({ ...prev, nombre: event.target.value }))}
+              />
+              <Input
+                placeholder="Email"
+                type="email"
+                value={contacto.email}
+                onChange={(event) => setContacto((prev) => ({ ...prev, email: event.target.value }))}
+              />
+              <Button onClick={submitQuote} disabled={isPending}>
+                {isPending ? 'Guardando...' : 'Guardar cotización'}
+              </Button>
+              {pdfUrl && (
+                <a className="text-sm font-semibold text-accent hover:underline" href={pdfUrl} target="_blank" rel="noreferrer">
+                  Descargar PDF
+                </a>
+              )}
+            </div>
           </CardContent>
         </Card>
-      )}
-
-      <div className="flex justify-between">
-        <Button variant="ghost" onClick={back} disabled={step === 0}>Volver</Button>
-        {step < steps.length - 1 && <Button onClick={next}>Continuar</Button>}
-      </div>
+      </section>
     </div>
   )
 }

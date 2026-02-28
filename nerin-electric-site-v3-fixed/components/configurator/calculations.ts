@@ -42,13 +42,14 @@ function buildSelectedItems({
   catalog: QuoteCatalogItem[]
 }) {
   const selected = summary.mode === 'PROFESSIONAL' ? summary.professionalItems : summary.adicionales
-  const source = summary.mode === 'PROFESSIONAL'
-    ? catalog.map((item) => ({
-      id: item.id,
-      nombre: item.name,
-      precioUnitarioManoObra: item.baseUnitPrice,
-    }))
-    : adicionales
+  const source =
+    summary.mode === 'PROFESSIONAL'
+      ? catalog.map((item) => ({
+          id: item.id,
+          nombre: item.name,
+          precioUnitarioManoObra: item.baseUnitPrice,
+        }))
+      : adicionales
 
   return selected
     .map((item) => {
@@ -83,11 +84,24 @@ export function calculateTotals({
   const selectedItems = buildSelectedItems({ summary, adicionales, catalog })
   const itemsSubtotal = selectedItems.reduce((acc, item) => acc + item.subtotal, 0)
   const packSubtotal = pack ? Number(pack.basePrice) : 0
+  const serviceUnits = Math.max(summary.serviceUnits, 1)
+  const guidedAmbientes = Math.max(summary.ambientes - 4, 0) * 22000
+  const guidedBocas = Math.max(summary.bocasExtra, 0) * 18000
 
-  const subtotalBase = Math.max(
-    service?.basePrice ?? 0,
-    summary.mode === 'EXPRESS' ? service?.minPrice ?? 0 : packSubtotal + itemsSubtotal,
-  )
+  let subtotalBase = service?.basePrice ?? 0
+
+  if (summary.mode === 'EXPRESS') {
+    subtotalBase = Math.max(service?.minPrice ?? 0, (service?.basePrice ?? 0) * serviceUnits + itemsSubtotal)
+  }
+
+  if (summary.mode === 'ASSISTED') {
+    const reference = packSubtotal + guidedAmbientes + guidedBocas + itemsSubtotal
+    subtotalBase = Math.max(service?.basePrice ?? 0, reference)
+  }
+
+  if (summary.mode === 'PROFESSIONAL') {
+    subtotalBase = Math.max(service?.basePrice ?? 0, itemsSubtotal)
+  }
 
   const zoneMultiplier = zoneMultipliers[summary.zoneTier] ?? 1
   const recargoZona = subtotalBase * (zoneMultiplier - 1)

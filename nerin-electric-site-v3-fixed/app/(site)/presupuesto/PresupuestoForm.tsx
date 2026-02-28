@@ -19,6 +19,7 @@ const clientTypes = [
 const workTypes = [
   { value: 'mantenimiento', label: 'Mantenimiento' },
   { value: 'obra-nueva', label: 'Obra nueva' },
+  { value: 'reforma', label: 'Reforma eléctrica' },
   { value: 'adecuacion', label: 'Adecuación' },
   { value: 'tablero', label: 'Tablero' },
   { value: 'puesta-a-tierra', label: 'Puesta a tierra' },
@@ -54,7 +55,8 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
 
   const defaultWorkType = useMemo(() => {
     if (leadType === 'mantenimiento') return 'mantenimiento'
-    return 'adecuacion'
+    if (leadType === 'obra') return 'obra-nueva'
+    return 'reforma'
   }, [leadType])
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
