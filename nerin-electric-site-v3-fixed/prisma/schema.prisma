@@ -478,7 +478,12 @@ model OpsProjectAdditionalItem {
   unit                     String
   unitPrice                BigInt
   quantity                 Float
-  status                   String             @default("QUOTED")
+  status                   String             @default("PENDING_CLIENT_APPROVAL")
+  approvalStatus           String             @default("PENDING")
+  approvalNote             String?
+  requestedBy              String?
+  approvedByClientAt       DateTime?
+  evidenceUrl              String?
   mercadoPagoPreferenceId  String?
   mercadoPagoInitPoint     String?
   createdAt                DateTime           @default(now())

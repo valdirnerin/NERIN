@@ -1,0 +1,63 @@
+import { QuoteCatalogItem, QuoteService } from './types'
+
+export const quoteServices: QuoteService[] = [
+  {
+    id: 'diagnostico-premium',
+    name: 'Diagnóstico eléctrico premium',
+    description: 'Inspección técnica, mediciones y plan de acción priorizado.',
+    flow: 'ONLINE',
+    basePrice: 95000,
+    minPrice: 95000,
+    includes: ['Relevamiento visual', 'Medición básica de protecciones', 'Informe digital'],
+    excludes: ['Materiales', 'Reparaciones no incluidas en el diagnóstico'],
+  },
+  {
+    id: 'colocacion-artefactos',
+    name: 'Colocación de artefactos',
+    description: 'Instalación de artefactos simples y especiales con matriz por complejidad.',
+    flow: 'ONLINE',
+    basePrice: 75000,
+    minPrice: 75000,
+    includes: ['Montaje', 'Conexionado', 'Prueba funcional'],
+    excludes: ['Artefactos provistos por NERIN', 'Obras civiles'],
+  },
+  {
+    id: 'circuito-dedicado-aa',
+    name: 'Circuito dedicado para aire acondicionado',
+    description: 'Línea independiente y protecciones según carga.',
+    flow: 'ONLINE',
+    basePrice: 180000,
+    minPrice: 180000,
+    includes: ['Circuito dedicado', 'Protecciones', 'Puesta en marcha'],
+    excludes: ['Equipo de AA', 'Canalizaciones extra especiales'],
+  },
+  {
+    id: 'reforma-parcial',
+    name: 'Reformas parciales',
+    description: 'Trabajo por etapas con definición técnica asistida.',
+    flow: 'SURVEY',
+    basePrice: 320000,
+    includes: ['Presupuesto preliminar', 'Visita técnica', 'Definición de alcance'],
+    excludes: ['Ejecución sin validación'],
+  },
+]
+
+export const professionalCatalog: QuoteCatalogItem[] = [
+  { id: 'boca-iluminacion', name: 'Bocas de iluminación', unit: 'boca', baseUnitPrice: 26000, kind: 'PER_POINT', suggestedQty: 12 },
+  { id: 'tomacorriente', name: 'Tomacorrientes', unit: 'boca', baseUnitPrice: 30000, kind: 'PER_POINT', suggestedQty: 10 },
+  { id: 'boca-especial', name: 'Bocas especiales', unit: 'boca', baseUnitPrice: 42000, kind: 'PER_POINT', suggestedQty: 4 },
+  { id: 'boca-datos', name: 'Bocas de datos', unit: 'boca', baseUnitPrice: 31000, kind: 'PER_POINT', suggestedQty: 4 },
+  { id: 'boca-tv', name: 'Bocas de TV', unit: 'boca', baseUnitPrice: 24000, kind: 'PER_POINT', suggestedQty: 2 },
+  { id: 'boca-aa', name: 'Bocas de aire acondicionado', unit: 'boca', baseUnitPrice: 49000, kind: 'PER_POINT', suggestedQty: 3 },
+  { id: 'tablero', name: 'Tableros', unit: 'unidad', baseUnitPrice: 280000, kind: 'UNIT', suggestedQty: 1 },
+  { id: 'puesta-tierra', name: 'Puesta a tierra', unit: 'unidad', baseUnitPrice: 180000, kind: 'UNIT', suggestedQty: 1 },
+  { id: 'canalizacion', name: 'Canalizaciones', unit: 'ml', baseUnitPrice: 22000, kind: 'UNIT', suggestedQty: 40 },
+  { id: 'alimentacion', name: 'Alimentaciones', unit: 'tramo', baseUnitPrice: 92000, kind: 'UNIT', suggestedQty: 2 },
+  { id: 'artefacto-simple', name: 'Artefacto simple', unit: 'unidad', baseUnitPrice: 16000, kind: 'UNIT', suggestedQty: 8 },
+  { id: 'artefacto-mediano', name: 'Artefacto decorativo mediano', unit: 'unidad', baseUnitPrice: 26000, kind: 'UNIT', suggestedQty: 4 },
+  { id: 'artefacto-pesado', name: 'Artefacto pesado/especial', unit: 'unidad', baseUnitPrice: 48000, kind: 'UNIT', suggestedQty: 2 },
+  { id: 'artefacto-exterior', name: 'Artefacto exterior', unit: 'unidad', baseUnitPrice: 30000, kind: 'UNIT', suggestedQty: 4 },
+  { id: 'lineal-led', name: 'Lineal / perfil LED', unit: 'metro', baseUnitPrice: 18000, kind: 'UNIT', suggestedQty: 12 },
+  { id: 'altura-especial', name: 'Altura especial', unit: 'unidad', baseUnitPrice: 25000, kind: 'UNIT', suggestedQty: 1 },
+  { id: 'dos-operarios', name: 'Necesidad de dos operarios', unit: 'jornada', baseUnitPrice: 85000, kind: 'UNIT', suggestedQty: 1 },
+]

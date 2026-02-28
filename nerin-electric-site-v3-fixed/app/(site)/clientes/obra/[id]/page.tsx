@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Table, TableCell, TableHead, TableRow } from '@/components/ui/table'
+import { approveOpsAdditionalByClient } from '@/app/(admin)/admin/(shell)/ops/actions'
 
 export default async function ClienteObraPage({ params }: { params: { id: string } }) {
   if (!DB_ENABLED) {
@@ -85,6 +86,7 @@ export default async function ClienteObraPage({ params }: { params: { id: string
                   <TableHead>Porcentaje</TableHead>
                   <TableHead>Monto</TableHead>
                   <TableHead>Estado</TableHead>
+                  <TableHead>Aprobación</TableHead>
                   <TableHead></TableHead>
                 </TableRow>
               </thead>
@@ -126,6 +128,7 @@ export default async function ClienteObraPage({ params }: { params: { id: string
                   <TableHead>Adicional</TableHead>
                   <TableHead>Detalle</TableHead>
                   <TableHead>Estado</TableHead>
+                  <TableHead>Aprobación</TableHead>
                   <TableHead></TableHead>
                 </TableRow>
               </thead>
@@ -141,7 +144,16 @@ export default async function ClienteObraPage({ params }: { params: { id: string
                       <Badge className="bg-slate-100 text-slate-600">{additional.status}</Badge>
                     </TableCell>
                     <TableCell>
-                      {additional.status !== 'PAID' && additional.mercadoPagoInitPoint ? (
+                      <span className="text-xs text-slate-500">{additional.approvalStatus}</span>
+                    </TableCell>
+                    <TableCell>
+                      {additional.approvalStatus === 'PENDING' ? (
+                        <form action={approveOpsAdditionalByClient} className="space-y-2">
+                          <input type="hidden" name="additionalId" value={additional.id} />
+                          <input type="hidden" name="returnTo" value={`/clientes/obra/${project.id}`} />
+                          <Button size="sm" type="submit">Aprobar</Button>
+                        </form>
+                      ) : additional.status !== 'PAID' && additional.mercadoPagoInitPoint ? (
                         <Button size="sm" variant="secondary" asChild>
                           <a href={additional.mercadoPagoInitPoint} target="_blank" rel="noreferrer">
                             Pagar

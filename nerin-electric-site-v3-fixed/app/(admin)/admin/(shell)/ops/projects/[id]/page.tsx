@@ -185,6 +185,7 @@ export default async function AdminOpsProjectDetail({
                   <TableHead>Porcentaje</TableHead>
                   <TableHead>Monto</TableHead>
                   <TableHead>Estado</TableHead>
+                  <TableHead>Aprobación</TableHead>
                   <TableHead>Pago</TableHead>
                 </TableRow>
               </thead>
@@ -254,6 +255,7 @@ export default async function AdminOpsProjectDetail({
                   <TableHead>Cantidad</TableHead>
                   <TableHead>Precio</TableHead>
                   <TableHead>Estado</TableHead>
+                  <TableHead>Aprobación</TableHead>
                   <TableHead>Pago</TableHead>
                 </TableRow>
               </thead>
@@ -268,6 +270,7 @@ export default async function AdminOpsProjectDetail({
                     <TableCell>
                       <Badge className="bg-slate-100 text-slate-600">{additional.status}</Badge>
                     </TableCell>
+                    <TableCell>{additional.approvalStatus}</TableCell>
                     <TableCell>
                       {additional.mercadoPagoInitPoint ? (
                         <a className="text-accent" href={additional.mercadoPagoInitPoint} target="_blank" rel="noreferrer">
@@ -328,6 +331,14 @@ export default async function AdminOpsProjectDetail({
               <div className="grid gap-2">
                 <Label htmlFor="additional-price">Precio unitario (ARS)</Label>
                 <Input id="additional-price" name="unitPrice" type="number" step="0.01" />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="additional-requested-by">Cargado por</Label>
+                <Input id="additional-requested-by" name="requestedBy" placeholder="Técnico / coordinador" />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="additional-evidence">URL evidencia/foto (opcional)</Label>
+                <Input id="additional-evidence" name="evidenceUrl" placeholder="https://..." />
               </div>
               <label className="flex items-center gap-2 text-sm text-slate-600">
                 <input type="checkbox" name="generatePayment" />

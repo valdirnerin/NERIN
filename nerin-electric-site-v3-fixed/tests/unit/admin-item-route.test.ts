@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockRequireAdmin = vi.fn<() => Promise<void>>()
-const mockReadMarkdown = vi.fn()
-const mockWriteMarkdown = vi.fn()
-const mockDeleteMarkdown = vi.fn()
 const mockRevalidatePath = vi.fn<[string], void>()
+const mockUpsertPost = vi.fn()
+const mockGetPost = vi.fn()
+const mockDeletePost = vi.fn()
 
 vi.mock('next/server', () => ({
   NextResponse: {
@@ -22,10 +22,12 @@ vi.mock('@/lib/auth', () => ({
   requireAdmin: () => mockRequireAdmin(),
 }))
 
-vi.mock('@/lib/content', () => ({
-  readMarkdown: (...args: unknown[]) => mockReadMarkdown(...args),
-  writeMarkdown: (...args: unknown[]) => mockWriteMarkdown(...args),
-  deleteMarkdown: (...args: unknown[]) => mockDeleteMarkdown(...args),
+vi.mock('@/lib/content-store', () => ({
+  getContentStore: () => ({
+    upsertPost: (...args: unknown[]) => mockUpsertPost(...args),
+    getPost: (...args: unknown[]) => mockGetPost(...args),
+    deletePost: (...args: unknown[]) => mockDeletePost(...args),
+  }),
 }))
 
 import { POST, DELETE } from '@/app/api/admin/item/route'
@@ -35,8 +37,9 @@ describe('app/api/admin/item/route', () => {
     vi.clearAllMocks()
     mockRequireAdmin.mockResolvedValue()
     mockRevalidatePath.mockImplementation(() => {})
-    mockWriteMarkdown.mockImplementation(() => {})
-    mockDeleteMarkdown.mockImplementation(() => {})
+    mockUpsertPost.mockImplementation(() => {})
+    mockGetPost.mockResolvedValue({ id: 'post-1' })
+    mockDeletePost.mockImplementation(() => {})
   })
 
   describe('POST', () => {
@@ -51,7 +54,14 @@ describe('app/api/admin/item/route', () => {
 
       expect(response.status).toBe(200)
       await expect(response.json()).resolves.toEqual({ ok: true })
-      expect(mockWriteMarkdown).toHaveBeenCalledWith('blog', 'test-post', { title: 'Test' }, 'Hello')
+      expect(mockUpsertPost).toHaveBeenCalledWith({
+        slug: 'test-post',
+        title: 'Test',
+        excerpt: '',
+        content: 'Hello',
+        coverImage: null,
+        publishedAt: null,
+      })
       expect(mockRevalidatePath).toHaveBeenNthCalledWith(1, '/blog')
       expect(mockRevalidatePath).toHaveBeenNthCalledWith(2, '/blog/test-post')
     })
@@ -78,7 +88,7 @@ describe('app/api/admin/item/route', () => {
         ok: false,
         error: 'No se pudo refrescar el contenido del blog. Intentá nuevamente.',
       })
-      expect(mockWriteMarkdown).toHaveBeenCalled()
+      expect(mockUpsertPost).toHaveBeenCalled()
     })
   })
 
@@ -92,7 +102,8 @@ describe('app/api/admin/item/route', () => {
 
       expect(response.status).toBe(200)
       await expect(response.json()).resolves.toEqual({ ok: true })
-      expect(mockDeleteMarkdown).toHaveBeenCalledWith('blog', 'to-delete')
+      expect(mockGetPost).toHaveBeenCalledWith('to-delete')
+      expect(mockDeletePost).toHaveBeenCalledWith('post-1')
       expect(mockRevalidatePath).toHaveBeenNthCalledWith(1, '/blog')
       expect(mockRevalidatePath).toHaveBeenNthCalledWith(2, '/blog/to-delete')
     })
@@ -113,7 +124,7 @@ describe('app/api/admin/item/route', () => {
         ok: false,
         error: 'No se pudo refrescar el contenido del blog. Intentá nuevamente.',
       })
-      expect(mockDeleteMarkdown).toHaveBeenCalled()
+      expect(mockGetPost).toHaveBeenCalled()
     })
   })
 })
