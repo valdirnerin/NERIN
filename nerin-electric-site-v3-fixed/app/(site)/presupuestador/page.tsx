@@ -1,17 +1,18 @@
 export const dynamic = 'force-dynamic'
+
+import Link from 'next/link'
 import { getConfiguratorData } from '@/lib/marketing-data'
 import { Badge } from '@/components/ui/badge'
 import { ConfiguratorWizard } from '@/components/configurator/ConfiguratorWizard'
 import { Button } from '@/components/ui/button'
-import Link from 'next/link'
 
 export const revalidate = 60
 
 export async function generateMetadata() {
   const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
-  const title = 'Presupuestador eléctrico | Servicio puntual, obra o profesional'
+  const title = 'Contratación NERIN | Servicio puntual, relevamiento o cotización profesional'
   const description =
-    'Elegí tu modo de cotización en NERIN: servicio puntual, cotización guiada para obra o cotizador profesional por ítems.'
+    'Ingresá por una de las 3 puertas de NERIN: resolver algo puntual, pedir relevamiento o cotizar por plano/cantidades.'
 
   return {
     title,
@@ -33,6 +34,24 @@ export async function generateMetadata() {
     },
   }
 }
+
+const doors = [
+  {
+    title: 'Resolver algo puntual',
+    description: 'Para necesidades inmediatas con alcance claro.',
+    href: '/presupuestador?mode=EXPRESS',
+  },
+  {
+    title: 'Pedir relevamiento/proyecto',
+    description: 'Para obras y reformas con definición técnica.',
+    href: '/presupuesto?tipo=obra',
+  },
+  {
+    title: 'Cotización profesional',
+    description: 'Para perfiles técnicos con plano y cantidades.',
+    href: '/presupuestador?mode=PROFESSIONAL',
+  },
+]
 
 export default async function PresupuestadorPage({
   searchParams,
@@ -64,22 +83,25 @@ export default async function PresupuestadorPage({
 
   return (
     <div className="space-y-8 sm:space-y-10">
-      <header className="space-y-4 sm:space-y-5">
-        <Badge>Hub de cotización</Badge>
-        <h1>Elegí cómo querés cotizar tu trabajo eléctrico</h1>
+      <header className="space-y-4">
+        <Badge>Sistema comercial NERIN</Badge>
+        <h1>Una contratación clara en 3 puertas</h1>
         <p className="max-w-3xl text-lg text-slate-600">
-          No todos los proyectos se cotizan igual. Si querés resolver algo puntual, contratar una obra con guía o cargar
-          cantidades técnicas, empezá por el camino correcto desde el inicio.
+          Elegí el contexto correcto y avanzá con una propuesta ordenada. Sin calculadoras confusas ni desvíos.
         </p>
-        <div className="flex flex-wrap gap-3">
-          <Button variant="secondary" asChild>
-            <Link href="/presupuesto?tipo=obra">Solicitar relevamiento</Link>
-          </Button>
-          <Button variant="ghost" asChild>
-            <Link href="/packs">Ver bases técnicas (packs)</Link>
-          </Button>
-        </div>
       </header>
+
+      <section className="grid gap-4 md:grid-cols-3">
+        {doors.map((door) => (
+          <article key={door.title} className="rounded-2xl border border-border bg-white p-5">
+            <h2 className="text-base font-semibold">{door.title}</h2>
+            <p className="mt-2 text-sm text-muted-foreground">{door.description}</p>
+            <Button variant="ghost" className="mt-4 px-0" asChild>
+              <a href={door.href}>Entrar</a>
+            </Button>
+          </article>
+        ))}
+      </section>
 
       <ConfiguratorWizard
         packs={wizardPacks}

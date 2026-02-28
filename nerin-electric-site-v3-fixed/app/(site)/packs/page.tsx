@@ -1,4 +1,5 @@
 export const dynamic = 'force-dynamic'
+
 import Link from 'next/link'
 import { getPacksForMarketing } from '@/lib/marketing-data'
 import { Button } from '@/components/ui/button'
@@ -13,7 +14,7 @@ export async function generateMetadata() {
   const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
   const title = 'Bases técnicas de mano de obra | NERIN'
   const description =
-    'Referencia técnica de bases de mano de obra para instalación eléctrica. Para contratar, usar el hub de cotización.'
+    'Anexo técnico de referencia para equipos que necesitan revisar bases de mano de obra. La contratación principal se inicia desde el hub NERIN.'
 
   return {
     title,
@@ -41,20 +42,20 @@ export default async function PacksPage() {
   const packs = await getPacksForMarketing()
 
   return (
-    <div className="space-y-12">
-      <header className="space-y-5">
-        <Badge>Referencia técnica</Badge>
-        <h1>Bases de mano de obra (uso técnico)</h1>
-        <p className="max-w-3xl text-lg text-slate-600">
-          Este contenido es complementario para quienes quieren revisar bases prearmadas. La contratación principal de
-          NERIN se organiza desde el hub de cotización por tipo de necesidad.
+    <div className="space-y-10">
+      <header className="space-y-4 rounded-2xl border border-border bg-muted/20 p-6">
+        <Badge>Anexo técnico</Badge>
+        <h1>Bases de mano de obra</h1>
+        <p className="max-w-3xl text-base text-slate-600">
+          Este contenido es de apoyo para perfiles técnicos. Si querés avanzar comercialmente, volvé al sistema de
+          contratación con 3 puertas.
         </p>
-        <Button asChild size="lg">
-          <Link href="/presupuestador">Ir al hub de cotización</Link>
+        <Button asChild>
+          <Link href="/presupuestador">Volver al hub comercial</Link>
         </Button>
       </header>
 
-      <section className="grid gap-6">
+      <section className="grid gap-5">
         {packs.map((pack) => (
           <Card key={pack.id} id={pack.slug} className="scroll-mt-32">
             <CardHeader>
@@ -68,26 +69,16 @@ export default async function PacksPage() {
                 </p>
               </div>
             </CardHeader>
-            <CardContent className="space-y-4 text-sm text-slate-600">
+            <CardContent className="space-y-3 text-sm text-slate-600">
               <p>{pack.scope}</p>
               <ul className="grid gap-2 sm:grid-cols-2">
-                {pack.features.map((item) => (
+                {pack.features.slice(0, 4).map((item) => (
                   <li key={item}>• {item}</li>
                 ))}
               </ul>
             </CardContent>
           </Card>
         ))}
-      </section>
-
-      <section className="rounded-2xl border border-border bg-muted/40 p-6">
-        <p className="text-sm text-muted-foreground">
-          ¿Querés avanzar con una propuesta comercial? Definí si necesitás servicio puntual, obra guiada o cotización
-          profesional.
-        </p>
-        <Button className="mt-4" variant="secondary" asChild>
-          <Link href="/presupuestador">Volver al presupuestador</Link>
-        </Button>
       </section>
     </div>
   )
