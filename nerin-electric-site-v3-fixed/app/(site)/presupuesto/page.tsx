@@ -43,8 +43,8 @@ export default async function PresupuestoPage({
   const plan = searchParams?.plan
 
   return (
-    <div className="grid gap-14 lg:grid-cols-[1.15fr_0.85fr]">
-      <div className="space-y-8">
+    <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12">
+      <div className="space-y-6 sm:space-y-8">
         <Badge>Relevamiento técnico</Badge>
         <h1>Cotización para instalación, obra o reforma</h1>
         <p className="max-w-2xl text-lg text-slate-600">
@@ -53,7 +53,7 @@ export default async function PresupuestoPage({
         </p>
         <PresupuestoForm whatsappNumber={site.contact.whatsappNumber} leadType={leadType} plan={plan} />
       </div>
-      <aside className="space-y-6 rounded-3xl border border-border bg-white p-8 shadow-subtle">
+      <aside className="space-y-5 rounded-3xl border border-border bg-white p-5 shadow-subtle sm:p-7 lg:sticky lg:top-24">
         <h2>Qué validamos en el relevamiento</h2>
         <ul className="space-y-3 text-sm text-slate-600">
           <li>• Estado general de tablero, alimentaciones y protecciones.</li>

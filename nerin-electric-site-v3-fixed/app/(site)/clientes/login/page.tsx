@@ -50,7 +50,7 @@ export default function LoginPage() {
   }, [status, isAdmin, isClient])
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-12 px-6 py-16 md:flex-row md:items-start">
+    <div className="mx-auto flex max-w-5xl flex-col gap-8 px-0 py-4 sm:py-8 md:flex-row md:items-start md:gap-10">
       <div className="max-w-md space-y-6">
         <Badge>Portal de clientes</Badge>
         <h1 className="text-3xl font-semibold tracking-tight">Ingresá con tu email</h1>
@@ -87,7 +87,7 @@ export default function LoginPage() {
           .
         </p>
       </div>
-      <div className="flex w-full max-w-sm shrink-0 justify-center md:justify-end">
+      <div className="flex w-full max-w-md shrink-0 justify-center md:justify-end">
         {redirectMessage ? (
           <div className="w-full rounded-lg border border-emerald-100/60 p-6 text-sm text-slate-600 shadow-lg shadow-emerald-100/40">
             {redirectMessage}

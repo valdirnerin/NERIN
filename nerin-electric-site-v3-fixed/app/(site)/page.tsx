@@ -65,9 +65,9 @@ export default async function HomePage() {
   const site = await getSiteContent()
 
   return (
-    <div className="space-y-20">
-      <section className="grid gap-10 lg:grid-cols-[1.1fr_1fr]">
-        <div className="space-y-6">
+    <div className="space-y-14 sm:space-y-16 lg:space-y-20">
+      <section className="grid gap-8 lg:grid-cols-[1.1fr_1fr] lg:gap-10">
+        <div className="space-y-5 sm:space-y-6">
           <Badge>{site.hero.badge}</Badge>
           <h1>Instalaciones eléctricas con criterio comercial y ejecución profesional</h1>
           <p className="max-w-2xl text-lg text-muted-foreground">
@@ -98,7 +98,7 @@ export default async function HomePage() {
           <p className="text-xs font-semibold uppercase tracking-[0.4em] text-muted-foreground">Tres caminos claros</p>
           <h2>Elegí tu forma de contratación</h2>
         </div>
-        <div className="grid gap-5 md:grid-cols-3">
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {mainPaths.map((path) => (
             <Card key={path.title}>
               <CardHeader>
@@ -120,7 +120,7 @@ export default async function HomePage() {
           <p className="text-xs font-semibold uppercase tracking-[0.4em] text-muted-foreground">Servicios destacados</p>
           <h2>Servicios puntuales más solicitados</h2>
         </div>
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2">
           {[
             'Diagnóstico eléctrico premium',
             'Colocación de artefactos',
@@ -136,8 +136,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="relative left-1/2 right-1/2 -mx-[50vw] w-screen bg-[#0B0F14] py-16 text-white">
-        <div className="container space-y-8">
+      <section className="relative -mx-4 bg-[#0B0F14] px-4 py-12 text-white sm:-mx-5 sm:px-5 lg:-mx-6 lg:px-6 xl:-mx-10 xl:px-10">
+        <div className="mx-auto max-w-[var(--container)] space-y-8">
           <div className="max-w-2xl space-y-3">
             <p className="text-xs font-semibold uppercase tracking-[0.4em] text-[#FBBF24]">Cobertura premium</p>
             <h2 className="text-white">Atención técnica en zonas priorizadas</h2>
@@ -174,7 +174,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="rounded-3xl border border-border bg-muted/40 p-6">
+      <section className="rounded-3xl border border-border bg-muted/40 p-5 sm:p-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="space-y-2">
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">Contenido técnico</p>

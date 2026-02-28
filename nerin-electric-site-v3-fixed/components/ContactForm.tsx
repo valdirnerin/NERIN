@@ -25,7 +25,7 @@ export default function ContactForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="grid gap-6 md:grid-cols-2 rounded-lg border border-gray-200 p-6 shadow-sm"
+      className="grid gap-5 rounded-xl border border-gray-200 p-4 shadow-sm sm:p-6 md:grid-cols-2"
     >
       <div className="flex flex-col gap-2">
         <label className="text-sm font-medium text-gray-700" htmlFor="nombre">
@@ -33,7 +33,7 @@ export default function ContactForm() {
         </label>
         <input
           id="nombre"
-          className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          className="min-h-11 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
           placeholder="Nombre"
           value={form.nombre}
           onChange={(event) => setForm((prev) => ({ ...prev, nombre: event.target.value }))}
@@ -48,7 +48,7 @@ export default function ContactForm() {
         <input
           id="email"
           type="email"
-          className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          className="min-h-11 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
           placeholder="tu@email.com"
           value={form.email}
           onChange={(event) => setForm((prev) => ({ ...prev, email: event.target.value }))}
@@ -56,7 +56,7 @@ export default function ContactForm() {
         />
       </div>
 
-      <div className="md:col-span-2 flex flex-col gap-2">
+      <div className="flex flex-col gap-2 md:col-span-2">
         <label className="text-sm font-medium text-gray-700" htmlFor="mensaje">
           Mensaje
         </label>
@@ -71,10 +71,10 @@ export default function ContactForm() {
         />
       </div>
 
-      <div className="md:col-span-2 flex flex-col gap-3 sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-3 md:col-span-2 sm:flex-row sm:items-center">
         <button
           type="submit"
-          className="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
+          className="inline-flex min-h-11 items-center justify-center rounded-md bg-blue-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
         >
           Enviar
         </button>

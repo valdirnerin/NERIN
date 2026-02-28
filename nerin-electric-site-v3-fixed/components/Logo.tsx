@@ -16,8 +16,8 @@ export function Logo({ className, imageUrl, subtitle, title }: LogoProps) {
   const showImage = Boolean(imageUrl) && !imageFailed
 
   return (
-    <Link href="/" className={cn('no-underline flex items-center gap-3 font-display text-lg', className)}>
-      <span className="inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-[var(--radius)] border border-border bg-white p-1">
+    <Link href="/" className={cn('no-underline flex min-w-0 items-center gap-2.5 font-display text-lg sm:gap-3', className)}>
+      <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-[var(--radius)] border border-border bg-white p-1 sm:h-10 sm:w-10">
         {showImage ? (
           <img
             src={imageUrl ?? undefined}
@@ -32,9 +32,9 @@ export function Logo({ className, imageUrl, subtitle, title }: LogoProps) {
           </svg>
         )}
       </span>
-      <div className="flex flex-col leading-tight">
-        <span className="text-base font-semibold uppercase tracking-[0.2em] text-foreground">{title}</span>
-        <span className="text-xs text-muted-foreground">{subtitle}</span>
+      <div className="flex min-w-0 flex-col leading-tight">
+        <span className="truncate text-sm font-semibold uppercase tracking-[0.16em] text-foreground sm:text-base sm:tracking-[0.2em]">{title}</span>
+        <span className="hidden text-xs text-muted-foreground sm:block">{subtitle}</span>
       </div>
     </Link>
   )

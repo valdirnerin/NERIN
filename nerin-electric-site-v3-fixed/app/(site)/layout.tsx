@@ -121,10 +121,10 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
           imageUrl: site.logo.imageUrl,
         }}
       />
-      <main className="container pb-24 pt-14">{children}</main>
+      <main className="container pb-20 pt-8 sm:pt-10 lg:pt-12">{children}</main>
       <Footer site={site} />
       <a
-        className="no-underline fixed bottom-6 right-6 hidden h-12 w-12 items-center justify-center rounded-full border border-transparent bg-[#0B0F14] text-white shadow-subtle transition hover:border-[#FBBF24] hover:text-[#FBBF24] focus-visible:ring-2 focus-visible:ring-[#FBBF24]/60 md:inline-flex"
+        className="no-underline fixed bottom-4 right-4 z-40 inline-flex h-12 w-12 items-center justify-center rounded-full border border-transparent bg-[#0B0F14] text-white shadow-subtle transition hover:border-[#FBBF24] hover:text-[#FBBF24] focus-visible:ring-2 focus-visible:ring-[#FBBF24]/60 sm:bottom-5 sm:right-5"
         href={whatsappHref}
         target="_blank"
         rel="noreferrer"

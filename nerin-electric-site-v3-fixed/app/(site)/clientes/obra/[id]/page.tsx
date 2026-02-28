@@ -61,7 +61,7 @@ export default async function ClienteObraPage({ params }: { params: { id: string
   ].sort((a, b) => b.date.getTime() - a.date.getTime())
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8 sm:space-y-10">
       <header className="space-y-2">
         <Badge>Portal de clientes</Badge>
         <h1>{project.title}</h1>
@@ -73,7 +73,7 @@ export default async function ClienteObraPage({ params }: { params: { id: string
         </Button>
       </header>
 
-      <section className="grid gap-6 lg:grid-cols-2">
+      <section className="grid gap-5 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>Certificados de avance</CardTitle>
@@ -171,7 +171,7 @@ export default async function ClienteObraPage({ params }: { params: { id: string
         </Card>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-2">
+      <section className="grid gap-5 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>Fotos</CardTitle>

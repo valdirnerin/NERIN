@@ -136,7 +136,7 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
     const message = `Hola, soy ${leadName ?? 'un cliente'}. Envié un pedido de presupuesto (ID: ${leadId}). Quiero coordinar.`
     const whatsappHref = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
     return (
-      <div className="space-y-6 rounded-3xl border border-border bg-white p-8 shadow-subtle">
+      <div className="space-y-5 rounded-3xl border border-border bg-white p-4 shadow-subtle sm:p-6 lg:p-8">
         <h2 className="text-2xl font-semibold text-foreground">¡Solicitud enviada!</h2>
         <p className="text-sm text-slate-600">
           Recibimos tu pedido. Tu ID de solicitud es <strong>{leadId}</strong>. Te respondemos en 24–48 h.
@@ -152,9 +152,9 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 rounded-3xl border border-border bg-white p-8 shadow-subtle">
+    <form onSubmit={handleSubmit} className="space-y-5 rounded-3xl border border-border bg-white p-4 shadow-subtle sm:p-6 lg:p-8">
       <AttributionFields />
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2">
         <div>
           <Label htmlFor="nombre">Nombre y Apellido *</Label>
           <Input id="nombre" name="nombre" required placeholder="Ej: Carla Méndez" />
@@ -173,7 +173,7 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
             id="cliente"
             name="cliente"
             defaultValue={defaultClientType}
-            className="h-11 w-full rounded-xl border border-border bg-white px-4 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+            className="min-h-11 w-full rounded-xl border border-border bg-white px-4 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
             required
           >
             {clientTypes.map((option) => (
@@ -192,14 +192,14 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
           <Input id="direccion" name="direccion" placeholder="Calle y número" />
         </div>
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2">
         <div>
           <Label htmlFor="trabajo">Tipo de trabajo *</Label>
           <select
             id="trabajo"
             name="trabajo"
             defaultValue={defaultWorkType}
-            className="h-11 w-full rounded-xl border border-border bg-white px-4 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+            className="min-h-11 w-full rounded-xl border border-border bg-white px-4 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
             required
           >
             {workTypes.map((option) => (
@@ -215,7 +215,7 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
             id="urgencia"
             name="urgencia"
             defaultValue="24-48h"
-            className="h-11 w-full rounded-xl border border-border bg-white px-4 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+            className="min-h-11 w-full rounded-xl border border-border bg-white px-4 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
             required
           >
             {urgencies.map((option) => (
@@ -250,12 +250,12 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
           type="checkbox"
           name="consentimiento"
           required
-          className="mt-1 h-4 w-4 rounded border-border text-accent focus-visible:ring-accent/40"
+          className="mt-1 h-5 w-5 rounded border-border text-accent focus-visible:ring-accent/40"
         />
         Acepto contacto por WhatsApp/Email.
       </label>
       {status === 'error' && <p className="text-sm text-red-600">{errorMessage}</p>}
-      <Button type="submit" size="lg" disabled={status === 'submitting'}>
+      <Button type="submit" size="lg" disabled={status === 'submitting'} className="w-full sm:w-auto">
         {status === 'submitting' ? 'Enviando...' : 'Enviar solicitud'}
       </Button>
     </form>
