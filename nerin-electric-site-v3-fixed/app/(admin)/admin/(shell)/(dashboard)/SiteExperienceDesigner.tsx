@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { AdminMediaField } from '@/components/admin/AdminMediaField'
 import { Button } from '@/components/ui/button'
 
 interface SiteExperienceDesignerProps {
@@ -482,19 +483,18 @@ export function SiteExperienceDesigner({ initialData }: SiteExperienceDesignerPr
                 }
               />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="hero-background">Imagen de fondo (URL)</Label>
-              <Input
-                id="hero-background"
-                value={form.hero.backgroundImage}
-                onChange={(event) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    hero: { ...prev.hero, backgroundImage: event.target.value },
-                  }))
-                }
-              />
-            </div>
+            <AdminMediaField
+              id="hero-background"
+              label="Imagen de fondo"
+              value={form.hero.backgroundImage}
+              onChange={(next) =>
+                setForm((prev) => ({
+                  ...prev,
+                  hero: { ...prev.hero, backgroundImage: next },
+                }))
+              }
+              uploadFolder="site/hero"
+            />
             <div className="grid gap-2">
               <Label htmlFor="hero-caption">Leyenda de la imagen</Label>
               <Textarea

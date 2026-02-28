@@ -3,8 +3,8 @@ import path from 'node:path'
 import fs from 'node:fs/promises'
 import { prisma } from '@/lib/db'
 import { DB_ENABLED } from '@/lib/dbMode'
-import { getStorageDir } from '@/lib/content'
 import { requireAdmin } from '@/lib/auth'
+import { getMediaDir, getMediaPublicUrl, sanitizeMediaFilename } from '@/lib/media'
 
 export async function POST(req: Request) {
   await requireAdmin()
@@ -27,23 +27,22 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Project not found' }, { status: 404 })
   }
 
-  const safeName = (file.name || 'upload').replace(/[^a-zA-Z0-9._-]/g, '_')
-  const storageDir = getStorageDir()
-  const uploadsDir = path.join(storageDir, 'uploads', 'projects', projectId)
-  await fs.mkdir(uploadsDir, { recursive: true })
+  const safeName = sanitizeMediaFilename(file.name || 'upload.png')
+  const uniqueName = `${Date.now()}-${safeName}`
+  const storedPath = path.posix.join('projects', projectId, uniqueName)
+  const outputPath = path.join(getMediaDir(), storedPath)
+
+  await fs.mkdir(path.dirname(outputPath), { recursive: true })
 
   const arrayBuffer = await file.arrayBuffer()
   const buffer = Buffer.from(arrayBuffer)
-  const outputPath = path.join(uploadsDir, safeName)
   await fs.writeFile(outputPath, buffer)
-
-  const storedPath = path.posix.join('projects', projectId, safeName)
 
   const photo = await prisma.projectPhoto.create({
     data: {
       projectId,
       title,
-      filename: safeName,
+      filename: uniqueName,
       mimeType: file.type || 'application/octet-stream',
       size: buffer.length,
       storedPath,
@@ -53,6 +52,6 @@ export async function POST(req: Request) {
   return NextResponse.json({
     ok: true,
     id: photo.id,
-    url: `/uploads/${storedPath}`,
+    url: getMediaPublicUrl(storedPath),
   })
 }
