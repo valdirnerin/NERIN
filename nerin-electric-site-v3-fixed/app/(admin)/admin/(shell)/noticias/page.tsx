@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Table, TableCell, TableHead, TableRow } from '@/components/ui/table'
 import { Textarea } from '@/components/ui/textarea'
+import { AdminMediaField } from '@/components/admin/AdminMediaField'
 
 type Metric = { label: string; value: string }
 
@@ -88,6 +89,8 @@ export default function AdminNoticiasPage() {
   const [saving, setSaving] = useState(false)
 
   const isEditing = useMemo(() => Boolean(form.id), [form.id])
+
+  const fotos = textToFotos(form.fotosText)
 
   const resetForm = useCallback(() => {
     setForm(emptyForm)
@@ -325,13 +328,40 @@ export default function AdminNoticiasPage() {
                 onChange={(event) => setForm((prev) => ({ ...prev, metricasText: event.target.value }))}
               />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="fotos">URLs de fotos (una por línea)</Label>
-              <Textarea
-                id="fotos"
-                value={form.fotosText}
-                onChange={(event) => setForm((prev) => ({ ...prev, fotosText: event.target.value }))}
-              />
+            <div className="grid gap-3">
+              <Label>Fotos de la noticia</Label>
+              {fotos.map((foto, index) => (
+                <div key={`${form.id ?? 'new'}-foto-${index}`} className="space-y-2 rounded-xl border border-border p-3">
+                  <AdminMediaField
+                    id={`case-study-foto-${index}`}
+                    label={`Foto ${index + 1}`}
+                    value={foto}
+                    onChange={(next) => {
+                      const nextFotos = fotos.map((item, itemIndex) => (itemIndex === index ? next : item)).filter(Boolean)
+                      setForm((prev) => ({ ...prev, fotosText: nextFotos.join('\n') }))
+                    }}
+                    uploadFolder="case-studies"
+                  />
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {
+                      const nextFotos = fotos.filter((_, itemIndex) => itemIndex !== index)
+                      setForm((prev) => ({ ...prev, fotosText: nextFotos.join('\n') }))
+                    }}
+                  >
+                    Eliminar foto
+                  </Button>
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setForm((prev) => ({ ...prev, fotosText: [...fotos, ''].join('\n') }))}
+              >
+                Agregar foto
+              </Button>
             </div>
             <label className="flex items-center gap-2 text-sm text-slate-600">
               <input

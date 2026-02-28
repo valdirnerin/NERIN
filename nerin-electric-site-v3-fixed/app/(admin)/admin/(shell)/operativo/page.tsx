@@ -11,6 +11,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { toPublicMediaUrl } from '@/lib/media'
+import { ProjectPhotoUploader } from './ProjectPhotoUploader'
 import { Table, TableCell, TableHead, TableRow } from '@/components/ui/table'
 
 const formatCurrency = (value: number) =>
@@ -135,31 +137,13 @@ export default async function AdminOperativoPage() {
 
                     <div className="space-y-4">
                       <h3 className="text-base font-semibold text-foreground">Fotos de obra</h3>
-                      <form
-                        action="/api/upload/project-photo"
-                        method="post"
-                        encType="multipart/form-data"
-                        className="grid gap-3"
-                      >
-                        <input type="hidden" name="projectId" value={project.id} />
-                        <div className="grid gap-2">
-                          <Label htmlFor={`photo-title-${project.id}`}>Título</Label>
-                          <Input id={`photo-title-${project.id}`} name="title" placeholder="Ingreso de materiales" />
-                        </div>
-                        <div className="grid gap-2">
-                          <Label htmlFor={`photo-file-${project.id}`}>Archivo</Label>
-                          <Input id={`photo-file-${project.id}`} name="file" type="file" accept="image/*" required />
-                        </div>
-                        <Button type="submit" variant="secondary">
-                          Subir foto
-                        </Button>
-                      </form>
+                      <ProjectPhotoUploader projectId={project.id} />
                       {project.photos.length ? (
                         <div className="grid grid-cols-2 gap-3">
                           {project.photos.map((photo) => (
                             <figure key={photo.id} className="space-y-2">
                               <img
-                                src={`/uploads/${photo.storedPath}`}
+                                src={toPublicMediaUrl(photo.storedPath)}
                                 alt={photo.title ?? 'Foto de obra'}
                                 className="h-32 w-full rounded-lg object-cover"
                                 loading="lazy"
