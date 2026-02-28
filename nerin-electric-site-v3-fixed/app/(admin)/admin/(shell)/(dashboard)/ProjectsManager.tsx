@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Table, TableCell, TableHead, TableRow } from '@/components/ui/table'
+import { AdminMediaField } from '@/components/admin/AdminMediaField'
 
 type Project = {
   id?: string
@@ -162,21 +163,44 @@ export function ProjectsManager() {
               />
             </div>
           </div>
-          <div className="grid gap-2">
-            <Label htmlFor="project-images">Imágenes (URLs separadas por coma)</Label>
-            <Input
-              id="project-images"
-              value={form.images.join(', ')}
-              onChange={(event) =>
-                setForm((prev) => ({
-                  ...prev,
-                  images: event.target.value
-                    .split(',')
-                    .map((url) => url.trim())
-                    .filter(Boolean),
-                }))
-              }
-            />
+          <div className="grid gap-3">
+            <Label>Imágenes del proyecto</Label>
+            {form.images.map((image, index) => (
+              <div key={`${form.id ?? 'new'}-${index}`} className="space-y-2 rounded-xl border border-border p-3">
+                <AdminMediaField
+                  id={`project-image-${index}`}
+                  label={`Imagen ${index + 1}`}
+                  value={image}
+                  onChange={(next) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      images: prev.images.map((current, currentIndex) => (currentIndex === index ? next : current)),
+                    }))
+                  }
+                  uploadFolder="projects"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() =>
+                    setForm((prev) => ({
+                      ...prev,
+                      images: prev.images.filter((_, currentIndex) => currentIndex !== index),
+                    }))
+                  }
+                >
+                  Eliminar imagen
+                </Button>
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setForm((prev) => ({ ...prev, images: [...prev.images, ''] }))}
+            >
+              Agregar imagen
+            </Button>
           </div>
           <div className="flex gap-3">
             <Button type="submit">{isEditing ? 'Actualizar' : 'Crear'}</Button>

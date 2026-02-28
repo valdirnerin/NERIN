@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { AdminMediaField } from '@/components/admin/AdminMediaField'
 import { Table, TableCell, TableHead, TableRow } from '@/components/ui/table'
 
 interface Brand {
@@ -130,8 +131,7 @@ export function BrandManager({ initialBrands }: BrandManagerProps) {
           <div>
             <CardTitle>Marcas y partners tecnológicos</CardTitle>
             <p className="text-sm text-slate-600">
-              Cargá marcas que se muestran en el home y en la página de contacto. Podés incluir la URL del logo hospedado en
-              CDN propio.
+              Cargá marcas que se muestran en el home y en la página de contacto usando un flujo unificado de media.
             </p>
             {message && (
               <p className={`text-xs ${message.type === 'success' ? 'text-emerald-600' : 'text-red-600'}`}>{message.message}</p>
@@ -155,15 +155,14 @@ export function BrandManager({ initialBrands }: BrandManagerProps) {
               required
             />
           </div>
-          <div className="grid gap-2">
-            <Label htmlFor="brand-logo">Logo (URL opcional)</Label>
-            <Input
-              id="brand-logo"
-              value={form.logoUrl}
-              onChange={(event) => setForm((prev) => ({ ...prev, logoUrl: event.target.value }))}
-              placeholder="https://..."
-            />
-          </div>
+          <AdminMediaField
+            id="brand-logo"
+            label="Logo de la marca"
+            value={form.logoUrl}
+            onChange={(next) => setForm((prev) => ({ ...prev, logoUrl: next }))}
+            uploadFolder="brands"
+            description="Podés subir archivo desde el dispositivo o pegar una URL externa."
+          />
           <Button type="submit" disabled={loading}>
             {isEditing ? 'Actualizar' : 'Agregar'}
           </Button>
@@ -184,9 +183,12 @@ export function BrandManager({ initialBrands }: BrandManagerProps) {
                   <TableCell>{brand.nombre}</TableCell>
                   <TableCell className="text-sm text-slate-500">
                     {brand.logoUrl ? (
-                      <a className="text-accent underline" href={brand.logoUrl} target="_blank" rel="noreferrer">
-                        {brand.logoUrl}
-                      </a>
+                      <div className="flex items-center gap-3">
+                        <img src={brand.logoUrl} alt={brand.nombre} className="h-10 w-10 rounded-md border border-border object-contain bg-white p-1" />
+                        <a className="max-w-[260px] truncate text-accent underline" href={brand.logoUrl} target="_blank" rel="noreferrer">
+                          {brand.logoUrl}
+                        </a>
+                      </div>
                     ) : (
                       <span className="text-slate-400">Sin logo</span>
                     )}

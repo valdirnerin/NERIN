@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Table, TableCell, TableHead, TableRow } from '@/components/ui/table'
+import { AdminMediaField } from '@/components/admin/AdminMediaField'
 
 interface BlogSummary {
   slug: string
@@ -251,14 +252,13 @@ export function BlogManager() {
               onChange={(event) => setForm((prev) => ({ ...prev, publishedAt: event.target.value }))}
             />
           </div>
-          <div className="grid gap-2">
-            <Label htmlFor="blog-hero">Imagen principal (URL opcional)</Label>
-            <Input
-              id="blog-hero"
-              value={form.heroImage ?? ''}
-              onChange={(event) => setForm((prev) => ({ ...prev, heroImage: event.target.value }))}
-            />
-          </div>
+          <AdminMediaField
+            id="blog-hero"
+            label="Imagen principal"
+            value={form.heroImage ?? ''}
+            onChange={(next) => setForm((prev) => ({ ...prev, heroImage: next }))}
+            uploadFolder="blog"
+          />
           <div className="grid gap-2">
             <Label htmlFor="blog-tags">Tags (separadas por coma)</Label>
             <Input
