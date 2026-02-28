@@ -27,6 +27,7 @@ export default async function LeadsPage({ searchParams }: { searchParams?: Searc
   const urgency = searchParams?.urgencia
 
   const leads = await prisma.lead.findMany({
+    include: { attachments: true },
     where: {
       ...(leadType ? { leadType } : {}),
       ...(urgency ? { urgency } : {}),
@@ -117,8 +118,23 @@ export default async function LeadsPage({ searchParams }: { searchParams?: Searc
               <div className="mt-3 flex flex-wrap gap-3 text-xs text-slate-500">
                 <span>Origen: {lead.leadType ?? '-'}</span>
                 <span>Plan: {lead.plan ?? '-'}</span>
-                <span>Adjuntos: {lead.hasFiles ? 'Sí' : 'No'}</span>
+                <span>Adjuntos: {lead.attachments.length}</span>
               </div>
+              {lead.attachments.length > 0 && (
+                <div className="mt-3 text-xs text-slate-500">
+                  <p className="font-semibold text-foreground">Archivos adjuntos</p>
+                  <ul className="mt-1 space-y-1">
+                    {lead.attachments.map((attachment) => (
+                      <li key={attachment.id}>
+                        <a className="underline" href={attachment.publicUrl} target="_blank" rel="noreferrer">
+                          {attachment.originalName}
+                        </a>{' '}
+                        · {(attachment.size / 1024 / 1024).toFixed(2)} MB
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           ))}
         </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import type { FormEvent } from 'react'
+import type { ChangeEvent, FormEvent } from 'react'
 import { useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -46,6 +46,7 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
   const [leadId, setLeadId] = useState<string | null>(null)
   const [leadName, setLeadName] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
 
   const defaultClientType = useMemo(() => {
     if (leadType === 'consorcio') return 'consorcio'
@@ -59,54 +60,60 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
     return 'reforma'
   }, [leadType])
 
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files ?? [])
+    setSelectedFiles(files)
+    setErrorMessage(null)
+  }
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setStatus('submitting')
     setErrorMessage(null)
 
     const form = event.currentTarget
-    const formData = new FormData(form)
-    const hasFiles = (form.elements.namedItem('adjuntos') as HTMLInputElement | null)?.files?.length
-      ? true
-      : false
-
-    const nameValue = String(formData.get('nombre') ?? '')
+    const formData = new FormData()
+    const rawFormData = new FormData(form)
+    const nameValue = String(rawFormData.get('nombre') ?? '')
     const attribution = readAttribution()
-    const payload = {
-      name: nameValue,
-      phone: String(formData.get('telefono') ?? ''),
-      email: String(formData.get('email') ?? ''),
-      clientType: String(formData.get('cliente') ?? ''),
-      location: String(formData.get('ubicacion') ?? ''),
-      address: String(formData.get('direccion') ?? ''),
-      workType: String(formData.get('trabajo') ?? ''),
-      urgency: String(formData.get('urgencia') ?? ''),
-      details: String(formData.get('detalle') ?? ''),
-      consent: Boolean(formData.get('consentimiento')),
-      leadType: leadType || undefined,
-      plan: plan || undefined,
-      reason: leadType || plan || undefined,
-      hasFiles,
-      utmSource: attribution.utmSource,
-      utmMedium: attribution.utmMedium,
-      utmCampaign: attribution.utmCampaign,
-      utmTerm: attribution.utmTerm,
-      utmContent: attribution.utmContent,
-      fbclid: attribution.fbclid,
-      gclid: attribution.gclid,
-      landingPage: attribution.landingPage,
-      referrer: attribution.referrer,
-    }
+
+    formData.set('name', nameValue)
+    formData.set('phone', String(rawFormData.get('telefono') ?? ''))
+    formData.set('email', String(rawFormData.get('email') ?? ''))
+    formData.set('clientType', String(rawFormData.get('cliente') ?? ''))
+    formData.set('location', String(rawFormData.get('ubicacion') ?? ''))
+    formData.set('address', String(rawFormData.get('direccion') ?? ''))
+    formData.set('workType', String(rawFormData.get('trabajo') ?? ''))
+    formData.set('urgency', String(rawFormData.get('urgencia') ?? ''))
+    formData.set('details', String(rawFormData.get('detalle') ?? ''))
+    formData.set('consent', String(Boolean(rawFormData.get('consentimiento'))))
+    formData.set('leadType', leadType || '')
+    formData.set('plan', plan || '')
+    formData.set('reason', leadType || plan || '')
+    formData.set('hasFiles', String(selectedFiles.length > 0))
+    formData.set('utmSource', attribution.utmSource || '')
+    formData.set('utmMedium', attribution.utmMedium || '')
+    formData.set('utmCampaign', attribution.utmCampaign || '')
+    formData.set('utmTerm', attribution.utmTerm || '')
+    formData.set('utmContent', attribution.utmContent || '')
+    formData.set('fbclid', attribution.fbclid || '')
+    formData.set('gclid', attribution.gclid || '')
+    formData.set('landingPage', attribution.landingPage || '')
+    formData.set('referrer', attribution.referrer || '')
+
+    selectedFiles.forEach((file) => {
+      formData.append('adjuntos', file, file.name)
+    })
 
     try {
       const response = await fetch('/api/leads', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: formData,
       })
 
       if (!response.ok) {
-        throw new Error('Lead submission failed')
+        const data = (await response.json().catch(() => null)) as { error?: string } | null
+        throw new Error(data?.error || 'Lead submission failed')
       }
 
       const data: { leadId: string } = await response.json()
@@ -121,14 +128,15 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
           content_type: 'form',
           plan_tier: plan || undefined,
           channel: leadType === 'visita' ? 'schedule' : 'form',
-          user_data: { email: payload.email, phone: payload.phone },
+          user_data: { email: String(rawFormData.get('email') ?? ''), phone: String(rawFormData.get('telefono') ?? '') },
         })
       }
       form.reset()
+      setSelectedFiles([])
     } catch (error) {
       console.error(error)
       setStatus('error')
-      setErrorMessage('No pudimos enviar el formulario. Probá de nuevo en unos minutos.')
+      setErrorMessage(error instanceof Error ? error.message : 'No pudimos enviar el formulario. Probá de nuevo en unos minutos.')
     }
   }
 
@@ -146,7 +154,6 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
             Continuar por WhatsApp
           </a>
         </Button>
-        <p className="text-xs text-slate-500">Si tenés fotos o planos, podés enviarlos en la conversación.</p>
       </div>
     )
   }
@@ -237,8 +244,15 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
       </div>
       <div>
         <Label htmlFor="adjuntos">Adjuntar fotos o plano (opcional)</Label>
-        <Input id="adjuntos" name="adjuntos" type="file" multiple />
-        <p className="mt-2 text-xs text-slate-500">Si no podés adjuntar, envialo por WhatsApp luego.</p>
+        <Input id="adjuntos" name="adjuntos" type="file" multiple accept="image/*,.pdf" onChange={handleFileChange} />
+        <p className="mt-2 text-xs text-slate-500">Formatos permitidos: imágenes o PDF. Máximo recomendado: 10 MB por archivo.</p>
+        {selectedFiles.length > 0 && (
+          <ul className="mt-2 space-y-1 text-xs text-slate-600">
+            {selectedFiles.map((file) => (
+              <li key={`${file.name}-${file.lastModified}`}>{file.name} · {(file.size / 1024 / 1024).toFixed(2)} MB</li>
+            ))}
+          </ul>
+        )}
       </div>
       {plan && (
         <p className="rounded-2xl border border-border bg-muted/50 p-3 text-sm text-slate-600">
@@ -255,6 +269,7 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
         Acepto contacto por WhatsApp/Email.
       </label>
       {status === 'error' && <p className="text-sm text-red-600">{errorMessage}</p>}
+      {status === 'submitting' && <p className="text-sm text-slate-500">Enviando formulario y adjuntos, por favor esperá...</p>}
       <Button type="submit" size="lg" disabled={status === 'submitting'} className="w-full sm:w-auto">
         {status === 'submitting' ? 'Enviando...' : 'Enviar solicitud'}
       </Button>

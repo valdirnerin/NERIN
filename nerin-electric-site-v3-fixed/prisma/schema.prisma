@@ -224,6 +224,21 @@ model Lead {
   landingPage String?
   referrer   String?
   createdAt  DateTime @default(now())
+  attachments LeadAttachment[]
+}
+
+model LeadAttachment {
+  id           String   @id @default(cuid())
+  leadId       String
+  originalName String
+  mimeType     String
+  size         Int
+  storedPath   String
+  publicUrl    String
+  createdAt    DateTime @default(now())
+  lead         Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId])
 }
 
 model WorkOrder {
