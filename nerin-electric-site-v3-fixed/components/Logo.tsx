@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 
@@ -13,6 +13,11 @@ type LogoProps = {
 
 export function Logo({ className, imageUrl, subtitle, title }: LogoProps) {
   const [imageFailed, setImageFailed] = useState(false)
+
+  useEffect(() => {
+    setImageFailed(false)
+  }, [imageUrl])
+
   const showImage = Boolean(imageUrl) && !imageFailed
 
   return (
