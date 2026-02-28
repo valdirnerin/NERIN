@@ -61,6 +61,14 @@ export type ContentPost = {
   seoDescription?: string | null
 }
 
+export type LeadAttachmentPayload = {
+  originalName: string
+  mimeType: string
+  size: number
+  storedPath: string
+  publicUrl: string
+}
+
 export type LeadPayload = {
   name: string
   phone: string
@@ -75,6 +83,7 @@ export type LeadPayload = {
   leadType?: string | null
   plan?: string | null
   hasFiles?: boolean
+  attachments?: LeadAttachmentPayload[]
   consent: boolean
   utmSource?: string | null
   utmMedium?: string | null
@@ -104,7 +113,7 @@ export interface ContentStore {
   getPost(slug: string): Promise<ContentPost | null>
   upsertPost(post: ContentPost): Promise<ContentPost>
   deletePost(id: string): Promise<void>
-  createLead(payload: LeadPayload): Promise<LeadPayload & { id: string }>
+  createLead(payload: LeadPayload): Promise<LeadPayload & { id: string; attachments: LeadAttachmentPayload[] }>
 }
 
 const memoryStore = (() => {
@@ -178,7 +187,8 @@ const memoryStore = (() => {
       posts = posts.filter((item) => item.id !== id)
     },
     createLead: async (payload: LeadPayload) => {
-      const lead = { id: crypto.randomUUID(), ...payload }
+      const attachments = payload.attachments ?? []
+      const lead = { id: crypto.randomUUID(), ...payload, attachments, hasFiles: attachments.length > 0 || Boolean(payload.hasFiles) }
       leads = leads.concat(lead)
       return lead
     },
@@ -288,8 +298,9 @@ function buildFileStore(): ContentStore {
       )
     },
     createLead: async (payload: LeadPayload) => {
-      const leads = await readJsonFile<Array<LeadPayload & { id: string }>>('leads.json', [])
-      const lead = { id: crypto.randomUUID(), ...payload }
+      const leads = await readJsonFile<Array<LeadPayload & { id: string; attachments?: LeadAttachmentPayload[] }>>('leads.json', [])
+      const attachments = payload.attachments ?? []
+      const lead = { id: crypto.randomUUID(), ...payload, attachments, hasFiles: attachments.length > 0 || Boolean(payload.hasFiles) }
       await writeJsonFile('leads.json', leads.concat(lead))
       return lead
     },
@@ -684,6 +695,7 @@ function buildPrismaStore(): ContentStore {
     createLead: async (payload: LeadPayload) => {
       try {
         const lead = await prisma.lead.create({
+          include: { attachments: true },
           data: {
             name: payload.name,
             phone: payload.phone,
@@ -697,7 +709,18 @@ function buildPrismaStore(): ContentStore {
             reason: payload.reason ?? null,
             leadType: payload.leadType ?? null,
             plan: payload.plan ?? null,
-            hasFiles: payload.hasFiles ?? false,
+            hasFiles: payload.hasFiles ?? (payload.attachments?.length ?? 0) > 0,
+            attachments: payload.attachments && payload.attachments.length > 0
+              ? {
+                  create: payload.attachments.map((attachment) => ({
+                    originalName: attachment.originalName,
+                    mimeType: attachment.mimeType,
+                    size: attachment.size,
+                    storedPath: attachment.storedPath,
+                    publicUrl: attachment.publicUrl,
+                  })),
+                }
+              : undefined,
             consent: payload.consent,
             utmSource: payload.utmSource ?? null,
             utmMedium: payload.utmMedium ?? null,
@@ -725,6 +748,13 @@ function buildPrismaStore(): ContentStore {
           leadType: lead.leadType,
           plan: lead.plan,
           hasFiles: lead.hasFiles,
+          attachments: lead.attachments.map((attachment) => ({
+            originalName: attachment.originalName,
+            mimeType: attachment.mimeType,
+            size: attachment.size,
+            storedPath: attachment.storedPath,
+            publicUrl: attachment.publicUrl,
+          })),
           consent: lead.consent,
           utmSource: lead.utmSource,
           utmMedium: lead.utmMedium,
@@ -738,7 +768,7 @@ function buildPrismaStore(): ContentStore {
         }
       } catch (error) {
         if (handleMissingTable(error, 'Lead', 'returning in-memory lead')) {
-          return { id: crypto.randomUUID(), ...payload }
+          return { id: crypto.randomUUID(), ...payload, attachments: payload.attachments ?? [] }
         }
         throw error
       }
