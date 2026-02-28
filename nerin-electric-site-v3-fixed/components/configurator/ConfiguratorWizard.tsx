@@ -118,14 +118,14 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
   }
 
   return (
-    <div className="space-y-8">
-      <section className="grid gap-4 md:grid-cols-3">
+    <div className="space-y-6 sm:space-y-8">
+      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {modeCards.map((card) => (
           <button
             key={card.mode}
             type="button"
             onClick={() => updateMode(card.mode)}
-            className={`rounded-2xl border p-5 text-left transition ${
+            className={`rounded-2xl border p-4 sm:p-5 text-left transition min-h-32 ${
               summary.mode === card.mode ? 'border-accent bg-accent/5' : 'border-border bg-white'
             }`}
           >
@@ -135,7 +135,7 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
         ))}
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-[1.45fr_0.9fr]">
+      <section className="grid gap-5 lg:grid-cols-[1.35fr_0.9fr] xl:gap-6">
         <Card>
           <CardHeader>
             <CardTitle>
@@ -144,14 +144,14 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
               {summary.mode === 'PROFESSIONAL' && 'Cotización profesional por ítems'}
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-5">
             <div className="grid gap-3">
               {visibleServices.map((service) => (
                 <button
                   key={service.id}
                   type="button"
                   onClick={() => setSummary((prev) => ({ ...prev, serviceId: service.id }))}
-                  className={`rounded-xl border p-4 text-left ${summary.serviceId === service.id ? 'border-accent bg-accent/5' : 'border-border'}`}
+                  className={`rounded-xl border p-3.5 sm:p-4 text-left ${summary.serviceId === service.id ? 'border-accent bg-accent/5' : 'border-border'}`}
                 >
                   <p className="font-semibold text-foreground">{service.name}</p>
                   <p className="mt-1 text-sm text-slate-600">{service.description}</p>
@@ -163,7 +163,7 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
             </div>
 
             {summary.mode === 'EXPRESS' && (
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-4 md:grid-cols-2">
                 <div>
                   <Label>Unidades de servicio</Label>
                   <Input
@@ -190,7 +190,7 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
 
             {summary.mode === 'ASSISTED' && (
               <>
-                <div className="grid gap-4 sm:grid-cols-3">
+                <div className="grid gap-4 md:grid-cols-3">
                   <div>
                     <Label>Ambientes</Label>
                     <Input
@@ -226,9 +226,9 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
                 </div>
                 <div className="space-y-2">
                   <p className="text-sm font-semibold text-foreground">Ajustes editables</p>
-                  <div className="grid gap-3 md:grid-cols-2">
+                  <div className="grid gap-3 lg:grid-cols-2">
                     {adicionales.slice(0, 8).map((item) => (
-                      <div key={item.id} className="grid grid-cols-[1fr_92px] items-center gap-3">
+                      <div key={item.id} className="grid grid-cols-1 gap-2 rounded-xl border border-border/70 p-3 sm:grid-cols-[1fr_110px] sm:items-center sm:gap-3">
                         <span className="text-sm text-slate-600">{item.nombre}</span>
                         <Input
                           type="number"
@@ -244,9 +244,9 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
             )}
 
             {summary.mode === 'PROFESSIONAL' && (
-              <div className="grid gap-3 md:grid-cols-2">
+              <div className="grid gap-3 lg:grid-cols-2">
                 {professionalCatalog.map((item) => (
-                  <div key={item.id} className="grid grid-cols-[1fr_90px] items-center gap-3">
+                  <div key={item.id} className="grid grid-cols-1 gap-2 rounded-xl border border-border/70 p-3 sm:grid-cols-[1fr_110px] sm:items-center sm:gap-3">
                     <span className="text-sm text-slate-600">{item.name}</span>
                     <Input
                       type="number"
@@ -269,7 +269,7 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="h-fit lg:sticky lg:top-24">
           <CardHeader>
             <CardTitle>Resumen comercial</CardTitle>
           </CardHeader>
@@ -299,7 +299,7 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
                 value={contacto.email}
                 onChange={(event) => setContacto((prev) => ({ ...prev, email: event.target.value }))}
               />
-              <Button onClick={submitQuote} disabled={isPending}>
+              <Button onClick={submitQuote} disabled={isPending} className="w-full">
                 {isPending ? 'Guardando...' : 'Guardar cotización'}
               </Button>
               {pdfUrl && (

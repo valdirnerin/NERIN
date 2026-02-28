@@ -41,14 +41,14 @@ export default async function MantenimientoPage() {
   const site = await getSiteContent()
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-10 sm:space-y-12">
       <header className="space-y-4">
         <Badge>Mantenimiento</Badge>
         <h1>{site.maintenancePage.introTitle}</h1>
         <p className="max-w-3xl text-lg text-slate-600">{site.maintenancePage.introDescription}</p>
       </header>
 
-      <section className="grid gap-6 md:grid-cols-3">
+      <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {plans.map((plan) => (
           <Card key={plan.id} className="flex flex-col justify-between">
             <CardHeader>
@@ -80,9 +80,9 @@ export default async function MantenimientoPage() {
         ))}
       </section>
 
-      <section className="rounded-3xl border border-border bg-white p-10 shadow-subtle">
+      <section className="rounded-3xl border border-border bg-white p-5 shadow-subtle sm:p-8 lg:p-10">
         <h2 className="text-2xl font-semibold text-foreground">Alcance operativo</h2>
-        <div className="mt-6 grid gap-6 md:grid-cols-3">
+        <div className="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {site.maintenancePage.cards.map((card) => (
             <div key={card.title}>
               <h3 className="text-lg font-semibold text-foreground">{card.title}</h3>

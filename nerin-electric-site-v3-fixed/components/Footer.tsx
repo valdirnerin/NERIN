@@ -22,7 +22,7 @@ export function Footer({ site }: FooterProps) {
   const whatsappHref = getWhatsappHref(site)
   return (
     <footer className="border-t border-border bg-white">
-      <div className="container grid gap-12 py-14 md:grid-cols-4">
+      <div className="container grid gap-10 py-12 sm:py-14 md:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-3">
           <p className="text-sm uppercase tracking-[0.35em] text-muted-foreground">NERIN</p>
           <p className="text-sm text-muted-foreground">{site.tagline}</p>
@@ -35,7 +35,7 @@ export function Footer({ site }: FooterProps) {
           <ul className="mt-3 space-y-2 text-sm text-foreground">
             {quickLinks.map((item) => (
               <li key={item.href}>
-                <Link className="hover:text-foreground" href={item.href} data-track={item.href === "/presupuesto" ? "lead" : undefined} data-content-name={item.href === "/presupuesto" ? "Pedir presupuesto footer" : undefined}>
+                <Link className="hover:text-foreground" href={item.href} data-track={item.href === '/presupuesto' ? 'lead' : undefined} data-content-name={item.href === '/presupuesto' ? 'Pedir presupuesto footer' : undefined}>
                   {item.label}
                 </Link>
               </li>
@@ -51,7 +51,7 @@ export function Footer({ site }: FooterProps) {
               </a>
             </li>
             <li>
-              <a href={`mailto:${site.contact.email}`} className="hover:text-foreground">
+              <a href={`mailto:${site.contact.email}`} className="hover:text-foreground break-all">
                 {site.contact.email}
               </a>
             </li>
@@ -76,9 +76,9 @@ export function Footer({ site }: FooterProps) {
         </div>
       </div>
       <div className="border-t border-border bg-muted py-6">
-        <div className="container flex flex-col gap-3 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
+        <div className="container flex flex-col gap-3 text-sm text-muted-foreground lg:flex-row lg:items-center lg:justify-between">
           <span>© {new Date().getFullYear()} NERIN Electric. Todos los derechos reservados.</span>
-          <div className="flex flex-col gap-2 md:items-end">
+          <div className="flex flex-col gap-2 lg:items-end">
             <span>Desarrollado con foco en performance, accesibilidad AA y cumplimiento normativo AEA 90364-7-771.</span>
             <Link href="/admin" className="text-xs uppercase tracking-[0.3em] text-muted-foreground hover:text-foreground">
               Panel admin

@@ -5,20 +5,23 @@ import { usePathname } from 'next/navigation'
 import { adminNav } from '@/components/admin/nav'
 import { cn } from '@/lib/utils'
 
-export function AdminSidebar() {
+type AdminSidebarProps = {
+  onNavigate?: () => void
+  className?: string
+}
+
+export function AdminSidebar({ onNavigate, className }: AdminSidebarProps) {
   const pathname = usePathname()
 
   return (
-    <aside className="flex h-full w-64 flex-col gap-6 border-r border-border bg-white px-4 py-6">
+    <aside className={cn('flex h-full w-72 flex-col gap-6 border-r border-border bg-white px-4 py-6', className)}>
       <div className="flex items-center gap-2 px-2 text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">
         Admin Nerin
       </div>
-      <nav className="flex flex-1 flex-col gap-6 text-sm">
+      <nav className="flex flex-1 flex-col gap-5 text-sm">
         {adminNav.map((section) => (
           <div key={section.label} className="space-y-2">
-            <p className="px-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              {section.label}
-            </p>
+            <p className="px-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{section.label}</p>
             <div className="flex flex-col gap-1">
               {section.items.map((item) => {
                 const isActive =
@@ -29,8 +32,9 @@ export function AdminSidebar() {
                   <Link
                     key={item.href}
                     href={item.href}
+                    onClick={onNavigate}
                     className={cn(
-                      'rounded-xl px-3 py-2 text-sm transition hover:bg-slate-100',
+                      'rounded-xl px-3 py-2.5 text-sm transition hover:bg-slate-100',
                       isActive ? 'bg-slate-100 font-semibold text-foreground' : 'text-slate-600',
                     )}
                   >

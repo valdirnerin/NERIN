@@ -23,6 +23,7 @@ body {
   background: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-plex), system-ui, sans-serif;
+  overflow-x: clip;
 }
 
 a {
@@ -40,8 +41,20 @@ a.no-underline {
   text-decoration: none;
 }
 
+html,
+body {
+  max-width: 100%;
+}
+
+@supports (padding: max(0px)) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
 main {
   display: block;
+  width: 100%;
 }
 
 .focus-ring {
@@ -55,10 +68,10 @@ main {
 
 @layer base {
   h1 {
-    @apply font-display text-4xl md:text-6xl font-semibold tracking-tight text-foreground;
+    @apply font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground;
   }
   h2 {
-    @apply font-display text-3xl md:text-4xl font-semibold tracking-tight text-foreground;
+    @apply font-display text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-foreground;
   }
   h3 {
     @apply font-display text-2xl font-semibold text-foreground;
@@ -68,6 +81,7 @@ main {
   }
   .container {
     max-width: var(--container);
+    @apply mx-auto px-4 sm:px-5 lg:px-6;
   }
 }
 
@@ -77,5 +91,14 @@ main {
   }
   .pill {
     @apply inline-flex items-center gap-2 rounded-[var(--radius)] border border-border bg-muted px-3 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground;
+  }
+}
+
+@layer base {
+  input,
+  select,
+  textarea,
+  button {
+    @apply text-base md:text-sm;
   }
 }

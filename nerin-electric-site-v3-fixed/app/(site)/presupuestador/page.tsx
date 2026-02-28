@@ -63,8 +63,8 @@ export default async function PresupuestadorPage({
   }))
 
   return (
-    <div className="space-y-10">
-      <header className="space-y-5">
+    <div className="space-y-8 sm:space-y-10">
+      <header className="space-y-4 sm:space-y-5">
         <Badge>Hub de cotización</Badge>
         <h1>Elegí cómo querés cotizar tu trabajo eléctrico</h1>
         <p className="max-w-3xl text-lg text-slate-600">

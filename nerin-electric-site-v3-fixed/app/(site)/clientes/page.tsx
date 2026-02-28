@@ -70,7 +70,7 @@ export default async function ClienteDashboard() {
     : null
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8 sm:space-y-10">
       <header className="space-y-2">
         <Badge>Portal de clientes</Badge>
         <h1>Hola {displayName}</h1>
@@ -100,13 +100,13 @@ export default async function ClienteDashboard() {
 
       {normalizedClient?.projects.length ? (
         <section className="space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
             <h2 className="text-2xl font-semibold text-foreground">Proyectos activos</h2>
             <p className="text-sm text-slate-500">Empresa de envío: {normalizedClient.notas ?? 'Se informará si aplica'}</p>
           </div>
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-5 lg:grid-cols-2">
             {normalizedClient.projects.map((project) => (
-              <Card key={project.id} className="space-y-3">
+              <Card key={project.id} className="space-y-3 overflow-hidden">
                 <CardHeader>
                   <CardTitle>{project.nombre}</CardTitle>
                   <p className="text-sm text-slate-500">Estado: {project.estado}</p>
@@ -199,11 +199,11 @@ export default async function ClienteDashboard() {
 
       {opsClient?.projects.length ? (
         <section className="space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
             <h2 className="text-2xl font-semibold text-foreground">Obras operativas</h2>
             <p className="text-sm text-slate-500">Seguimiento de obra y pagos en línea.</p>
           </div>
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-5 lg:grid-cols-2">
             {opsClient.projects.map((project) => (
               <Card key={project.id}>
                 <CardHeader>
