@@ -1,7 +1,7 @@
 
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { SiteExperience } from '@/types/site'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -80,6 +80,8 @@ export function SiteExperienceDesigner({ initialData }: SiteExperienceDesignerPr
   const [message, setMessage] = useState<MessageState>(null)
   const [logoUploading, setLogoUploading] = useState(false)
   const [logoUploadError, setLogoUploadError] = useState<string | null>(null)
+  const [logoPreviewUrl, setLogoPreviewUrl] = useState<string | null>(null)
+  const [logoNeedsSave, setLogoNeedsSave] = useState(false)
 
   const heroStatsText = useMemo(() => formatPairs(form.hero.stats), [form.hero.stats])
   const heroHighlightsText = useMemo(() => formatPairs(form.hero.highlights, 'title'), [form.hero.highlights])
@@ -97,6 +99,14 @@ export function SiteExperienceDesigner({ initialData }: SiteExperienceDesignerPr
   const secondaryPhonesText = useMemo(() => form.contact.secondaryPhones.join('\n'), [form.contact.secondaryPhones])
   const seoKeywordsText = useMemo(() => form.seo.keywords.join(', '), [form.seo.keywords])
 
+  useEffect(() => {
+    return () => {
+      if (logoPreviewUrl) {
+        URL.revokeObjectURL(logoPreviewUrl)
+      }
+    }
+  }, [logoPreviewUrl])
+
   async function handleSave() {
     setSaving(true)
     setMessage(null)
@@ -113,6 +123,7 @@ export function SiteExperienceDesigner({ initialData }: SiteExperienceDesignerPr
       if (payload.site) {
         setForm(payload.site)
       }
+      setLogoNeedsSave(false)
       setMessage({ type: 'success', message: 'Configuración guardada correctamente.' })
       router.refresh()
     } catch (error) {
@@ -125,36 +136,56 @@ export function SiteExperienceDesigner({ initialData }: SiteExperienceDesignerPr
 
   function handleReset() {
     setForm(initialData)
+    setLogoUploadError(null)
+    setLogoNeedsSave(false)
+    if (logoPreviewUrl) {
+      URL.revokeObjectURL(logoPreviewUrl)
+      setLogoPreviewUrl(null)
+    }
     setMessage(null)
   }
 
   async function handleLogoUpload(file: File) {
     setLogoUploading(true)
     setLogoUploadError(null)
+
+    const localPreview = URL.createObjectURL(file)
+    setLogoPreviewUrl((current) => {
+      if (current) {
+        URL.revokeObjectURL(current)
+      }
+      return localPreview
+    })
+
     try {
       const formData = new FormData()
-      const filename = `logo-${Date.now()}-${file.name}`
+      const filename = `logo-${file.name}`
       formData.append('file', file)
       formData.append('name', filename)
       const response = await fetch('/api/admin/upload', {
         method: 'POST',
         body: formData,
       })
+
+      const payload = (await response.json()) as { ok?: boolean; url?: string; error?: string }
       if (!response.ok) {
-        throw new Error('No se pudo subir el logo')
+        throw new Error(payload.error || 'No se pudo subir el logo')
       }
-      const payload = (await response.json()) as { ok?: boolean; url?: string }
+
       const url = payload.url
       if (typeof url !== 'string' || url.trim().length === 0) {
         throw new Error('Respuesta inválida al subir el logo')
       }
+
       setForm((prev) => ({
         ...prev,
         logo: { ...prev.logo, imageUrl: url },
       }))
+      setLogoNeedsSave(true)
     } catch (error) {
       console.error('Error uploading logo', error)
-      setLogoUploadError('No se pudo subir el logo. Intentá nuevamente.')
+      const message = error instanceof Error ? error.message : 'No se pudo subir el logo. Intentá nuevamente.'
+      setLogoUploadError(message)
     } finally {
       setLogoUploading(false)
     }
@@ -226,16 +257,37 @@ export function SiteExperienceDesigner({ initialData }: SiteExperienceDesignerPr
               <p className="text-xs text-slate-500">Formatos recomendados: PNG o SVG. Tamaño sugerido: 256×256.</p>
               {logoUploading && <p className="text-xs text-slate-500">Subiendo logo...</p>}
               {logoUploadError && <p className="text-xs text-red-600">{logoUploadError}</p>}
-              {form.logo.imageUrl && !logoUploading && (
+              {logoNeedsSave && <p className="text-xs text-amber-600">Logo cargado, falta guardar cambios.</p>}
+              {(logoPreviewUrl || form.logo.imageUrl) && (
                 <div className="flex items-center gap-3">
-                  <span className="text-xs text-slate-500">Logo cargado:</span>
+                  <span className="text-xs text-slate-500">Vista previa del logo:</span>
                   <img
-                    src={form.logo.imageUrl}
+                    src={logoPreviewUrl ?? form.logo.imageUrl ?? undefined}
                     alt="Logo cargado"
                     className="h-10 w-10 rounded-md border border-border bg-white object-contain"
                   />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (logoPreviewUrl) {
+                        URL.revokeObjectURL(logoPreviewUrl)
+                        setLogoPreviewUrl(null)
+                      }
+                      setLogoNeedsSave(true)
+                      setLogoUploadError(null)
+                      setForm((prev) => ({
+                        ...prev,
+                        logo: { ...prev.logo, imageUrl: '' },
+                      }))
+                    }}
+                  >
+                    Quitar logo
+                  </Button>
                 </div>
               )}
+
             </div>
             <div className="grid gap-2">
               <Label htmlFor="site-name">Nombre comercial</Label>

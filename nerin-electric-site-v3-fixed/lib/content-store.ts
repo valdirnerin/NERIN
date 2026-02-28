@@ -6,7 +6,7 @@ import { isMissingTableError } from '@/lib/prisma-errors'
 import { DB_ENABLED } from '@/lib/dbMode'
 import { parseJson, parseStringArray, serializeJson, serializeStringArray } from '@/lib/serialization'
 import type { SiteExperience } from '@/types/site'
-import { SITE_DEFAULTS } from '@/lib/content'
+import { getStorageDir, SITE_DEFAULTS } from '@/lib/content'
 
 export type ContentSettings = {
   id?: string
@@ -185,7 +185,7 @@ const memoryStore = (() => {
   } satisfies ContentStore
 })()
 
-const contentDir = process.env.CONTENT_DIR || '/var/data/content'
+const contentDir = process.env.CONTENT_DIR || path.join(getStorageDir(), 'content')
 
 async function readJsonFile<T>(filename: string, fallback: T): Promise<T> {
   try {
