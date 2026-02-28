@@ -11,8 +11,9 @@ export const revalidate = 60
 export async function generateMetadata() {
   const site = await getSiteContent()
   const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
-  const title = 'Packs eléctricos | NERIN'
-  const description = 'Packs de mano de obra eléctrica para viviendas con alcance claro y configurador online.'
+  const title = 'Bases técnicas de mano de obra | NERIN'
+  const description =
+    'Referencia técnica de bases de mano de obra para instalación eléctrica. Para contratar, usar el hub de cotización.'
 
   return {
     title,
@@ -38,48 +39,22 @@ export async function generateMetadata() {
 
 export default async function PacksPage() {
   const packs = await getPacksForMarketing()
-  const site = await getSiteContent()
-  const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
-  const servicesSchema = {
-    '@context': 'https://schema.org',
-    '@graph': packs.map((pack) => ({
-      '@type': 'Service',
-      name: pack.name,
-      description: pack.description,
-      provider: {
-        '@type': 'LocalBusiness',
-        name: site.name,
-        url: siteUrl,
-      },
-      areaServed: site.contact.serviceArea,
-      offers: {
-        '@type': 'Offer',
-        priceCurrency: 'ARS',
-        price: Number(pack.basePrice),
-        availability: 'https://schema.org/InStock',
-        url: `${siteUrl}/packs#${pack.slug}`,
-      },
-    })),
-  }
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(servicesSchema) }}
-      />
-      <div className="space-y-16">
-      <header className="space-y-6">
-        <Badge>Packs de mano de obra</Badge>
-        <h1>{site.packsPage.introTitle}</h1>
-        <p className="text-lg text-slate-600">{site.packsPage.introDescription}</p>
+    <div className="space-y-12">
+      <header className="space-y-5">
+        <Badge>Referencia técnica</Badge>
+        <h1>Bases de mano de obra (uso técnico)</h1>
+        <p className="max-w-3xl text-lg text-slate-600">
+          Este contenido es complementario para quienes quieren revisar bases prearmadas. La contratación principal de
+          NERIN se organiza desde el hub de cotización por tipo de necesidad.
+        </p>
         <Button asChild size="lg">
-          <Link href="/presupuestador" data-track="view_pack" data-content-name="Configurar pack online">Configurar pack online</Link>
+          <Link href="/presupuestador">Ir al hub de cotización</Link>
         </Button>
-        <p className="text-sm text-slate-500">{site.packsPage.note}</p>
       </header>
 
-      <section className="space-y-8">
+      <section className="grid gap-6">
         {packs.map((pack) => (
           <Card key={pack.id} id={pack.slug} className="scroll-mt-32">
             <CardHeader>
@@ -88,49 +63,32 @@ export default async function PacksPage() {
                   <CardTitle>{pack.name}</CardTitle>
                   <p className="text-sm text-slate-500">{pack.description}</p>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm uppercase tracking-wide text-slate-400">Mano de obra base</p>
-                  <p className="text-2xl font-semibold text-foreground">
-                    ${Number(pack.basePrice).toLocaleString('es-AR')}
-                  </p>
-                  {pack.advancePrice > 0 && (
-                    <p className="text-xs text-slate-500">
-                      Anticipo sugerido ${Number(pack.advancePrice).toLocaleString('es-AR')}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="grid gap-6 md:grid-cols-[2fr_1fr]">
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-foreground">Alcance completo</h3>
-                <p className="text-sm text-slate-600">{pack.scope}</p>
-                <ul className="grid gap-2 sm:grid-cols-2">
-                  {pack.features.map((item) => (
-                    <li key={item} className="text-sm text-slate-600">
-                      • {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="space-y-4">
-                <div className="rounded border border-dashed border-slate-200 p-4 text-sm text-slate-600">
-                  <p>Materiales, artefactos y tablero final se cotizan aparte según marcas preferidas.</p>
-                  <p className="mt-2">Podés sumar adicionales críticos desde el configurador online.</p>
-                </div>
-                <Button variant="secondary" asChild>
-                  <Link href={`/presupuestador?pack=${pack.slug}`} data-track="view_pack" data-content-name={pack.name} data-value={Number(pack.basePrice)} data-currency="ARS">Elegir este pack</Link>
-                </Button>
-                <p className="text-xs text-slate-500">
-                  Proyecto eléctrico se cobra aparte (base $500.000). Coordinamos marcas como Schneider, Prysmian, Gimsa,
-                  Daisa o Genrock según tu presupuesto.
+                <p className="text-xl font-semibold text-foreground">
+                  Base ${Number(pack.basePrice).toLocaleString('es-AR')}
                 </p>
               </div>
+            </CardHeader>
+            <CardContent className="space-y-4 text-sm text-slate-600">
+              <p>{pack.scope}</p>
+              <ul className="grid gap-2 sm:grid-cols-2">
+                {pack.features.map((item) => (
+                  <li key={item}>• {item}</li>
+                ))}
+              </ul>
             </CardContent>
           </Card>
         ))}
       </section>
+
+      <section className="rounded-2xl border border-border bg-muted/40 p-6">
+        <p className="text-sm text-muted-foreground">
+          ¿Querés avanzar con una propuesta comercial? Definí si necesitás servicio puntual, obra guiada o cotización
+          profesional.
+        </p>
+        <Button className="mt-4" variant="secondary" asChild>
+          <Link href="/presupuestador">Volver al presupuestador</Link>
+        </Button>
+      </section>
     </div>
-    </>
   )
 }

@@ -11,6 +11,7 @@ import { professionalCatalog, quoteServices } from './catalog'
 const QuoteSchema = z.object({
   mode: z.enum(['EXPRESS', 'ASSISTED', 'PROFESSIONAL']),
   serviceId: z.string(),
+  serviceUnits: z.number().min(1).max(20),
   zoneTier: z.enum(['PRIORITY', 'SECONDARY', 'REVIEW']),
   urgencyMultiplier: z.number().min(1).max(2),
   difficultyMultiplier: z.number().min(1).max(2),
