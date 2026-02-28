@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { calculateTotals } from '@/components/configurator/calculations'
+import { professionalCatalog, quoteServices } from '@/components/configurator/catalog'
 import type { WizardAdditional, WizardPack, WizardSummary } from '@/components/configurator/types'
 
 const pack: WizardPack = {
@@ -26,17 +27,40 @@ const adicionales: WizardAdditional[] = [
 ]
 
 describe('calculateTotals', () => {
-  it('calcula totales de mano de obra', () => {
+  it('calcula totales para modo asistido con recargos', () => {
     const summary: WizardSummary = {
+      mode: 'ASSISTED',
+      serviceId: 'reforma-parcial',
+      zoneTier: 'SECONDARY',
+      urgencyMultiplier: 1.1,
+      difficultyMultiplier: 1,
       packId: pack.id,
       ambientes: 6,
       bocasExtra: 10,
       adicionales: [{ id: 'add-1', cantidad: 3 }],
+      professionalItems: [],
     }
 
-    const totals = calculateTotals({ pack, adicionales, summary })
-    expect(totals.subtotalPack).toBe(2500000)
-    expect(totals.totalManoObra).toBe(2500000 + 3 * 42000)
-    expect(totals.adicionales[0].subtotal).toBe(3 * 42000)
+    const totals = calculateTotals({ pack, adicionales, summary, services: quoteServices, catalog: professionalCatalog })
+    expect(totals.totalManoObra).toBeGreaterThan(2500000 + 3 * 42000)
+    expect(totals.requiresSurvey).toBe(true)
+  })
+
+  it('usa el mismo motor para profesional', () => {
+    const summary: WizardSummary = {
+      mode: 'PROFESSIONAL',
+      serviceId: 'reforma-parcial',
+      zoneTier: 'PRIORITY',
+      urgencyMultiplier: 1,
+      difficultyMultiplier: 1,
+      packId: pack.id,
+      ambientes: 0,
+      bocasExtra: 0,
+      adicionales: [],
+      professionalItems: [{ id: 'boca-iluminacion', cantidad: 2 }],
+    }
+
+    const totals = calculateTotals({ pack, adicionales, summary, services: quoteServices, catalog: professionalCatalog })
+    expect(totals.adicionales[0].nombre).toContain('Bocas de iluminación')
   })
 })

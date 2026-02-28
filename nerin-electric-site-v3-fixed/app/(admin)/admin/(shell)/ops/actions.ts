@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/db'
 import { DB_ENABLED } from '@/lib/dbMode'
 import { createPreference } from '@/lib/mercadopago'
+import { getSession } from '@/lib/auth'
 
 const toNumber = (value: FormDataEntryValue | null, fallback = 0) => {
   if (typeof value !== 'string') return fallback
@@ -214,7 +215,6 @@ export async function createOpsAdditional(formData: FormData) {
 
   const catalogItemId = String(formData.get('catalogItemId') || '')
   const quantity = toNumber(formData.get('quantity'), 1)
-  const generatePayment = formData.get('generatePayment') === 'on'
 
   let name = String(formData.get('name') || '').trim()
   let description = String(formData.get('description') || '').trim() || null
@@ -247,11 +247,14 @@ export async function createOpsAdditional(formData: FormData) {
       unit,
       unitPrice: unitPriceCents,
       quantity,
-      status: generatePayment ? 'APPROVED' : 'QUOTED',
+      status: 'PENDING_CLIENT_APPROVAL',
+      approvalStatus: 'PENDING',
+      requestedBy: String(formData.get('requestedBy') || '').trim() || null,
+      evidenceUrl: String(formData.get('evidenceUrl') || '').trim() || null,
     },
   })
 
-  if (generatePayment) {
+  if (formData.get('generatePayment') === 'on') {
     try {
       const baseUrl = process.env.PUBLIC_BASE_URL
       if (!baseUrl) throw new Error('PUBLIC_BASE_URL missing')
@@ -273,6 +276,9 @@ export async function createOpsAdditional(formData: FormData) {
         data: {
           mercadoPagoPreferenceId: preference.preferenceId,
           mercadoPagoInitPoint: preference.initPoint,
+          status: 'PENDING_PAYMENT',
+          approvalStatus: 'APPROVED',
+          approvedByClientAt: new Date(),
         },
       })
     } catch (error) {
@@ -281,6 +287,43 @@ export async function createOpsAdditional(formData: FormData) {
       redirect(`${returnTo}?mpError=1`)
     }
   }
+
+  revalidatePath(returnTo)
+  redirect(returnTo)
+}
+
+
+export async function approveOpsAdditionalByClient(formData: FormData) {
+  ensureDb()
+  const additionalId = String(formData.get('additionalId') || '')
+  const returnTo = String(formData.get('returnTo') || '/clientes')
+  if (!additionalId) return
+
+  const session = await getSession()
+  if (!session?.user?.email) {
+    redirect('/clientes/login')
+  }
+
+  const additional = await prisma.opsProjectAdditionalItem.findUnique({
+    where: { id: additionalId },
+    include: { project: { include: { client: true } } },
+  })
+
+  if (!additional || additional.project.client.email !== session.user.email) {
+    redirect('/clientes')
+  }
+
+  const note = String(formData.get('approvalNote') || '').trim() || null
+
+  await prisma.opsProjectAdditionalItem.update({
+    where: { id: additionalId },
+    data: {
+      approvalStatus: 'APPROVED',
+      status: 'APPROVED',
+      approvalNote: note,
+      approvedByClientAt: new Date(),
+    },
+  })
 
   revalidatePath(returnTo)
   redirect(returnTo)
