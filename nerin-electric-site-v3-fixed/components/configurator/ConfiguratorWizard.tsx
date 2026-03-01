@@ -236,8 +236,18 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
                   onClick={() => setSummary((prev) => ({ ...prev, serviceId: service.id }))}
                   className={`rounded-xl border p-4 text-left ${summary.serviceId === service.id ? 'border-accent bg-accent/5' : 'border-border'}`}
                 >
-                  <p className="font-semibold text-foreground">{service.name}</p>
-                  <p className="mt-1 text-sm text-slate-600">{service.description}</p>
+                  <div className="flex items-start justify-between gap-3"> 
+                    <div>
+                      <p className="font-semibold text-foreground">{service.name}</p>
+                      <p className="mt-1 text-sm text-slate-600">{service.description}</p>
+                    </div>
+                    <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border bg-muted/40 text-sm" aria-hidden="true">
+                      {service.visualIcon ?? '•'}
+                    </span>
+                  </div>
+                  {service.categoryLabel && (
+                    <p className="mt-3 inline-flex rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-slate-600">{service.categoryLabel}</p>
+                  )}
                 </button>
               ))}
             </div>
