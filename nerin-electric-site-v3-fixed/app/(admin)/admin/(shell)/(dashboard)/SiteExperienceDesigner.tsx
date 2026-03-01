@@ -441,7 +441,7 @@ export function SiteExperienceDesigner({ initialData }: SiteExperienceDesignerPr
 
         <Card>
           <CardHeader>
-            <CardTitle>Hero y mensajes clave</CardTitle>
+            <CardTitle>Hero y propuesta de valor premium</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-2">
@@ -623,11 +623,11 @@ export function SiteExperienceDesigner({ initialData }: SiteExperienceDesignerPr
 
         <Card>
           <CardHeader>
-            <CardTitle>Servicios y packs</CardTitle>
+            <CardTitle>Verticales, oferta destacada y sistema comercial</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-2">
-              <Label htmlFor="services-title">Título de servicios</Label>
+              <Label htmlFor="services-title">Título de verticales principales</Label>
               <Input
                 id="services-title"
                 value={form.services.title}
@@ -640,7 +640,7 @@ export function SiteExperienceDesigner({ initialData }: SiteExperienceDesignerPr
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="services-description">Descripción</Label>
+              <Label htmlFor="services-description">Mensaje corto de diferenciación</Label>
               <Textarea
                 id="services-description"
                 value={form.services.description}
@@ -653,7 +653,7 @@ export function SiteExperienceDesigner({ initialData }: SiteExperienceDesignerPr
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="services-items">Servicios (Título | Descripción)</Label>
+              <Label htmlFor="services-items">Mundos/verticales (Título | Descripción)</Label>
               <Textarea
                 id="services-items"
                 value={servicesText}
@@ -666,7 +666,7 @@ export function SiteExperienceDesigner({ initialData }: SiteExperienceDesignerPr
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="packs-title">Título de packs</Label>
+              <Label htmlFor="packs-title">Título de anexo técnico</Label>
               <Input
                 id="packs-title"
                 value={form.packs.title}
@@ -679,7 +679,7 @@ export function SiteExperienceDesigner({ initialData }: SiteExperienceDesignerPr
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="packs-description">Descripción packs</Label>
+              <Label htmlFor="packs-description">Descripción de anexo técnico</Label>
               <Textarea
                 id="packs-description"
                 value={form.packs.description}
@@ -692,7 +692,7 @@ export function SiteExperienceDesigner({ initialData }: SiteExperienceDesignerPr
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="packs-cta-label">CTA packs</Label>
+              <Label htmlFor="packs-cta-label">CTA de anexo técnico</Label>
               <Input
                 id="packs-cta-label"
                 value={form.packs.ctaLabel}
@@ -715,7 +715,7 @@ export function SiteExperienceDesigner({ initialData }: SiteExperienceDesignerPr
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="packs-note">Nota adicional packs</Label>
+              <Label htmlFor="packs-note">Nota comercial del anexo</Label>
               <Textarea
                 id="packs-note"
                 value={form.packs.note}

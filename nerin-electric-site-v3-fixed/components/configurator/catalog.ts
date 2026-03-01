@@ -3,7 +3,7 @@ import { QuoteCatalogItem, QuoteService } from './types'
 export const quoteServices: QuoteService[] = [
   {
     id: 'diagnostico-premium',
-    name: 'Diagnóstico eléctrico premium',
+    name: 'Diagnóstico eléctrico',
     description: 'Inspección técnica, mediciones y plan de acción priorizado para resolver riesgos inmediatos.',
     flow: 'ONLINE',
     path: 'PUNTUAL',
@@ -43,7 +43,7 @@ export const quoteServices: QuoteService[] = [
     basePrice: 160000,
     minPrice: 160000,
     includes: ['Revisión de protecciones', 'Reordenamiento básico', 'Checklist de riesgos'],
-    excludes: ['Cambio total de tablero', 'Materiales premium'],
+    excludes: ['Cambio total de tablero', 'Materiales no incluidos'],
   },
   {
     id: 'reforma-parcial',

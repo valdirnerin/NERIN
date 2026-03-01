@@ -21,18 +21,18 @@ interface Props {
 const modeCards: Array<{ mode: WizardSummary['mode']; title: string; description: string }> = [
   {
     mode: 'EXPRESS',
-    title: 'Servicio puntual',
-    description: 'Para contratar tareas directas con alcance claro y precio desde.',
+    title: '1) Servicio puntual',
+    description: 'Para resolver un trabajo puntual.',
   },
   {
     mode: 'ASSISTED',
-    title: 'Cotización guiada',
-    description: 'Para instalación, obra o reforma con supuestos editables y relevamiento.',
+    title: '2) Relevamiento / proyecto',
+    description: 'Para obras y reformas.',
   },
   {
     mode: 'PROFESSIONAL',
-    title: 'Cotización profesional',
-    description: 'Para clientes técnicos con carga manual por ítems de obra.',
+    title: '3) Cotización técnica',
+    description: 'Para cotizar por plano o cantidades.',
   },
 ]
 
@@ -125,7 +125,7 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
             key={card.mode}
             type="button"
             onClick={() => updateMode(card.mode)}
-            className={`rounded-2xl border p-4 sm:p-5 text-left transition min-h-32 ${
+            className={`rounded-2xl border p-4 text-left transition ${
               summary.mode === card.mode ? 'border-accent bg-accent/5' : 'border-border bg-white'
             }`}
           >
@@ -138,11 +138,7 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
       <section className="grid gap-5 lg:grid-cols-[1.35fr_0.9fr] xl:gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>
-              {summary.mode === 'EXPRESS' && 'Contratar servicio puntual'}
-              {summary.mode === 'ASSISTED' && 'Cotización guiada para instalación / obra'}
-              {summary.mode === 'PROFESSIONAL' && 'Cotización profesional por ítems'}
-            </CardTitle>
+            <CardTitle>Completá tu solicitud</CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="grid gap-3">
@@ -151,42 +147,56 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
                   key={service.id}
                   type="button"
                   onClick={() => setSummary((prev) => ({ ...prev, serviceId: service.id }))}
-                  className={`rounded-xl border p-3.5 sm:p-4 text-left ${summary.serviceId === service.id ? 'border-accent bg-accent/5' : 'border-border'}`}
+                  className={`rounded-xl border p-4 text-left ${summary.serviceId === service.id ? 'border-accent bg-accent/5' : 'border-border'}`}
                 >
                   <p className="font-semibold text-foreground">{service.name}</p>
                   <p className="mt-1 text-sm text-slate-600">{service.description}</p>
-                  <p className="mt-2 text-sm font-medium text-foreground">
-                    Desde ${Number(service.minPrice ?? service.basePrice).toLocaleString('es-AR')}
-                  </p>
                 </button>
               ))}
             </div>
 
-            {summary.mode === 'EXPRESS' && (
-              <div className="grid gap-4 md:grid-cols-2">
-                <div>
-                  <Label>Unidades de servicio</Label>
-                  <Input
-                    type="number"
-                    min={1}
-                    value={summary.serviceUnits}
-                    onChange={(event) => setSummary((prev) => ({ ...prev, serviceUnits: Number(event.target.value) || 1 }))}
-                  />
-                </div>
-                <div>
-                  <Label>Urgencia</Label>
-                  <select
-                    className="h-11 w-full rounded-xl border border-border bg-white px-4 text-sm"
-                    value={summary.urgencyMultiplier}
-                    onChange={(event) => setSummary((prev) => ({ ...prev, urgencyMultiplier: Number(event.target.value) || 1 }))}
-                  >
-                    <option value={1}>Normal</option>
-                    <option value={1.1}>Prioridad 72 h</option>
-                    <option value={1.2}>Urgente 24 h</option>
-                  </select>
-                </div>
+            <div className="grid gap-4 md:grid-cols-3">
+              <div>
+                <Label>Unidades</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  value={summary.serviceUnits}
+                  onChange={(event) => setSummary((prev) => ({ ...prev, serviceUnits: Number(event.target.value) || 1 }))}
+                />
               </div>
-            )}
+              <div>
+                <Label>Zona</Label>
+                <select
+                  className="h-11 w-full rounded-xl border border-border bg-white px-4 text-sm"
+                  value={summary.zoneTier}
+                  onChange={(event) =>
+                    setSummary((prev) => ({
+                      ...prev,
+                      zoneTier: event.target.value as WizardSummary['zoneTier'],
+                    }))
+                  }
+                >
+                  <option value="PRIORITY">Prioritaria</option>
+                  <option value="STANDARD">Estándar</option>
+                  <option value="EXTENDED">Extendida</option>
+                </select>
+              </div>
+              <div>
+                <Label>Urgencia</Label>
+                <select
+                  className="h-11 w-full rounded-xl border border-border bg-white px-4 text-sm"
+                  value={summary.urgencyMultiplier}
+                  onChange={(event) =>
+                    setSummary((prev) => ({ ...prev, urgencyMultiplier: Number(event.target.value) || 1 }))
+                  }
+                >
+                  <option value={1}>Normal</option>
+                  <option value={1.1}>72 h</option>
+                  <option value={1.2}>24 h</option>
+                </select>
+              </div>
+            </div>
 
             {summary.mode === 'ASSISTED' && (
               <>
@@ -224,21 +234,18 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
                     </select>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <p className="text-sm font-semibold text-foreground">Ajustes editables</p>
-                  <div className="grid gap-3 lg:grid-cols-2">
-                    {adicionales.slice(0, 8).map((item) => (
-                      <div key={item.id} className="grid grid-cols-1 gap-2 rounded-xl border border-border/70 p-3 sm:grid-cols-[1fr_110px] sm:items-center sm:gap-3">
-                        <span className="text-sm text-slate-600">{item.nombre}</span>
-                        <Input
-                          type="number"
-                          min={0}
-                          value={summary.adicionales.find((it) => it.id === item.id)?.cantidad ?? 0}
-                          onChange={(event) => updateItems(item.id, Number(event.target.value) || 0, 'adicionales')}
-                        />
-                      </div>
-                    ))}
-                  </div>
+                <div className="grid gap-3 lg:grid-cols-2">
+                  {adicionales.slice(0, 6).map((item) => (
+                    <div key={item.id} className="grid grid-cols-[1fr_90px] gap-3 rounded-xl border border-border/70 p-3 items-center">
+                      <span className="text-sm text-slate-600">{item.nombre}</span>
+                      <Input
+                        type="number"
+                        min={0}
+                        value={summary.adicionales.find((it) => it.id === item.id)?.cantidad ?? 0}
+                        onChange={(event) => updateItems(item.id, Number(event.target.value) || 0, 'adicionales')}
+                      />
+                    </div>
+                  ))}
                 </div>
               </>
             )}
@@ -246,7 +253,7 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
             {summary.mode === 'PROFESSIONAL' && (
               <div className="grid gap-3 lg:grid-cols-2">
                 {professionalCatalog.map((item) => (
-                  <div key={item.id} className="grid grid-cols-1 gap-2 rounded-xl border border-border/70 p-3 sm:grid-cols-[1fr_110px] sm:items-center sm:gap-3">
+                  <div key={item.id} className="grid grid-cols-[1fr_90px] gap-3 rounded-xl border border-border/70 p-3 items-center">
                     <span className="text-sm text-slate-600">{item.name}</span>
                     <Input
                       type="number"
@@ -260,10 +267,11 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
             )}
 
             <div>
-              <Label>Comentarios para el equipo técnico</Label>
+              <Label>Detalle del trabajo</Label>
               <Textarea
                 value={summary.comentarios}
                 onChange={(event) => setSummary((prev) => ({ ...prev, comentarios: event.target.value }))}
+                placeholder="Escribí un detalle breve del trabajo."
               />
             </div>
           </CardContent>
@@ -278,12 +286,8 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
               Servicio: <b>{selectedService?.name}</b>
             </p>
             <p>
-              Flujo:{' '}
-              <b>{totals.requiresSurvey ? 'Relevamiento técnico previo' : 'Contratación directa con validación'}</b>
+              Modalidad: <b>{totals.requiresSurvey ? 'Con relevamiento' : 'Directa'}</b>
             </p>
-            <p>Subtotal base: ${totals.subtotalBase.toLocaleString('es-AR')}</p>
-            <p>Recargo zona: ${totals.recargoZona.toLocaleString('es-AR')}</p>
-            <p>Recargo urgencia: ${totals.recargoUrgencia.toLocaleString('es-AR')}</p>
             <p className="text-lg font-semibold">Total estimado: ${totals.totalManoObra.toLocaleString('es-AR')}</p>
             {totals.warning && <p className="text-amber-600">{totals.warning}</p>}
 

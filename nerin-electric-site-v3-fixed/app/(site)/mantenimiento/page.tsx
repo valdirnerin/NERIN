@@ -1,4 +1,5 @@
 export const dynamic = 'force-dynamic'
+
 import Link from 'next/link'
 import { getMaintenancePlansForMarketing } from '@/lib/marketing-data'
 import { Badge } from '@/components/ui/badge'
@@ -11,8 +12,8 @@ export const revalidate = 60
 export async function generateMetadata() {
   const site = await getSiteContent()
   const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
-  const title = 'Planes de mantenimiento eléctrico | NERIN'
-  const description = 'Planes de mantenimiento eléctrico con visitas programadas, SLAs y reportes mensuales.'
+  const title = 'Mantenimiento eléctrico | NERIN'
+  const description = 'Planes de mantenimiento con visitas y tareas definidas.'
 
   return {
     title,
@@ -57,22 +58,19 @@ export default async function MantenimientoPage() {
               <p className="text-sm text-slate-500">${Number(plan.precioMensual).toLocaleString('es-AR')} / mes</p>
             </CardHeader>
             <CardContent className="space-y-4 text-sm text-slate-600">
-              <p className="font-medium text-foreground">Incluye tareas fijas:</p>
+              <p className="font-medium text-foreground">Incluye:</p>
               <ul className="space-y-2">
                 {plan.incluyeTareasFijas.map((task) => (
                   <li key={task}>• {task}</li>
                 ))}
               </ul>
-              <p>{plan.visitasMes} visita(s) técnica(s) mensual(es) con checklist digital y reporte fotográfico.</p>
-              <p className="text-xs text-slate-500">
-                Cantidades inalterables: aseguramos tiempos de respuesta y disponibilidad de técnicos senior.
-              </p>
+              <p>{plan.visitasMes} visita(s) por mes.</p>
               <div className="flex flex-col gap-2">
                 <Button asChild>
-                  <Link href={`/presupuesto?tipo=mantenimiento&plan=${plan.slug}`} data-track="lead" data-content-name={plan.nombre} data-plan-tier={plan.slug} data-value={Number(plan.precioMensual)} data-currency="ARS">Solicitar alta del plan</Link>
+                  <Link href={`/presupuesto?tipo=mantenimiento&plan=${plan.slug}`}>Solicitar plan</Link>
                 </Button>
                 <Button asChild variant="secondary">
-                  <Link href="/presupuesto?tipo=mantenimiento" data-track="lead" data-content-name="Hablar con un asesor">Hablar con un asesor</Link>
+                  <Link href="/contacto">Contacto</Link>
                 </Button>
               </div>
             </CardContent>
@@ -81,7 +79,7 @@ export default async function MantenimientoPage() {
       </section>
 
       <section className="rounded-3xl border border-border bg-white p-5 shadow-subtle sm:p-8 lg:p-10">
-        <h2 className="text-2xl font-semibold text-foreground">Alcance operativo</h2>
+        <h2 className="text-2xl font-semibold text-foreground">Alcance</h2>
         <div className="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {site.maintenancePage.cards.map((card) => (
             <div key={card.title}>
