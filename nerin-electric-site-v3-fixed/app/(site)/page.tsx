@@ -41,17 +41,17 @@ const worlds = [
   {
     title: 'Viviendas',
     description: 'Instalaciones, arreglos y reformas eléctricas en casas y departamentos.',
-    href: '/presupuestador?mode=ASSISTED',
+    href: '/presupuestador?mode=PROJECT',
   },
   {
     title: 'Comercios',
     description: 'Trabajos para locales, oficinas y espacios de atención al público.',
-    href: '/presupuestador?mode=ASSISTED',
+    href: '/presupuestador?mode=PROJECT',
   },
   {
     title: 'Obras',
     description: 'Cotización para obra nueva, ampliaciones y mantenimiento técnico.',
-    href: '/presupuestador?mode=PROFESSIONAL',
+    href: '/presupuestador?mode=PROJECT',
   },
 ]
 
@@ -68,14 +68,9 @@ const hiringFlow = [
     href: '/presupuestador?mode=EXPRESS',
   },
   {
-    title: 'Relevamiento',
-    description: 'Para obras o trabajos más grandes.',
-    href: '/presupuesto?tipo=obra',
-  },
-  {
-    title: 'Cotización técnica',
-    description: 'Para cotizar por plano o cantidades.',
-    href: '/presupuestador?mode=PROFESSIONAL',
+    title: 'Obra / reforma / instalación',
+    description: 'Para trabajos más grandes o con definición técnica.',
+    href: '/presupuestador?mode=PROJECT',
   },
 ]
 
@@ -106,7 +101,7 @@ export default async function HomePage() {
                 <Link href="/presupuestador">Iniciar cotización</Link>
               </Button>
               <Button size="lg" variant="secondary" asChild>
-                <Link href="/presupuesto?tipo=obra">Solicitar relevamiento</Link>
+                <Link href="/presupuestador?mode=PROJECT">Solicitar obra o reforma</Link>
               </Button>
             </div>
           </div>
@@ -122,7 +117,7 @@ export default async function HomePage() {
           <p className="text-xs font-semibold uppercase tracking-[0.4em] text-muted-foreground">Qué hacemos</p>
           <h2>Tipos de trabajo</h2>
         </div>
-        <div className="grid gap-4 lg:grid-cols-3">
+        <div className="grid gap-4 lg:grid-cols-2">
           {worlds.map((world) => (
             <article key={world.title} className="rounded-2xl border border-border bg-white p-5">
               <h3 className="text-lg font-semibold">{world.title}</h3>
@@ -177,7 +172,7 @@ export default async function HomePage() {
           <p className="text-xs font-semibold uppercase tracking-[0.4em] text-muted-foreground">Cómo contratar</p>
           <h2>Elegí una opción</h2>
         </div>
-        <div className="grid gap-4 lg:grid-cols-3">
+        <div className="grid gap-4 lg:grid-cols-2">
           {hiringFlow.map((step) => (
             <article key={step.title} className="rounded-2xl border border-border bg-white p-5">
               <h3 className="font-semibold">{step.title}</h3>

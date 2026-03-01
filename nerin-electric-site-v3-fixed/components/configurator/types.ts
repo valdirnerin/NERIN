@@ -1,7 +1,7 @@
-export type QuoteMode = 'EXPRESS' | 'ASSISTED' | 'PROFESSIONAL'
+export type QuoteMode = 'EXPRESS' | 'PROJECT'
 export type ServiceFlow = 'ONLINE' | 'SURVEY'
 export type ServicePath = 'PUNTUAL' | 'OBRA'
-export type ZoneTier = 'PRIORITY' | 'SECONDARY' | 'REVIEW'
+export type ZoneTier = 'PRIORITY' | 'STANDARD' | 'EXTENDED' | 'REVIEW'
 export type PriceKind = 'UNIT' | 'PER_POINT' | 'FIXED'
 
 export interface WizardPack {
@@ -51,11 +51,16 @@ export interface WizardSummary {
   serviceId: string
   serviceUnits: number
   zoneTier: ZoneTier
+  address: string
+  zoneLabel?: string
+  zoneLat?: number
+  zoneLng?: number
   urgencyMultiplier: number
   difficultyMultiplier: number
   packId: string
   ambientes: number
   bocasExtra: number
+  hasPlan: boolean
   adicionales: Array<{
     id: string
     cantidad: number

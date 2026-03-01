@@ -27,18 +27,22 @@ const adicionales: WizardAdditional[] = [
 ]
 
 describe('calculateTotals', () => {
-  it('calcula totales para modo asistido con recargos', () => {
+  it('calcula totales para obra/reforma con recargos', () => {
     const summary: WizardSummary = {
-      mode: 'ASSISTED',
+      mode: 'PROJECT',
       serviceId: 'reforma-parcial',
-      zoneTier: 'SECONDARY',
+      serviceUnits: 1,
+      zoneTier: 'STANDARD',
+      address: 'Av. Cabildo 2450',
       urgencyMultiplier: 1.1,
       difficultyMultiplier: 1,
       packId: pack.id,
       ambientes: 6,
       bocasExtra: 10,
+      hasPlan: false,
       adicionales: [{ id: 'add-1', cantidad: 3 }],
       professionalItems: [],
+      comentarios: '',
     }
 
     const totals = calculateTotals({ pack, adicionales, summary, services: quoteServices, catalog: professionalCatalog })
@@ -46,18 +50,22 @@ describe('calculateTotals', () => {
     expect(totals.requiresSurvey).toBe(true)
   })
 
-  it('usa el mismo motor para profesional', () => {
+  it('usa cantidades técnicas cuando tengo plano o cantidades', () => {
     const summary: WizardSummary = {
-      mode: 'PROFESSIONAL',
+      mode: 'PROJECT',
       serviceId: 'reforma-parcial',
+      serviceUnits: 1,
       zoneTier: 'PRIORITY',
+      address: 'Av. Santa Fe 1000',
       urgencyMultiplier: 1,
       difficultyMultiplier: 1,
       packId: pack.id,
       ambientes: 0,
       bocasExtra: 0,
+      hasPlan: true,
       adicionales: [],
       professionalItems: [{ id: 'boca-iluminacion', cantidad: 2 }],
+      comentarios: '',
     }
 
     const totals = calculateTotals({ pack, adicionales, summary, services: quoteServices, catalog: professionalCatalog })

@@ -9,8 +9,9 @@ import {
 
 const zoneMultipliers: Record<ZoneTier, number> = {
   PRIORITY: 1,
-  SECONDARY: 1.12,
-  REVIEW: 1.25,
+  STANDARD: 1.08,
+  EXTENDED: 1.16,
+  REVIEW: 1.24,
 }
 
 export interface QuoteTotals {
@@ -41,9 +42,9 @@ function buildSelectedItems({
   adicionales: WizardAdditional[]
   catalog: QuoteCatalogItem[]
 }) {
-  const selected = summary.mode === 'PROFESSIONAL' ? summary.professionalItems : summary.adicionales
+  const selected = summary.mode === 'PROJECT' && summary.hasPlan ? summary.professionalItems : summary.adicionales
   const source =
-    summary.mode === 'PROFESSIONAL'
+    summary.mode === 'PROJECT' && summary.hasPlan
       ? catalog.map((item) => ({
           id: item.id,
           nombre: item.name,
@@ -94,13 +95,9 @@ export function calculateTotals({
     subtotalBase = Math.max(service?.minPrice ?? 0, (service?.basePrice ?? 0) * serviceUnits + itemsSubtotal)
   }
 
-  if (summary.mode === 'ASSISTED') {
+  if (summary.mode === 'PROJECT') {
     const reference = packSubtotal + guidedAmbientes + guidedBocas + itemsSubtotal
-    subtotalBase = Math.max(service?.basePrice ?? 0, reference)
-  }
-
-  if (summary.mode === 'PROFESSIONAL') {
-    subtotalBase = Math.max(service?.basePrice ?? 0, itemsSubtotal)
+    subtotalBase = summary.hasPlan ? Math.max(service?.basePrice ?? 0, itemsSubtotal) : Math.max(service?.basePrice ?? 0, reference)
   }
 
   const zoneMultiplier = zoneMultipliers[summary.zoneTier] ?? 1
