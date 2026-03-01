@@ -20,9 +20,9 @@ interface HeaderProps {
 
 const navigation = [
   { href: '/', label: 'Inicio' },
-  { href: '/presupuestador', label: 'Contratar' },
+  { href: '/presupuestador', label: 'Cotización' },
   { href: '/obras', label: 'Casos' },
-  { href: '/empresa', label: 'Empresa' },
+  { href: '/mantenimiento', label: 'Mantenimiento' },
   { href: '/contacto', label: 'Contacto' },
 ] as const
 
@@ -46,12 +46,7 @@ export function Header({ contact, logo }: HeaderProps) {
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <Button
-            variant="outline"
-            size="sm"
-            asChild
-            className="hidden items-center gap-2 border border-border bg-white text-foreground lg:inline-flex"
-          >
+          <Button variant="outline" size="sm" asChild className="hidden border border-border bg-white text-foreground lg:inline-flex">
             <a
               href={contact.whatsappHref}
               aria-label={contact.whatsappLabel}
@@ -65,7 +60,7 @@ export function Header({ contact, logo }: HeaderProps) {
             </a>
           </Button>
           <Button size="sm" asChild className="hidden lg:inline-flex">
-            <Link href="/presupuestador" data-track="lead" data-content-name="Contratar header">
+            <Link href="/presupuestador" data-track="lead" data-content-name="Cotización header">
               Iniciar cotización
             </Link>
           </Button>
@@ -100,12 +95,7 @@ export function Header({ contact, logo }: HeaderProps) {
           <div className="container space-y-5 py-4">
             <nav className="grid gap-1 text-sm font-medium text-foreground">
               {navigation.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="rounded-lg px-3 py-2 hover:bg-muted"
-                  onClick={() => setMenuOpen(false)}
-                >
+                <Link key={item.href} href={item.href} className="rounded-lg px-3 py-2 hover:bg-muted" onClick={() => setMenuOpen(false)}>
                   {item.label}
                 </Link>
               ))}

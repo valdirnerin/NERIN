@@ -11,7 +11,7 @@ const quickLinks = [
   { href: '/presupuestador', label: 'Iniciar cotización' },
   { href: '/presupuesto', label: 'Solicitar relevamiento' },
   { href: '/obras', label: 'Ver casos' },
-  { href: '/packs', label: 'Anexo técnico' },
+  { href: '/contacto', label: 'Contacto' },
 ] as const
 
 interface FooterProps {
@@ -26,9 +26,8 @@ export function Footer({ site }: FooterProps) {
       <div className="container grid gap-10 py-12 sm:py-14 md:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-3">
           <p className="text-sm uppercase tracking-[0.35em] text-muted-foreground">NERIN</p>
-          <p className="text-sm text-muted-foreground">Instalaciones eléctricas con criterio técnico y ejecución ordenada.</p>
-          <p className="text-sm text-muted-foreground">{site.contact.schedule}</p>
-          <p className="text-sm text-muted-foreground">{site.contact.phone}</p>
+          <p className="text-sm text-muted-foreground">Contratista eléctrico en CABA y GBA.</p>
+          <p className="text-sm text-muted-foreground">{site.contact.serviceArea}</p>
         </div>
 
         <div>
@@ -49,7 +48,7 @@ export function Footer({ site }: FooterProps) {
           <ul className="mt-3 space-y-2 text-sm text-foreground">
             <li>
               <a href={whatsappHref} className="hover:text-foreground" data-track="whatsapp" data-content-name="WhatsApp footer">
-                WhatsApp directo
+                WhatsApp
               </a>
             </li>
             <li>
@@ -57,7 +56,6 @@ export function Footer({ site }: FooterProps) {
                 {site.contact.email}
               </a>
             </li>
-            <li>{site.contact.serviceArea}</li>
           </ul>
         </div>
 
@@ -77,7 +75,7 @@ export function Footer({ site }: FooterProps) {
 
       <div className="border-t border-border bg-muted py-6">
         <div className="container flex flex-col gap-3 text-sm text-muted-foreground lg:flex-row lg:items-center lg:justify-between">
-          <span>© {new Date().getFullYear()} NERIN Electric. Todos los derechos reservados.</span>
+          <span>© {new Date().getFullYear()} NERIN Electric.</span>
           <Link href="/admin" className="text-xs uppercase tracking-[0.3em] text-muted-foreground hover:text-foreground">
             Panel admin
           </Link>

@@ -12,9 +12,8 @@ export const revalidate = 60
 export async function generateMetadata() {
   const site = await getSiteContent()
   const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
-  const title = 'NERIN | Instalaciones eléctricas con alcance claro y ejecución ordenada'
-  const description =
-    'Instalaciones, relevamientos y cotización técnica para viviendas, locales y operaciones corporativas. NERIN trabaja con alcance definido y coordinación previa.'
+  const title = 'Contratista eléctrico en CABA y GBA | NERIN'
+  const description = 'Servicios, mantenimiento y trabajos eléctricos para viviendas, comercios y obras.'
 
   return {
     title,
@@ -40,42 +39,42 @@ export async function generateMetadata() {
 
 const worlds = [
   {
-    title: 'Residencial',
-    description: 'Viviendas y reformas con definición de alcance antes de ejecutar.',
+    title: 'Viviendas',
+    description: 'Instalaciones, arreglos y reformas eléctricas en casas y departamentos.',
     href: '/presupuestador?mode=ASSISTED',
   },
   {
-    title: 'Comercial y gastronómico',
-    description: 'Locales y espacios de atención al público con coordinación por etapas.',
+    title: 'Comercios',
+    description: 'Trabajos para locales, oficinas y espacios de atención al público.',
     href: '/presupuestador?mode=ASSISTED',
   },
   {
-    title: 'Obras y operación corporativa',
-    description: 'Trabajos técnicos con prioridad en continuidad, seguridad y trazabilidad.',
+    title: 'Obras',
+    description: 'Cotización para obra nueva, ampliaciones y mantenimiento técnico.',
     href: '/presupuestador?mode=PROFESSIONAL',
   },
 ]
 
-const brandReasons = [
-  'Alcance y criterios técnicos definidos antes de iniciar.',
-  'Coordinación con cliente, obra y proveedores para evitar desvíos.',
-  'Adicionales y cambios validados antes de ejecutar.',
+const workSteps = [
+  'Revisamos el pedido y el tipo de trabajo.',
+  'Definimos alcance y forma de trabajo antes de empezar.',
+  'Ejecutamos y dejamos registro de lo realizado.',
 ]
 
 const hiringFlow = [
   {
-    title: '1. Servicio puntual',
-    description: 'Para resolver tareas concretas con contratación directa.',
+    title: 'Servicio puntual',
+    description: 'Para resolver algo concreto.',
     href: '/presupuestador?mode=EXPRESS',
   },
   {
-    title: '2. Relevamiento o proyecto',
-    description: 'Para obras y reformas que requieren diagnóstico técnico previo.',
+    title: 'Relevamiento',
+    description: 'Para obras o trabajos más grandes.',
     href: '/presupuesto?tipo=obra',
   },
   {
-    title: '3. Cotización por plano/cantidades',
-    description: 'Para estudios y equipos técnicos que necesitan una base ordenada.',
+    title: 'Cotización técnica',
+    description: 'Para cotizar por plano o cantidades.',
     href: '/presupuestador?mode=PROFESSIONAL',
   },
 ]
@@ -95,12 +94,12 @@ export default async function HomePage() {
         />
         <div className="relative z-10 grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
           <div className="space-y-5">
-            <Badge className="bg-white/10 text-white">NERIN · Instalaciones eléctricas</Badge>
+            <Badge className="bg-white/10 text-white">NERIN</Badge>
             <h1 className="max-w-2xl text-3xl font-semibold leading-tight text-white sm:text-4xl lg:text-5xl">
-              Ejecución eléctrica con criterio técnico y coordinación ordenada
+              Contratista eléctrico en CABA y GBA
             </h1>
             <p className="max-w-xl text-base text-slate-200 sm:text-lg">
-              Definimos alcance, método de trabajo y tiempos antes de empezar. Así se reduce la improvisación en obra.
+              Servicios, mantenimiento y trabajos eléctricos para viviendas, comercios y obras.
             </p>
             <div className="flex flex-wrap gap-3">
               <Button size="lg" asChild>
@@ -114,15 +113,14 @@ export default async function HomePage() {
           <div className="rounded-2xl border border-white/20 bg-white/5 p-5 backdrop-blur">
             <p className="text-sm uppercase tracking-[0.3em] text-slate-300">Zona de trabajo</p>
             <p className="mt-2 text-lg font-semibold">{site.contact.serviceArea}</p>
-            <p className="mt-3 text-sm text-slate-200">{site.hero.caption}</p>
           </div>
         </div>
       </section>
 
       <section className="space-y-6">
         <div className="max-w-2xl space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-muted-foreground">Dónde trabajamos</p>
-          <h2>Tres contextos de trabajo bien definidos</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-muted-foreground">Qué hacemos</p>
+          <h2>Tipos de trabajo</h2>
         </div>
         <div className="grid gap-4 lg:grid-cols-3">
           {worlds.map((world) => (
@@ -130,7 +128,7 @@ export default async function HomePage() {
               <h3 className="text-lg font-semibold">{world.title}</h3>
               <p className="mt-2 text-sm text-muted-foreground">{world.description}</p>
               <Button variant="ghost" className="mt-4 px-0" asChild>
-                <a href={world.href}>Ver opción</a>
+                <a href={world.href}>Continuar</a>
               </Button>
             </article>
           ))}
@@ -140,15 +138,12 @@ export default async function HomePage() {
       <section className="grid gap-8 lg:grid-cols-[1fr_1.2fr] lg:items-start">
         <div className="space-y-3">
           <p className="text-xs font-semibold uppercase tracking-[0.4em] text-muted-foreground">Cómo trabajamos</p>
-          <h2>Definición previa para ejecutar sin desorden</h2>
-          <p className="text-sm text-muted-foreground">
-            Nuestro foco está en ordenar el trabajo desde el inicio y sostener el criterio técnico durante toda la ejecución.
-          </p>
+          <h2>Proceso simple</h2>
         </div>
         <ul className="grid gap-3">
-          {brandReasons.map((reason) => (
-            <li key={reason} className="rounded-2xl border border-border bg-muted/20 px-5 py-4 text-sm font-medium">
-              {reason}
+          {workSteps.map((step) => (
+            <li key={step} className="rounded-2xl border border-border bg-muted/20 px-5 py-4 text-sm font-medium">
+              {step}
             </li>
           ))}
         </ul>
@@ -156,8 +151,8 @@ export default async function HomePage() {
 
       <section className="space-y-6">
         <div className="max-w-2xl space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-muted-foreground">Casos recientes</p>
-          <h2>Trabajos ejecutados con alcance definido</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-muted-foreground">Casos</p>
+          <h2>Trabajos recientes</h2>
         </div>
         <div className="grid gap-5 md:grid-cols-2">
           {caseStudies.slice(0, 2).map((cs) => (
@@ -172,12 +167,15 @@ export default async function HomePage() {
             </article>
           ))}
         </div>
+        <Button variant="secondary" asChild>
+          <Link href="/obras">Ver casos</Link>
+        </Button>
       </section>
 
       <section className="space-y-6 rounded-3xl border border-border bg-muted/30 p-6 sm:p-8">
         <div className="max-w-2xl space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-muted-foreground">Contratación</p>
-          <h2>Elegí el canal según tu necesidad</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-muted-foreground">Cómo contratar</p>
+          <h2>Elegí una opción</h2>
         </div>
         <div className="grid gap-4 lg:grid-cols-3">
           {hiringFlow.map((step) => (
@@ -195,12 +193,11 @@ export default async function HomePage() {
       <section className="rounded-3xl bg-[#0B0F14] px-6 py-10 text-white sm:px-8">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div className="space-y-2">
-            <p className="text-xs uppercase tracking-[0.35em] text-[#FBBF24]">Contacto comercial</p>
-            <h2 className="text-white">Si tenés un trabajo serio, coordinamos alcance y próximos pasos</h2>
-            <p className="text-sm text-slate-300">Respuesta inicial en 24–48 h hábiles.</p>
+            <p className="text-xs uppercase tracking-[0.35em] text-[#FBBF24]">Contacto</p>
+            <h2 className="text-white">¿Necesitás una cotización?</h2>
           </div>
           <Button size="lg" asChild>
-            <Link href="/presupuestador">Iniciar cotización</Link>
+            <Link href="/contacto">Contacto</Link>
           </Button>
         </div>
       </section>

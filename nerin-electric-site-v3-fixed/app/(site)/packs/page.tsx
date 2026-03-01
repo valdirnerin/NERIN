@@ -12,9 +12,8 @@ export const revalidate = 60
 export async function generateMetadata() {
   const site = await getSiteContent()
   const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
-  const title = 'Bases técnicas de mano de obra | NERIN'
-  const description =
-    'Referencia técnica para revisar bases de mano de obra. La contratación principal se realiza desde cotización.'
+  const title = 'Packs técnicos | NERIN'
+  const description = 'Referencia de bases de mano de obra.'
 
   return {
     title,
@@ -44,14 +43,11 @@ export default async function PacksPage() {
   return (
     <div className="space-y-10">
       <header className="space-y-4 rounded-2xl border border-border bg-muted/20 p-6">
-        <Badge>Referencia técnica</Badge>
+        <Badge>Packs técnicos</Badge>
         <h1>Bases de mano de obra</h1>
-        <p className="max-w-3xl text-base text-slate-600">
-          Este bloque es una referencia para revisión técnica. Si querés avanzar con contratación, usá el flujo de
-          cotización.
-        </p>
+        <p className="max-w-3xl text-base text-slate-600">Esta página es una referencia técnica.</p>
         <Button asChild>
-          <Link href="/presupuestador">Ir a cotización</Link>
+          <Link href="/presupuestador">Iniciar cotización</Link>
         </Button>
       </header>
 

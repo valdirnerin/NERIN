@@ -1,6 +1,5 @@
 export const dynamic = 'force-dynamic'
 
-import Link from 'next/link'
 import { getConfiguratorData } from '@/lib/marketing-data'
 import { Badge } from '@/components/ui/badge'
 import { ConfiguratorWizard } from '@/components/configurator/ConfiguratorWizard'
@@ -10,9 +9,8 @@ export const revalidate = 60
 
 export async function generateMetadata() {
   const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
-  const title = 'Cotización NERIN | Servicio puntual, relevamiento o cotización técnica'
-  const description =
-    'Elegí el ingreso correcto: servicio puntual, relevamiento para obra o cotización técnica por plano/cantidades.'
+  const title = 'Cotización | NERIN'
+  const description = 'Elegí servicio puntual, relevamiento o cotización técnica.'
 
   return {
     title,
@@ -38,17 +36,17 @@ export async function generateMetadata() {
 const doors = [
   {
     title: 'Servicio puntual',
-    description: 'Para resolver una necesidad concreta con contratación directa.',
+    description: 'Para resolver un trabajo concreto.',
     href: '/presupuestador?mode=EXPRESS',
   },
   {
-    title: 'Relevamiento / proyecto',
-    description: 'Para obras o reformas que necesitan diagnóstico previo.',
+    title: 'Relevamiento',
+    description: 'Para obras o trabajos más grandes.',
     href: '/presupuesto?tipo=obra',
   },
   {
     title: 'Cotización técnica',
-    description: 'Para profesionales que cotizan por plano o cantidades.',
+    description: 'Para cotizar por plano o cantidades.',
     href: '/presupuestador?mode=PROFESSIONAL',
   },
 ]
@@ -84,11 +82,9 @@ export default async function PresupuestadorPage({
   return (
     <div className="space-y-8 sm:space-y-10">
       <header className="space-y-4">
-        <Badge>Cotización y contratación</Badge>
-        <h1>Entrá por la puerta correcta</h1>
-        <p className="max-w-3xl text-lg text-slate-600">
-          Cada tipo de trabajo requiere un proceso distinto. Elegí el canal adecuado y avanzamos con una propuesta clara.
-        </p>
+        <Badge>Cotización</Badge>
+        <h1>Elegí cómo querés cotizar</h1>
+        <p className="max-w-3xl text-lg text-slate-600">Elegí una opción y seguí el paso a paso.</p>
       </header>
 
       <section className="grid gap-4 md:grid-cols-3">
@@ -97,7 +93,7 @@ export default async function PresupuestadorPage({
             <h2 className="text-base font-semibold">{door.title}</h2>
             <p className="mt-2 text-sm text-muted-foreground">{door.description}</p>
             <Button variant="ghost" className="mt-4 px-0" asChild>
-              <a href={door.href}>Ingresar</a>
+              <a href={door.href}>Continuar</a>
             </Button>
           </article>
         ))}
