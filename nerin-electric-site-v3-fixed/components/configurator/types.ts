@@ -29,6 +29,8 @@ export interface QuoteService {
   id: string
   name: string
   description: string
+  categoryLabel?: string
+  visualIcon?: string
   flow: ServiceFlow
   path: ServicePath
   basePrice: number

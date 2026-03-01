@@ -18,9 +18,11 @@ const clientTypes = [
 
 const workTypes = [
   { value: 'reforma-parcial', label: 'Reforma eléctrica parcial' },
-  { value: 'instalacion-local-oficina', label: 'Instalación para local u oficina' },
   { value: 'instalacion-vivienda', label: 'Instalación integral de vivienda' },
+  { value: 'instalacion-local-oficina', label: 'Instalación para local u oficina' },
   { value: 'obra-comercial', label: 'Obra comercial' },
+  { value: 'instalacion-edificio', label: 'Instalación para edificio' },
+  { value: 'areas-comunes-servicios-edificio', label: 'Áreas comunes y servicios de edificio' },
   { value: 'mantenimiento-programado', label: 'Mantenimiento técnico programado' },
   { value: 'otros-relevamiento', label: 'Otros trabajos con relevamiento' },
 ] as const
