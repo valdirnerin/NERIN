@@ -55,6 +55,7 @@ describe('app/api/leads/route POST', () => {
       leadType: 'mantenimiento',
       plan: 'plan-basico',
       hasFiles: false,
+      attachments: [],
       createdAt: new Date().toISOString(),
     })
 
@@ -80,7 +81,7 @@ describe('app/api/leads/route POST', () => {
     )
 
     expect(response.status).toBe(200)
-    await expect(response.json()).resolves.toEqual({ ok: true, leadId: 'lead_123' })
+    await expect(response.json()).resolves.toEqual({ ok: true, leadId: 'lead_123', attachmentsCount: 0 })
     expect(mockLeadCreate).toHaveBeenCalledOnce()
   })
 })

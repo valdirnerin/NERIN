@@ -748,7 +748,7 @@ function buildPrismaStore(): ContentStore {
           leadType: lead.leadType,
           plan: lead.plan,
           hasFiles: lead.hasFiles,
-          attachments: lead.attachments.map((attachment) => ({
+          attachments: (lead.attachments ?? []).map((attachment) => ({
             originalName: attachment.originalName,
             mimeType: attachment.mimeType,
             size: attachment.size,
