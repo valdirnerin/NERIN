@@ -7,9 +7,9 @@ export const revalidate = 60
 export async function generateMetadata() {
   const site = await getSiteContent()
   const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
-  const title = 'Relevamiento premium y propuesta eléctrica | NERIN'
+  const title = 'Relevamiento y propuesta eléctrica | NERIN'
   const description =
-    'Solicitá relevamiento para vivienda, local u operación corporativa. NERIN define alcance y propuesta comercial en 24–48 h.'
+    'Solicitá relevamiento para obra o reforma. Definimos alcance técnico, prioridades y propuesta comercial.'
 
   return {
     title,
@@ -46,20 +46,20 @@ export default async function PresupuestoPage({
     <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12">
       <div className="space-y-6 sm:space-y-8">
         <Badge>Relevamiento / Proyecto</Badge>
-        <h1>Contanos tu espacio. NERIN ordena la propuesta.</h1>
+        <h1>Contanos el trabajo y definimos el alcance</h1>
         <p className="max-w-2xl text-lg text-slate-600">
-          Este formulario es para obras, reformas o necesidades que requieren diagnóstico técnico. Si querés resolver
-          algo puntual, usá el modo express del presupuestador.
+          Este formulario aplica a obras, reformas o trabajos con definición técnica. Para tareas puntuales, usá el modo
+          de servicio puntual.
         </p>
         <PresupuestoForm whatsappNumber={site.contact.whatsappNumber} leadType={leadType} plan={plan} />
       </div>
 
       <aside className="space-y-5 rounded-3xl border border-border bg-white p-5 shadow-subtle sm:p-7 lg:sticky lg:top-24">
-        <h2>Qué obtenés</h2>
+        <h2>Qué revisamos</h2>
         <ul className="space-y-3 text-sm text-slate-600">
-          <li>• Diagnóstico inicial y prioridades de intervención.</li>
-          <li>• Alcance real de obra para decidir con claridad.</li>
-          <li>• Propuesta comercial y próximos pasos concretos.</li>
+          <li>• Estado actual y prioridades técnicas.</li>
+          <li>• Alcance real, etapas y condicionantes de obra.</li>
+          <li>• Propuesta comercial con próximos pasos.</li>
         </ul>
         <div className="rounded-2xl bg-muted p-6 text-sm text-slate-600">
           <p className="font-semibold text-foreground">Contacto directo</p>

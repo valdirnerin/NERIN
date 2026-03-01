@@ -10,9 +10,9 @@ export const revalidate = 60
 
 export async function generateMetadata() {
   const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
-  const title = 'Contratación NERIN | Servicio puntual, relevamiento o cotización profesional'
+  const title = 'Cotización NERIN | Servicio puntual, relevamiento o cotización técnica'
   const description =
-    'Ingresá por una de las 3 puertas de NERIN: resolver algo puntual, pedir relevamiento o cotizar por plano/cantidades.'
+    'Elegí el ingreso correcto: servicio puntual, relevamiento para obra o cotización técnica por plano/cantidades.'
 
   return {
     title,
@@ -37,18 +37,18 @@ export async function generateMetadata() {
 
 const doors = [
   {
-    title: 'Resolver algo puntual',
-    description: 'Para necesidades inmediatas con alcance claro.',
+    title: 'Servicio puntual',
+    description: 'Para resolver una necesidad concreta con contratación directa.',
     href: '/presupuestador?mode=EXPRESS',
   },
   {
-    title: 'Pedir relevamiento/proyecto',
-    description: 'Para obras y reformas con definición técnica.',
+    title: 'Relevamiento / proyecto',
+    description: 'Para obras o reformas que necesitan diagnóstico previo.',
     href: '/presupuesto?tipo=obra',
   },
   {
-    title: 'Cotización profesional',
-    description: 'Para perfiles técnicos con plano y cantidades.',
+    title: 'Cotización técnica',
+    description: 'Para profesionales que cotizan por plano o cantidades.',
     href: '/presupuestador?mode=PROFESSIONAL',
   },
 ]
@@ -84,10 +84,10 @@ export default async function PresupuestadorPage({
   return (
     <div className="space-y-8 sm:space-y-10">
       <header className="space-y-4">
-        <Badge>Sistema comercial NERIN</Badge>
-        <h1>Una contratación clara en 3 puertas</h1>
+        <Badge>Cotización y contratación</Badge>
+        <h1>Entrá por la puerta correcta</h1>
         <p className="max-w-3xl text-lg text-slate-600">
-          Elegí el contexto correcto y avanzá con una propuesta ordenada. Sin calculadoras confusas ni desvíos.
+          Cada tipo de trabajo requiere un proceso distinto. Elegí el canal adecuado y avanzamos con una propuesta clara.
         </p>
       </header>
 
@@ -97,7 +97,7 @@ export default async function PresupuestadorPage({
             <h2 className="text-base font-semibold">{door.title}</h2>
             <p className="mt-2 text-sm text-muted-foreground">{door.description}</p>
             <Button variant="ghost" className="mt-4 px-0" asChild>
-              <a href={door.href}>Entrar</a>
+              <a href={door.href}>Ingresar</a>
             </Button>
           </article>
         ))}

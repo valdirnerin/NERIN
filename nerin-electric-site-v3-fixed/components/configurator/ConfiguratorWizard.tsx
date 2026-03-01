@@ -21,18 +21,18 @@ interface Props {
 const modeCards: Array<{ mode: WizardSummary['mode']; title: string; description: string }> = [
   {
     mode: 'EXPRESS',
-    title: '1) Resolver algo puntual',
-    description: 'Para contratar rápido con alcance definido.',
+    title: '1) Servicio puntual',
+    description: 'Para tareas concretas con contratación directa.',
   },
   {
     mode: 'ASSISTED',
     title: '2) Relevamiento / proyecto',
-    description: 'Para obra o reforma con acompañamiento.',
+    description: 'Para obras o reformas con diagnóstico previo.',
   },
   {
     mode: 'PROFESSIONAL',
-    title: '3) Cotización profesional',
-    description: 'Para carga técnica por cantidades.',
+    title: '3) Cotización técnica',
+    description: 'Para cotizar por plano o cantidades.',
   },
 ]
 
@@ -138,7 +138,7 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
       <section className="grid gap-5 lg:grid-cols-[1.35fr_0.9fr] xl:gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Configurá tu solicitud</CardTitle>
+            <CardTitle>Definí tu solicitud</CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="grid gap-3">
@@ -267,11 +267,11 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
             )}
 
             <div>
-              <Label>Contexto del trabajo</Label>
+              <Label>Datos del trabajo</Label>
               <Textarea
                 value={summary.comentarios}
                 onChange={(event) => setSummary((prev) => ({ ...prev, comentarios: event.target.value }))}
-                placeholder="Contanos qué buscás resolver."
+                placeholder="Indicá alcance, prioridades o restricciones."
               />
             </div>
           </CardContent>
@@ -286,7 +286,7 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
               Servicio: <b>{selectedService?.name}</b>
             </p>
             <p>
-              Modalidad: <b>{totals.requiresSurvey ? 'Relevamiento técnico previo' : 'Contratación directa'}</b>
+              Modalidad: <b>{totals.requiresSurvey ? 'Con relevamiento técnico' : 'Contratación directa'}</b>
             </p>
             <p className="text-lg font-semibold">Total estimado: ${totals.totalManoObra.toLocaleString('es-AR')}</p>
             {totals.warning && <p className="text-amber-600">{totals.warning}</p>}
@@ -304,11 +304,11 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
                 onChange={(event) => setContacto((prev) => ({ ...prev, email: event.target.value }))}
               />
               <Button onClick={submitQuote} disabled={isPending} className="w-full">
-                {isPending ? 'Guardando...' : 'Guardar cotización'}
+                {isPending ? 'Guardando...' : 'Guardar solicitud'}
               </Button>
               {pdfUrl && (
                 <a className="text-sm font-semibold text-accent hover:underline" href={pdfUrl} target="_blank" rel="noreferrer">
-                  Descargar PDF
+                  Descargar resumen PDF
                 </a>
               )}
             </div>

@@ -22,7 +22,7 @@ const navigation = [
   { href: '/', label: 'Inicio' },
   { href: '/presupuestador', label: 'Contratar' },
   { href: '/obras', label: 'Casos' },
-  { href: '/empresa', label: 'Marca' },
+  { href: '/empresa', label: 'Empresa' },
   { href: '/contacto', label: 'Contacto' },
 ] as const
 
@@ -66,7 +66,7 @@ export function Header({ contact, logo }: HeaderProps) {
           </Button>
           <Button size="sm" asChild className="hidden lg:inline-flex">
             <Link href="/presupuestador" data-track="lead" data-content-name="Contratar header">
-              Contratar ahora
+              Iniciar cotización
             </Link>
           </Button>
 
@@ -112,7 +112,7 @@ export function Header({ contact, logo }: HeaderProps) {
             </nav>
             <div className="grid gap-2 sm:grid-cols-2">
               <Button asChild onClick={() => setMenuOpen(false)}>
-                <Link href="/presupuestador">Contratar ahora</Link>
+                <Link href="/presupuestador">Iniciar cotización</Link>
               </Button>
               <Button variant="outline" asChild>
                 <a href={contact.whatsappHref} target="_blank" rel="noopener noreferrer">
@@ -121,12 +121,12 @@ export function Header({ contact, logo }: HeaderProps) {
               </Button>
               {!session?.user && (
                 <Button variant="secondary" asChild className="sm:col-span-2" onClick={() => setMenuOpen(false)}>
-                  <Link href="/clientes/login">Ingresar al portal</Link>
+                  <Link href="/clientes/login">Ingresar</Link>
                 </Button>
               )}
               {session?.user && session.user.role !== 'admin' && (
                 <Button variant="secondary" asChild className="sm:col-span-2" onClick={() => setMenuOpen(false)}>
-                  <Link href={clientDashboardRoute}>Ir al portal clientes</Link>
+                  <Link href={clientDashboardRoute}>Portal clientes</Link>
                 </Button>
               )}
             </div>

@@ -1,4 +1,5 @@
 export const dynamic = 'force-dynamic'
+
 import Link from 'next/link'
 import { getMaintenancePlansForMarketing } from '@/lib/marketing-data'
 import { Badge } from '@/components/ui/badge'
@@ -12,7 +13,7 @@ export async function generateMetadata() {
   const site = await getSiteContent()
   const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
   const title = 'Planes de mantenimiento eléctrico | NERIN'
-  const description = 'Planes de mantenimiento eléctrico con visitas programadas, SLAs y reportes mensuales.'
+  const description = 'Mantenimiento programado con alcance fijo, frecuencia definida y reportes de seguimiento.'
 
   return {
     title,
@@ -57,22 +58,31 @@ export default async function MantenimientoPage() {
               <p className="text-sm text-slate-500">${Number(plan.precioMensual).toLocaleString('es-AR')} / mes</p>
             </CardHeader>
             <CardContent className="space-y-4 text-sm text-slate-600">
-              <p className="font-medium text-foreground">Incluye tareas fijas:</p>
+              <p className="font-medium text-foreground">Tareas incluidas:</p>
               <ul className="space-y-2">
                 {plan.incluyeTareasFijas.map((task) => (
                   <li key={task}>• {task}</li>
                 ))}
               </ul>
-              <p>{plan.visitasMes} visita(s) técnica(s) mensual(es) con checklist digital y reporte fotográfico.</p>
-              <p className="text-xs text-slate-500">
-                Cantidades inalterables: aseguramos tiempos de respuesta y disponibilidad de técnicos senior.
-              </p>
+              <p>{plan.visitasMes} visita(s) técnica(s) por mes con checklist y registro fotográfico.</p>
+              <p className="text-xs text-slate-500">Cantidades definidas y seguimiento operativo según plan acordado.</p>
               <div className="flex flex-col gap-2">
                 <Button asChild>
-                  <Link href={`/presupuesto?tipo=mantenimiento&plan=${plan.slug}`} data-track="lead" data-content-name={plan.nombre} data-plan-tier={plan.slug} data-value={Number(plan.precioMensual)} data-currency="ARS">Solicitar alta del plan</Link>
+                  <Link
+                    href={`/presupuesto?tipo=mantenimiento&plan=${plan.slug}`}
+                    data-track="lead"
+                    data-content-name={plan.nombre}
+                    data-plan-tier={plan.slug}
+                    data-value={Number(plan.precioMensual)}
+                    data-currency="ARS"
+                  >
+                    Solicitar plan
+                  </Link>
                 </Button>
                 <Button asChild variant="secondary">
-                  <Link href="/presupuesto?tipo=mantenimiento" data-track="lead" data-content-name="Hablar con un asesor">Hablar con un asesor</Link>
+                  <Link href="/presupuesto?tipo=mantenimiento" data-track="lead" data-content-name="Consulta mantenimiento">
+                    Consultar plan
+                  </Link>
                 </Button>
               </div>
             </CardContent>

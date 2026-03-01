@@ -8,7 +8,7 @@ const legalLinks = [
 ] as const
 
 const quickLinks = [
-  { href: '/presupuestador', label: 'Contratar con NERIN' },
+  { href: '/presupuestador', label: 'Iniciar cotización' },
   { href: '/presupuesto', label: 'Solicitar relevamiento' },
   { href: '/obras', label: 'Ver casos' },
   { href: '/packs', label: 'Anexo técnico' },
@@ -26,13 +26,13 @@ export function Footer({ site }: FooterProps) {
       <div className="container grid gap-10 py-12 sm:py-14 md:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-3">
           <p className="text-sm uppercase tracking-[0.35em] text-muted-foreground">NERIN</p>
-          <p className="text-sm text-muted-foreground">Ejecución eléctrica premium para espacios exigentes.</p>
+          <p className="text-sm text-muted-foreground">Instalaciones eléctricas con criterio técnico y ejecución ordenada.</p>
           <p className="text-sm text-muted-foreground">{site.contact.schedule}</p>
           <p className="text-sm text-muted-foreground">{site.contact.phone}</p>
         </div>
 
         <div>
-          <h4 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Navegación rápida</h4>
+          <h4 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Accesos</h4>
           <ul className="mt-3 space-y-2 text-sm text-foreground">
             {quickLinks.map((item) => (
               <li key={item.href}>
