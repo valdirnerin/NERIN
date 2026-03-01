@@ -1,10 +1,10 @@
 'use client'
 
-import { useMemo, useState, useTransition } from 'react'
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { calculateTotals } from './calculations'
 import { professionalCatalog, quoteServices } from './catalog'
 import { WizardAdditional, WizardPack, WizardSummary } from './types'
-import { getZoneTierLabel, resolveZoneByCoordinates } from './location'
+import { getZoneBadgeClasses, getZoneTierLabel } from '@/lib/service-area'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -20,9 +20,14 @@ interface Props {
 }
 
 type GeoSuggestion = {
-  display_name: string
-  lat: string
-  lon: string
+  displayName: string
+  lat: number
+  lng: number
+  zone: {
+    tier: WizardSummary['zoneTier']
+    label: string
+    area: string
+  }
 }
 
 const modeCards: Array<{ mode: WizardSummary['mode']; title: string; description: string }> = [
@@ -45,7 +50,7 @@ const fallbackZones: Array<{ value: WizardSummary['zoneTier']; label: string }> 
   { value: 'REVIEW', label: 'Fuera de cobertura / revisión manual' },
 ]
 
-const CABA_GBA_BOUNDS = '-34.96,-58.92,-34.36,-58.12'
+type GeoStatus = 'idle' | 'searching' | 'success' | 'error'
 
 export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialMode = 'EXPRESS' }: Props) {
   const defaultServiceByMode = {
@@ -76,10 +81,12 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
   const [contacto, setContacto] = useState({ nombre: '', email: '' })
   const [suggestions, setSuggestions] = useState<GeoSuggestion[]>([])
   const [isGeoLoading, setIsGeoLoading] = useState(false)
+  const [geoStatus, setGeoStatus] = useState<GeoStatus>('idle')
   const [geoError, setGeoError] = useState<string | null>(null)
   const [showManualZone, setShowManualZone] = useState(false)
   const [pdfUrl, setPdfUrl] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const selectedPack = useMemo(
     () => packs.find((pack) => pack.id === summary.packId) ?? packs[0] ?? null,
@@ -127,45 +134,60 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
   const fetchAddressSuggestions = async (query: string) => {
     if (query.trim().length < 5) {
       setSuggestions([])
+      setGeoStatus('idle')
+      setGeoError(null)
+      setShowManualZone(false)
       return
     }
 
     setIsGeoLoading(true)
+    setGeoStatus('searching')
     setGeoError(null)
+    setShowManualZone(false)
 
     try {
-      const url = `https://nominatim.openstreetmap.org/search?format=json&limit=5&countrycodes=ar&bounded=1&viewbox=${CABA_GBA_BOUNDS}&q=${encodeURIComponent(query)}`
-      const response = await fetch(url, {
-        headers: { Accept: 'application/json' },
-      })
-      if (!response.ok) throw new Error('No pudimos buscar esa dirección ahora.')
-      const data = (await response.json()) as GeoSuggestion[]
-      setSuggestions(data)
+      const response = await fetch(`/api/geocode?q=${encodeURIComponent(query)}`, { cache: 'no-store' })
+      const payload = (await response.json()) as { candidates?: GeoSuggestion[]; error?: string }
+      if (!response.ok) throw new Error(payload.error || 'No pudimos buscar esa dirección ahora.')
+
+      const candidates = payload.candidates ?? []
+      setSuggestions(candidates)
+      if (candidates.length === 0) {
+        setGeoStatus('error')
+        setGeoError('No encontramos coincidencias para esa dirección. Revisá calle, altura y localidad.')
+        setShowManualZone(true)
+      }
     } catch (error) {
       console.error(error)
-      setGeoError('No pudimos ubicar la dirección automáticamente. Podés usar el fallback manual.')
+      setGeoStatus('error')
+      setGeoError('No pudimos ubicar la dirección automáticamente. Podés seleccionar una zona manualmente.')
       setSuggestions([])
+      setShowManualZone(true)
     } finally {
       setIsGeoLoading(false)
     }
   }
 
   const applySuggestion = (item: GeoSuggestion) => {
-    const lat = Number(item.lat)
-    const lng = Number(item.lon)
-    const zone = resolveZoneByCoordinates(lat, lng)
-
     setSummary((prev) => ({
       ...prev,
-      address: item.display_name,
-      zoneTier: zone.tier,
-      zoneLabel: zone.label,
-      zoneLat: lat,
-      zoneLng: lng,
+      address: item.displayName,
+      zoneTier: item.zone.tier,
+      zoneLabel: item.zone.label,
+      zoneLat: item.lat,
+      zoneLng: item.lng,
     }))
     setSuggestions([])
     setGeoError(null)
+    setGeoStatus('success')
+    setShowManualZone(false)
   }
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+    }
+  }, [])
 
   const submitQuote = () => {
     startTransition(async () => {
@@ -255,28 +277,48 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
                 onChange={(event) => {
                   const value = event.target.value
                   setSummary((prev) => ({ ...prev, address: value }))
-                  void fetchAddressSuggestions(value)
+                  setGeoStatus(value.trim().length >= 5 ? 'searching' : 'idle')
+                  setSuggestions([])
+
+                  if (debounceRef.current) clearTimeout(debounceRef.current)
+                  debounceRef.current = setTimeout(() => {
+                    void fetchAddressSuggestions(value)
+                  }, 700)
                 }}
               />
-              {isGeoLoading && <p className="text-xs text-slate-500">Buscando dirección...</p>}
+              <div className="flex flex-wrap items-center gap-2">
+                <Button type="button" variant="secondary" size="sm" onClick={() => void fetchAddressSuggestions(summary.address)}>
+                  Detectar zona
+                </Button>
+                {isGeoLoading && <p className="text-xs text-slate-500">Buscando dirección...</p>}
+              </div>
               {geoError && <p className="text-xs text-amber-600">{geoError}</p>}
               {suggestions.length > 0 && (
                 <div className="rounded-lg border border-border bg-white">
                   {suggestions.map((item) => (
                     <button
-                      key={`${item.lat}-${item.lon}`}
+                      key={`${item.lat}-${item.lng}`}
                       type="button"
                       onClick={() => applySuggestion(item)}
                       className="block w-full border-b border-border px-3 py-2 text-left text-sm last:border-b-0 hover:bg-muted/30"
                     >
-                      {item.display_name}
+                      <span className="block">{item.displayName}</span>
+                      <span className="text-xs text-slate-500">{item.zone.label}</span>
                     </button>
                   ))}
                 </div>
               )}
 
               <div className="rounded-lg bg-muted/40 p-3 text-sm">
-                Zona detectada: <strong>{summary.zoneLabel ?? getZoneTierLabel(summary.zoneTier)}</strong>
+                <p className="text-xs text-slate-500">
+                  {geoStatus === 'idle' && 'Ingresá una dirección y presioná “Detectar zona”.'}
+                  {geoStatus === 'searching' && 'Buscando coincidencias de dirección...'}
+                  {geoStatus === 'error' && 'No se pudo resolver automáticamente.'}
+                  {geoStatus === 'success' && 'Dirección validada y zona detectada automáticamente.'}
+                </p>
+                <span className={`mt-2 inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${getZoneBadgeClasses(summary.zoneTier)}`}>
+                  {summary.zoneLabel ?? getZoneTierLabel(summary.zoneTier)}
+                </span>
               </div>
 
               <iframe
@@ -286,16 +328,18 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
                 loading="lazy"
               />
 
-              <div className="text-xs text-slate-600">
-                Si no pudimos detectar la zona, usá la selección manual.
-                <button
-                  type="button"
-                  className="ml-1 font-semibold text-accent"
-                  onClick={() => setShowManualZone((prev) => !prev)}
-                >
-                  {showManualZone ? 'Ocultar fallback' : 'Mostrar fallback'}
-                </button>
-              </div>
+              {geoStatus === 'error' && (
+                <div className="text-xs text-slate-600">
+                  Si la dirección no aparece, podés usar fallback manual.
+                  <button
+                    type="button"
+                    className="ml-1 font-semibold text-accent"
+                    onClick={() => setShowManualZone((prev) => !prev)}
+                  >
+                    {showManualZone ? 'Ocultar fallback' : 'Mostrar fallback'}
+                  </button>
+                </div>
+              )}
 
               {showManualZone && (
                 <select
