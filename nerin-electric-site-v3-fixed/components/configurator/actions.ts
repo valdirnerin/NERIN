@@ -9,15 +9,20 @@ import { calculateTotals } from './calculations'
 import { professionalCatalog, quoteServices } from './catalog'
 
 const QuoteSchema = z.object({
-  mode: z.enum(['EXPRESS', 'ASSISTED', 'PROFESSIONAL']),
+  mode: z.enum(['EXPRESS', 'PROJECT']),
   serviceId: z.string(),
   serviceUnits: z.number().min(1).max(20),
-  zoneTier: z.enum(['PRIORITY', 'SECONDARY', 'REVIEW']),
+  zoneTier: z.enum(['PRIORITY', 'STANDARD', 'EXTENDED', 'REVIEW']),
+  address: z.string().default(''),
+  zoneLabel: z.string().optional(),
+  zoneLat: z.number().optional(),
+  zoneLng: z.number().optional(),
   urgencyMultiplier: z.number().min(1).max(2),
   difficultyMultiplier: z.number().min(1).max(2),
   packId: z.string(),
   ambientes: z.number().min(0).max(40),
   bocasExtra: z.number().min(0).max(500),
+  hasPlan: z.boolean(),
   adicionales: z.array(z.object({ id: z.string(), cantidad: z.number().min(1).max(300) })),
   professionalItems: z.array(z.object({ id: z.string(), cantidad: z.number().min(1).max(500) })),
   comentarios: z.string().optional(),
@@ -71,7 +76,7 @@ export async function createConfiguratorQuote(data: z.infer<typeof QuoteSchema>)
       proyectoElectricoAparte: new Prisma.Decimal(500000),
       configuratorQuoteItems: {
         create: totals.adicionales.map((item) => ({
-          additionalItemId: payload.mode === 'PROFESSIONAL' ? null : item.id,
+          additionalItemId: payload.mode === 'PROJECT' && payload.hasPlan ? null : item.id,
           descripcion: item.nombre,
           cantidad: item.cantidad,
           precioUnitario: new Prisma.Decimal(item.precioUnitario),

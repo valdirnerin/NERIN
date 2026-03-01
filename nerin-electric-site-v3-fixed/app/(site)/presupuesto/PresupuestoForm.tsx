@@ -17,13 +17,12 @@ const clientTypes = [
 ] as const
 
 const workTypes = [
-  { value: 'mantenimiento', label: 'Mantenimiento' },
-  { value: 'obra-nueva', label: 'Obra nueva' },
-  { value: 'reforma', label: 'Reforma eléctrica' },
-  { value: 'adecuacion', label: 'Adecuación' },
-  { value: 'tablero', label: 'Tablero' },
-  { value: 'puesta-a-tierra', label: 'Puesta a tierra' },
-  { value: 'otro', label: 'Otro' },
+  { value: 'reforma-parcial', label: 'Reforma eléctrica parcial' },
+  { value: 'instalacion-local-oficina', label: 'Instalación para local u oficina' },
+  { value: 'instalacion-vivienda', label: 'Instalación integral de vivienda' },
+  { value: 'obra-comercial', label: 'Obra comercial' },
+  { value: 'mantenimiento-programado', label: 'Mantenimiento técnico programado' },
+  { value: 'otros-relevamiento', label: 'Otros trabajos con relevamiento' },
 ] as const
 
 const urgencies = [
@@ -47,6 +46,7 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
   const [leadName, setLeadName] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+  const [hasPlan, setHasPlan] = useState(false)
 
   const defaultClientType = useMemo(() => {
     if (leadType === 'consorcio') return 'consorcio'
@@ -55,9 +55,9 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
   }, [leadType])
 
   const defaultWorkType = useMemo(() => {
-    if (leadType === 'mantenimiento') return 'mantenimiento'
-    if (leadType === 'obra') return 'obra-nueva'
-    return 'reforma'
+    if (leadType === 'mantenimiento') return 'mantenimiento-programado'
+    if (leadType === 'obra') return 'reforma-parcial'
+    return 'reforma-parcial'
   }, [leadType])
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -91,6 +91,7 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
     formData.set('plan', plan || '')
     formData.set('reason', leadType || plan || '')
     formData.set('hasFiles', String(selectedFiles.length > 0))
+    formData.set('hasPlan', String(hasPlan))
     formData.set('utmSource', attribution.utmSource || '')
     formData.set('utmMedium', attribution.utmMedium || '')
     formData.set('utmCampaign', attribution.utmCampaign || '')
@@ -191,11 +192,11 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
           </select>
         </div>
         <div>
-          <Label htmlFor="ubicacion">Ubicación (barrio) *</Label>
+          <Label htmlFor="ubicacion">Zona aproximada (barrio/localidad) *</Label>
           <Input id="ubicacion" name="ubicacion" required placeholder="Ej: Palermo" />
         </div>
         <div>
-          <Label htmlFor="direccion">Dirección (opcional)</Label>
+          <Label htmlFor="direccion">Dirección del trabajo (opcional)</Label>
           <Input id="direccion" name="direccion" placeholder="Calle y número" />
         </div>
       </div>
@@ -242,8 +243,17 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
           placeholder="Ej: mantenimiento preventivo de tableros + puesta a tierra, visitas mensuales."
         />
       </div>
+      <label className="flex items-start gap-3 rounded-xl border border-border p-3 text-sm text-slate-700">
+        <input
+          type="checkbox"
+          checked={hasPlan}
+          onChange={(event) => setHasPlan(event.target.checked)}
+          className="mt-1"
+        />
+        <span><strong>Tengo plano o cantidades.</strong> Si lo activás, adjuntá plano o listado para agilizar la cotización.</span>
+      </label>
       <div>
-        <Label htmlFor="adjuntos">Adjuntar fotos o plano (opcional)</Label>
+        <Label htmlFor="adjuntos">Adjuntar fotos, plano o listado (opcional)</Label>
         <Input id="adjuntos" name="adjuntos" type="file" multiple accept="image/*,.pdf" onChange={handleFileChange} />
         <p className="mt-2 text-xs text-slate-500">Formatos permitidos: imágenes o PDF. Máximo recomendado: 10 MB por archivo.</p>
         {selectedFiles.length > 0 && (

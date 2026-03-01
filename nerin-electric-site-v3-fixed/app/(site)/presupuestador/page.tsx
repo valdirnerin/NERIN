@@ -10,7 +10,7 @@ export const revalidate = 60
 export async function generateMetadata() {
   const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
   const title = 'Cotización | NERIN'
-  const description = 'Elegí servicio puntual, relevamiento o cotización técnica.'
+  const description = 'Elegí entre servicio puntual o obra / reforma / instalación.'
 
   return {
     title,
@@ -36,25 +36,20 @@ export async function generateMetadata() {
 const doors = [
   {
     title: 'Servicio puntual',
-    description: 'Para resolver un trabajo concreto.',
+    description: 'Para resolver un trabajo concreto y directo.',
     href: '/presupuestador?mode=EXPRESS',
   },
   {
-    title: 'Relevamiento',
-    description: 'Para obras o trabajos más grandes.',
-    href: '/presupuesto?tipo=obra',
-  },
-  {
-    title: 'Cotización técnica',
-    description: 'Para cotizar por plano o cantidades.',
-    href: '/presupuestador?mode=PROFESSIONAL',
+    title: 'Obra / reforma / instalación',
+    description: 'Para trabajos grandes y variantes con plano o cantidades.',
+    href: '/presupuestador?mode=PROJECT',
   },
 ]
 
 export default async function PresupuestadorPage({
   searchParams,
 }: {
-  searchParams: { pack?: string; mode?: 'EXPRESS' | 'ASSISTED' | 'PROFESSIONAL' }
+  searchParams: { pack?: string; mode?: 'EXPRESS' | 'PROJECT' }
 }) {
   const { packs, adicionales } = await getConfiguratorData()
   const defaultPack = searchParams.pack ? packs.find((pack) => pack.slug === searchParams.pack)?.id : undefined
@@ -83,11 +78,11 @@ export default async function PresupuestadorPage({
     <div className="space-y-8 sm:space-y-10">
       <header className="space-y-4">
         <Badge>Cotización</Badge>
-        <h1>Elegí cómo querés cotizar</h1>
-        <p className="max-w-3xl text-lg text-slate-600">Elegí una opción y seguí el paso a paso.</p>
+        <h1>Elegí cómo querés avanzar</h1>
+        <p className="max-w-3xl text-lg text-slate-600">Dos caminos claros para cotizar sin confusión.</p>
       </header>
 
-      <section className="grid gap-4 md:grid-cols-3">
+      <section className="grid gap-4 md:grid-cols-2">
         {doors.map((door) => (
           <article key={door.title} className="rounded-2xl border border-border bg-white p-5">
             <h2 className="text-base font-semibold">{door.title}</h2>

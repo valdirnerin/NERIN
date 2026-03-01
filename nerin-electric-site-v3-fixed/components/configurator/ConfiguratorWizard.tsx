@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition } from 'react'
 import { calculateTotals } from './calculations'
 import { professionalCatalog, quoteServices } from './catalog'
 import { WizardAdditional, WizardPack, WizardSummary } from './types'
+import { getZoneTierLabel, resolveZoneByCoordinates } from './location'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -18,29 +19,38 @@ interface Props {
   initialMode?: WizardSummary['mode']
 }
 
+type GeoSuggestion = {
+  display_name: string
+  lat: string
+  lon: string
+}
+
 const modeCards: Array<{ mode: WizardSummary['mode']; title: string; description: string }> = [
   {
     mode: 'EXPRESS',
-    title: '1) Servicio puntual',
-    description: 'Para resolver un trabajo puntual.',
+    title: 'Servicio puntual',
+    description: 'Para resolver un trabajo concreto y directo.',
   },
   {
-    mode: 'ASSISTED',
-    title: '2) Relevamiento / proyecto',
-    description: 'Para obras y reformas.',
-  },
-  {
-    mode: 'PROFESSIONAL',
-    title: '3) Cotización técnica',
-    description: 'Para cotizar por plano o cantidades.',
+    mode: 'PROJECT',
+    title: 'Obra / reforma / instalación',
+    description: 'Para trabajos de mayor alcance que requieren definición técnica.',
   },
 ]
+
+const fallbackZones: Array<{ value: WizardSummary['zoneTier']; label: string }> = [
+  { value: 'PRIORITY', label: 'Prioritaria' },
+  { value: 'STANDARD', label: 'Estándar' },
+  { value: 'EXTENDED', label: 'Extendida' },
+  { value: 'REVIEW', label: 'Fuera de cobertura / revisión manual' },
+]
+
+const CABA_GBA_BOUNDS = '-34.96,-58.92,-34.36,-58.12'
 
 export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialMode = 'EXPRESS' }: Props) {
   const defaultServiceByMode = {
     EXPRESS: quoteServices.find((service) => service.path === 'PUNTUAL')?.id ?? quoteServices[0]?.id ?? '',
-    ASSISTED: quoteServices.find((service) => service.path === 'OBRA')?.id ?? quoteServices[0]?.id ?? '',
-    PROFESSIONAL: quoteServices.find((service) => service.path === 'OBRA')?.id ?? quoteServices[0]?.id ?? '',
+    PROJECT: quoteServices.find((service) => service.path === 'OBRA')?.id ?? quoteServices[0]?.id ?? '',
   }
 
   const [summary, setSummary] = useState<WizardSummary>({
@@ -48,11 +58,14 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
     serviceId: defaultServiceByMode[initialMode],
     serviceUnits: 1,
     zoneTier: 'PRIORITY',
+    address: '',
+    zoneLabel: 'Ingresá la dirección para detectar la zona automáticamente.',
     urgencyMultiplier: 1,
     difficultyMultiplier: 1,
     packId: defaultPackId && packs.some((pack) => pack.id === defaultPackId) ? defaultPackId : packs[0]?.id ?? '',
     ambientes: 4,
     bocasExtra: 0,
+    hasPlan: false,
     adicionales: [],
     professionalItems: professionalCatalog
       .filter((item) => item.suggestedQty)
@@ -61,6 +74,10 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
   })
 
   const [contacto, setContacto] = useState({ nombre: '', email: '' })
+  const [suggestions, setSuggestions] = useState<GeoSuggestion[]>([])
+  const [isGeoLoading, setIsGeoLoading] = useState(false)
+  const [geoError, setGeoError] = useState<string | null>(null)
+  const [showManualZone, setShowManualZone] = useState(false)
   const [pdfUrl, setPdfUrl] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
@@ -94,6 +111,7 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
       mode,
       serviceId: defaultServiceByMode[mode],
       serviceUnits: 1,
+      hasPlan: mode === 'PROJECT' ? prev.hasPlan : false,
     }))
     setPdfUrl(null)
   }
@@ -104,6 +122,49 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
       if (cantidad <= 0) return { ...prev, [key]: filtered }
       return { ...prev, [key]: [...filtered, { id, cantidad }] }
     })
+  }
+
+  const fetchAddressSuggestions = async (query: string) => {
+    if (query.trim().length < 5) {
+      setSuggestions([])
+      return
+    }
+
+    setIsGeoLoading(true)
+    setGeoError(null)
+
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?format=json&limit=5&countrycodes=ar&bounded=1&viewbox=${CABA_GBA_BOUNDS}&q=${encodeURIComponent(query)}`
+      const response = await fetch(url, {
+        headers: { Accept: 'application/json' },
+      })
+      if (!response.ok) throw new Error('No pudimos buscar esa dirección ahora.')
+      const data = (await response.json()) as GeoSuggestion[]
+      setSuggestions(data)
+    } catch (error) {
+      console.error(error)
+      setGeoError('No pudimos ubicar la dirección automáticamente. Podés usar el fallback manual.')
+      setSuggestions([])
+    } finally {
+      setIsGeoLoading(false)
+    }
+  }
+
+  const applySuggestion = (item: GeoSuggestion) => {
+    const lat = Number(item.lat)
+    const lng = Number(item.lon)
+    const zone = resolveZoneByCoordinates(lat, lng)
+
+    setSummary((prev) => ({
+      ...prev,
+      address: item.display_name,
+      zoneTier: zone.tier,
+      zoneLabel: zone.label,
+      zoneLat: lat,
+      zoneLng: lng,
+    }))
+    setSuggestions([])
+    setGeoError(null)
   }
 
   const submitQuote = () => {
@@ -117,9 +178,13 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
     })
   }
 
+  const mapSrc = summary.zoneLat && summary.zoneLng
+    ? `https://www.openstreetmap.org/export/embed.html?bbox=${summary.zoneLng - 0.06},${summary.zoneLat - 0.04},${summary.zoneLng + 0.06},${summary.zoneLat + 0.04}&layer=mapnik&marker=${summary.zoneLat},${summary.zoneLng}`
+    : 'https://www.openstreetmap.org/export/embed.html?bbox=-58.90,-34.96,-58.12,-34.36&layer=mapnik'
+
   return (
     <div className="space-y-6 sm:space-y-8">
-      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <section className="grid gap-3 sm:grid-cols-2">
         {modeCards.map((card) => (
           <button
             key={card.mode}
@@ -155,7 +220,7 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
               ))}
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2">
               <div>
                 <Label>Unidades</Label>
                 <Input
@@ -164,23 +229,6 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
                   value={summary.serviceUnits}
                   onChange={(event) => setSummary((prev) => ({ ...prev, serviceUnits: Number(event.target.value) || 1 }))}
                 />
-              </div>
-              <div>
-                <Label>Zona</Label>
-                <select
-                  className="h-11 w-full rounded-xl border border-border bg-white px-4 text-sm"
-                  value={summary.zoneTier}
-                  onChange={(event) =>
-                    setSummary((prev) => ({
-                      ...prev,
-                      zoneTier: event.target.value as WizardSummary['zoneTier'],
-                    }))
-                  }
-                >
-                  <option value="PRIORITY">Prioritaria</option>
-                  <option value="STANDARD">Estándar</option>
-                  <option value="EXTENDED">Extendida</option>
-                </select>
               </div>
               <div>
                 <Label>Urgencia</Label>
@@ -198,7 +246,79 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
               </div>
             </div>
 
-            {summary.mode === 'ASSISTED' && (
+            <div className="space-y-3 rounded-xl border border-border p-4">
+              <Label htmlFor="address">Dirección del trabajo</Label>
+              <Input
+                id="address"
+                value={summary.address}
+                placeholder="Ej: Av. Cabildo 2450, CABA"
+                onChange={(event) => {
+                  const value = event.target.value
+                  setSummary((prev) => ({ ...prev, address: value }))
+                  void fetchAddressSuggestions(value)
+                }}
+              />
+              {isGeoLoading && <p className="text-xs text-slate-500">Buscando dirección...</p>}
+              {geoError && <p className="text-xs text-amber-600">{geoError}</p>}
+              {suggestions.length > 0 && (
+                <div className="rounded-lg border border-border bg-white">
+                  {suggestions.map((item) => (
+                    <button
+                      key={`${item.lat}-${item.lon}`}
+                      type="button"
+                      onClick={() => applySuggestion(item)}
+                      className="block w-full border-b border-border px-3 py-2 text-left text-sm last:border-b-0 hover:bg-muted/30"
+                    >
+                      {item.display_name}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <div className="rounded-lg bg-muted/40 p-3 text-sm">
+                Zona detectada: <strong>{summary.zoneLabel ?? getZoneTierLabel(summary.zoneTier)}</strong>
+              </div>
+
+              <iframe
+                title="Mapa de cobertura CABA y GBA"
+                src={mapSrc}
+                className="h-52 w-full rounded-xl border border-border"
+                loading="lazy"
+              />
+
+              <div className="text-xs text-slate-600">
+                Si no pudimos detectar la zona, usá la selección manual.
+                <button
+                  type="button"
+                  className="ml-1 font-semibold text-accent"
+                  onClick={() => setShowManualZone((prev) => !prev)}
+                >
+                  {showManualZone ? 'Ocultar fallback' : 'Mostrar fallback'}
+                </button>
+              </div>
+
+              {showManualZone && (
+                <select
+                  className="h-11 w-full rounded-xl border border-border bg-white px-4 text-sm"
+                  value={summary.zoneTier}
+                  onChange={(event) =>
+                    setSummary((prev) => ({
+                      ...prev,
+                      zoneTier: event.target.value as WizardSummary['zoneTier'],
+                      zoneLabel: getZoneTierLabel(event.target.value as WizardSummary['zoneTier']),
+                    }))
+                  }
+                >
+                  {fallbackZones.map((zone) => (
+                    <option key={zone.value} value={zone.value}>
+                      {zone.label}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            {summary.mode === 'PROJECT' && (
               <>
                 <div className="grid gap-4 md:grid-cols-3">
                   <div>
@@ -234,36 +354,54 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
                     </select>
                   </div>
                 </div>
-                <div className="grid gap-3 lg:grid-cols-2">
-                  {adicionales.slice(0, 6).map((item) => (
-                    <div key={item.id} className="grid grid-cols-[1fr_90px] gap-3 rounded-xl border border-border/70 p-3 items-center">
-                      <span className="text-sm text-slate-600">{item.nombre}</span>
-                      <Input
-                        type="number"
-                        min={0}
-                        value={summary.adicionales.find((it) => it.id === item.id)?.cantidad ?? 0}
-                        onChange={(event) => updateItems(item.id, Number(event.target.value) || 0, 'adicionales')}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
 
-            {summary.mode === 'PROFESSIONAL' && (
-              <div className="grid gap-3 lg:grid-cols-2">
-                {professionalCatalog.map((item) => (
-                  <div key={item.id} className="grid grid-cols-[1fr_90px] gap-3 rounded-xl border border-border/70 p-3 items-center">
-                    <span className="text-sm text-slate-600">{item.name}</span>
-                    <Input
-                      type="number"
-                      min={0}
-                      value={summary.professionalItems.find((it) => it.id === item.id)?.cantidad ?? 0}
-                      onChange={(event) => updateItems(item.id, Number(event.target.value) || 0, 'professionalItems')}
-                    />
+                <label className="flex items-start gap-3 rounded-xl border border-border p-3 text-sm text-slate-700">
+                  <input
+                    type="checkbox"
+                    checked={summary.hasPlan}
+                    onChange={(event) => setSummary((prev) => ({ ...prev, hasPlan: event.target.checked }))}
+                    className="mt-1"
+                  />
+                  <span>
+                    <strong>Tengo plano o cantidades.</strong> Activá esta opción para cargar una variante técnica más detallada.
+                  </span>
+                </label>
+
+                {!summary.hasPlan && (
+                  <div className="grid gap-3 lg:grid-cols-2">
+                    {adicionales.slice(0, 8).map((item) => (
+                      <div key={item.id} className="grid grid-cols-[1fr_90px] items-center gap-3 rounded-xl border border-border/70 p-3">
+                        <span className="text-sm text-slate-600">{item.nombre}</span>
+                        <Input
+                          type="number"
+                          min={0}
+                          value={summary.adicionales.find((it) => it.id === item.id)?.cantidad ?? 0}
+                          onChange={(event) => updateItems(item.id, Number(event.target.value) || 0, 'adicionales')}
+                        />
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                )}
+
+                {summary.hasPlan && (
+                  <div className="space-y-3">
+                    <p className="text-sm text-slate-600">Cargá cantidades estimadas para preparar la cotización técnica preliminar.</p>
+                    <div className="grid gap-3 lg:grid-cols-2">
+                      {professionalCatalog.map((item) => (
+                        <div key={item.id} className="grid grid-cols-[1fr_90px] items-center gap-3 rounded-xl border border-border/70 p-3">
+                          <span className="text-sm text-slate-600">{item.name}</span>
+                          <Input
+                            type="number"
+                            min={0}
+                            value={summary.professionalItems.find((it) => it.id === item.id)?.cantidad ?? 0}
+                            onChange={(event) => updateItems(item.id, Number(event.target.value) || 0, 'professionalItems')}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
             )}
 
             <div>
@@ -271,7 +409,7 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
               <Textarea
                 value={summary.comentarios}
                 onChange={(event) => setSummary((prev) => ({ ...prev, comentarios: event.target.value }))}
-                placeholder="Escribí un detalle breve del trabajo."
+                placeholder="Contanos brevemente qué necesitás resolver."
               />
             </div>
           </CardContent>
@@ -286,7 +424,10 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
               Servicio: <b>{selectedService?.name}</b>
             </p>
             <p>
-              Modalidad: <b>{totals.requiresSurvey ? 'Con relevamiento' : 'Directa'}</b>
+              Modalidad: <b>{totals.requiresSurvey ? 'Con definición técnica previa' : 'Resolución directa'}</b>
+            </p>
+            <p>
+              Cobertura: <b>{getZoneTierLabel(summary.zoneTier)}</b>
             </p>
             <p className="text-lg font-semibold">Total estimado: ${totals.totalManoObra.toLocaleString('es-AR')}</p>
             {totals.warning && <p className="text-amber-600">{totals.warning}</p>}
