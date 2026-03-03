@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import Image from 'next/image'
 import Link from 'next/link'
+import type { Route } from 'next'
 import { getMarketingHomeData } from '@/lib/marketing-data'
 import { getSiteContent, getWhatsappHref } from '@/lib/site-content'
 import { Button } from '@/components/ui/button'
@@ -57,8 +58,27 @@ const urgencyItems = [
   { label: 'Canal más rápido', value: 'WhatsApp' },
 ]
 
-const salesOffers = [
+type SalesOfferBase = {
+  title: string
+  oldPrice: string
+  newPrice: string
+  note: string
+  cta: string
+}
+
+type SalesOffer =
+  | (SalesOfferBase & {
+      kind: 'route'
+      href: Route
+    })
+  | (SalesOfferBase & {
+      kind: 'anchor'
+      href: `#${string}`
+    })
+
+const salesOffers: SalesOffer[] = [
   {
+    kind: 'route',
     title: 'Servicio puntual express',
     oldPrice: '$58.000',
     newPrice: '$49.000',
@@ -67,6 +87,7 @@ const salesOffers = [
     cta: 'Reservar express',
   },
   {
+    kind: 'route',
     title: 'Obra / reforma',
     oldPrice: '$220.000',
     newPrice: '$189.000',
@@ -75,6 +96,7 @@ const salesOffers = [
     cta: 'Pedir presupuesto',
   },
   {
+    kind: 'anchor',
     title: 'Urgencias por WhatsApp',
     oldPrice: '2 hs',
     newPrice: 'Hoy',
@@ -231,7 +253,11 @@ export default async function HomePage() {
               </div>
               <p className="mt-2 text-sm text-slate-600">{offer.note}</p>
               <Button asChild className="mt-4 w-full bg-red-600 hover:bg-red-700">
-                <Link href={offer.href}>{offer.cta}</Link>
+                {offer.kind === 'route' ? (
+                  <Link href={offer.href}>{offer.cta}</Link>
+                ) : (
+                  <a href={offer.href}>{offer.cta}</a>
+                )}
               </Button>
             </article>
           ))}
