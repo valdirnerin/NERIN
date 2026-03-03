@@ -57,6 +57,48 @@ const urgencyItems = [
   { label: 'Canal más rápido', value: 'WhatsApp' },
 ]
 
+const salesOffers = [
+  {
+    title: 'Servicio puntual express',
+    oldPrice: '$58.000',
+    newPrice: '$49.000',
+    note: 'Diagnóstico + solución en visita técnica',
+    href: '/presupuestador?mode=EXPRESS',
+    cta: 'Reservar express',
+  },
+  {
+    title: 'Obra / reforma',
+    oldPrice: '$220.000',
+    newPrice: '$189.000',
+    note: 'Presupuesto técnico + plan de ejecución',
+    href: '/presupuestador?mode=PROJECT',
+    cta: 'Pedir presupuesto',
+  },
+  {
+    title: 'Urgencias por WhatsApp',
+    oldPrice: '2 hs',
+    newPrice: 'Hoy',
+    note: 'Canal prioritario para respuesta inmediata',
+    href: '#whatsapp-directo',
+    cta: 'Escribir ahora',
+  },
+]
+
+const quickAnswers = [
+  {
+    q: '¿En cuánto responden?',
+    a: 'Por WhatsApp respondemos rápido y coordinamos disponibilidad del día.',
+  },
+  {
+    q: '¿Pasan precio antes?',
+    a: 'Sí. Podés revisar lista de precios y pedir presupuesto en el momento.',
+  },
+  {
+    q: '¿Atienden CABA y GBA?',
+    a: 'Sí, trabajamos toda esa zona y coordinamos por tipo de trabajo.',
+  },
+]
+
 export default async function HomePage() {
   const { caseStudies } = await getMarketingHomeData()
   const site = await getSiteContent()
@@ -129,6 +171,7 @@ export default async function HomePage() {
               className="h-12 bg-[#25D366] text-base font-bold text-black hover:bg-[#1ebe5a]"
             >
               <a
+                id="whatsapp-directo"
                 href={whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -163,6 +206,36 @@ export default async function HomePage() {
             <p className="mt-2 text-2xl font-bold text-[#22d3ee]">{item.value}</p>
           </article>
         ))}
+      </section>
+
+      <section className="space-y-5 rounded-2xl border border-red-200 bg-white p-5 sm:p-6">
+        <div className="space-y-1">
+          <p className="text-xs font-semibold uppercase tracking-[0.34em] text-red-700">
+            Ofertas del día
+          </p>
+          <h2 className="text-2xl font-semibold text-slate-900">Elegí y cerrá hoy</h2>
+        </div>
+        <div className="grid gap-3 lg:grid-cols-3">
+          {salesOffers.map((offer) => (
+            <article
+              key={offer.title}
+              className="rounded-xl border border-border bg-gradient-to-b from-white to-red-50/40 p-4 shadow-sm"
+            >
+              <h3 className="text-lg font-semibold text-slate-900">{offer.title}</h3>
+              <p className="mt-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                Desde
+              </p>
+              <div className="mt-1 flex items-end gap-2">
+                <span className="text-sm text-slate-400 line-through">{offer.oldPrice}</span>
+                <span className="text-2xl font-bold text-red-600">{offer.newPrice}</span>
+              </div>
+              <p className="mt-2 text-sm text-slate-600">{offer.note}</p>
+              <Button asChild className="mt-4 w-full bg-red-600 hover:bg-red-700">
+                <Link href={offer.href}>{offer.cta}</Link>
+              </Button>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="rounded-2xl border border-cyan-200 bg-gradient-to-r from-cyan-50 to-sky-50 p-5 sm:p-6">
@@ -231,6 +304,18 @@ export default async function HomePage() {
                 <h3 className="text-lg font-semibold text-slate-900">{cs.titulo}</h3>
                 <p className="text-sm text-muted-foreground">{cs.resumen}</p>
               </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="space-y-4 rounded-2xl border border-border bg-white p-5 sm:p-6">
+        <h2 className="text-2xl font-semibold">Respuestas rápidas antes de contratar</h2>
+        <div className="grid gap-3 md:grid-cols-3">
+          {quickAnswers.map((item) => (
+            <article key={item.q} className="rounded-xl border border-border bg-muted/20 p-4">
+              <h3 className="text-base font-semibold text-slate-900">{item.q}</h3>
+              <p className="mt-1 text-sm text-muted-foreground">{item.a}</p>
             </article>
           ))}
         </div>
