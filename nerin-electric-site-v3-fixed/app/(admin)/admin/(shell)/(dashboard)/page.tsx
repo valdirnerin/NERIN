@@ -25,6 +25,29 @@ const AdminPacks = dynamicImport(() => import('./AdminPacks'), { ssr: false })
 
 export const revalidate = 0
 
+const moduleCards = [
+  {
+    title: 'Contenido del sitio',
+    description: 'Home, textos clave, contacto y estructura comercial.',
+    href: '#contenido',
+  },
+  {
+    title: 'Servicios y proyectos',
+    description: 'Actualizá catálogo, casos y material visual.',
+    href: '#servicios',
+  },
+  {
+    title: 'Precios y packs',
+    description: 'Mantené oferta comercial, adicionales y mantenimiento.',
+    href: '#precios',
+  },
+  {
+    title: 'Operaciones',
+    description: 'Consultas, proyectos, certificados y clientes.',
+    href: '#operaciones',
+  },
+]
+
 export default async function AdminPage() {
   if (!DB_ENABLED) {
     return (
@@ -46,99 +69,129 @@ export default async function AdminPage() {
   ])
 
   return (
-    <div className="space-y-12">
-      <header className="space-y-2">
-        <Badge>Panel administrativo</Badge>
-        <h1>Control total de contenido y operaciones</h1>
-        <p className="text-sm text-slate-600">
-          Diseñá la experiencia del sitio, gestioná marcas, blog, packs, planes de mantenimiento y certificados desde un solo
-          lugar. Cada cambio impacta en el sitio público, clientes y SEO.
-        </p>
-        <div className="flex flex-wrap gap-3 pt-2">
-          <Button variant="outline" asChild>
-            <Link href="/admin/noticias">Gestionar noticias</Link>
-          </Button>
-          <Button variant="outline" asChild>
-            <Link href="/admin/packs">Gestionar packs comerciales</Link>
-          </Button>
-          <Button variant="outline" asChild>
-            <Link href="/admin/ops">Admin operativo</Link>
-          </Button>
-          <Button variant="outline" asChild>
-            <Link href="/admin/operativo">Admin operativo (CAC/IVA)</Link>
-          </Button>
+    <div className="space-y-10">
+      <header className="rounded-3xl border border-border bg-white p-5 sm:p-7">
+        <div className="space-y-3">
+          <Badge>Centro admin NERIN</Badge>
+          <h1 className="text-2xl font-semibold text-slate-900 sm:text-3xl">
+            Admin reestructurado por módulos
+          </h1>
+          <p className="max-w-3xl text-sm text-slate-600 sm:text-base">
+            Todo está organizado para usarlo fácil: elegí un módulo, hacé el cambio y seguí al próximo.
+          </p>
+        </div>
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {moduleCards.map((item) => (
+            <a
+              key={item.title}
+              href={item.href}
+              className="rounded-2xl border border-border bg-slate-50 p-4 text-left transition hover:border-slate-300 hover:bg-white"
+            >
+              <p className="text-sm font-semibold text-slate-900">{item.title}</p>
+              <p className="mt-1 text-xs text-slate-600">{item.description}</p>
+            </a>
+          ))}
         </div>
       </header>
 
-      <SiteExperienceDesigner initialData={site} />
-
-      <section className="grid gap-6 lg:grid-cols-2">
-        <BrandManager initialBrands={brands} />
-        <BlogManager />
+      <section className="grid gap-4 md:grid-cols-4">
+        <StatCard label="Packs" value={packs.length} />
+        <StatCard label="Adicionales" value={adicionales.length} />
+        <StatCard label="Planes" value={plans.length} />
+        <StatCard label="Proyectos" value={projects.length} />
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-2">
-        <ServicesManager />
-        <ProjectsManager />
+      <section id="contenido" className="space-y-4">
+        <h2 className="text-lg font-semibold text-foreground">Módulo 1 · Contenido del sitio</h2>
+        <SiteExperienceDesigner initialData={site} />
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Nuevo adicional</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form action={createAdditional} className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="adicional-nombre">Nombre</Label>
-                <Input id="adicional-nombre" name="nombre" required />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="adicional-descripcion">Descripción</Label>
-                <Textarea id="adicional-descripcion" name="descripcion" required />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="adicional-unidad">Unidad</Label>
-                  <Input id="adicional-unidad" name="unidad" required />
+      <section id="servicios" className="space-y-4">
+        <h2 className="text-lg font-semibold text-foreground">Módulo 2 · Servicios, marcas y proyectos</h2>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <ServicesManager />
+          <ProjectsManager />
+          <BrandManager initialBrands={brands} />
+          <BlogManager />
+        </div>
+      </section>
+
+      <section id="precios" className="space-y-4">
+        <h2 className="text-lg font-semibold text-foreground">Módulo 3 · Precios y oferta comercial</h2>
+
+        <section className="space-y-3">
+          <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-slate-500">Packs</h3>
+          <AdminPacks />
+        </section>
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <CardTitle>Agregar adicional</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form action={createAdditional} className="grid gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="adicional-nombre">Nombre</Label>
+                  <Input id="adicional-nombre" name="nombre" required />
                 </div>
-                <div>
-                  <Label htmlFor="adicional-precio">Precio unitario mano de obra</Label>
-                  <Input id="adicional-precio" name="precioUnitarioManoObra" type="number" required />
+                <div className="grid gap-2">
+                  <Label htmlFor="adicional-descripcion">Descripción</Label>
+                  <Textarea id="adicional-descripcion" name="descripcion" required />
                 </div>
-              </div>
-              <Button type="submit">Agregar adicional</Button>
-            </form>
-          </CardContent>
-        </Card>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="adicional-unidad">Unidad</Label>
+                    <Input id="adicional-unidad" name="unidad" required />
+                  </div>
+                  <div>
+                    <Label htmlFor="adicional-precio">Precio mano de obra</Label>
+                    <Input id="adicional-precio" name="precioUnitarioManoObra" type="number" required />
+                  </div>
+                </div>
+                <Button type="submit">Guardar adicional</Button>
+              </form>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Nuevo plan de mantenimiento</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <MaintenanceForm />
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Plan de mantenimiento</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <MaintenanceForm />
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Nuevo caso de éxito</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <CaseStudyForm />
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Caso real / obra destacada</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CaseStudyForm />
+            </CardContent>
+          </Card>
+        </div>
       </section>
 
-      <section className="mt-10">
-        <AdminPacks />
-      </section>
+      <section id="operaciones" className="space-y-4">
+        <h2 className="text-lg font-semibold text-foreground">Módulo 4 · Operaciones y certificados</h2>
 
-      <section className="space-y-6">
+        <div className="flex flex-wrap gap-3">
+          <Button variant="outline" asChild>
+            <Link href="/admin/leads">Ver consultas nuevas</Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link href="/admin/ops">Ir al panel operativo</Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link href="/admin/ops/projects">Ver proyectos</Link>
+          </Button>
+        </div>
+
         <Card>
           <CardHeader>
-            <CardTitle>Certificados de avance</CardTitle>
+            <CardTitle>Crear certificado de avance</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <form action={createCertificate} className="grid gap-4">
@@ -173,26 +226,8 @@ export default async function AdminPage() {
               </label>
               <Button type="submit">Crear certificado</Button>
             </form>
-            <p className="text-xs text-slate-500">
-              Una vez creado, recordá generar el enlace de pago desde Mercado Pago y guardarlo en el certificado.
-            </p>
           </CardContent>
         </Card>
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-foreground">Resumen actual</h2>
-        <div className="grid gap-4 md:grid-cols-3">
-          <StatCard label="Packs publicados" value={packs.length} />
-          <StatCard label="Adicionales" value={adicionales.length} />
-          <StatCard label="Planes de mantenimiento" value={plans.length} />
-        </div>
-        <p className="text-sm text-slate-600">
-          Exportar datos →{' '}
-          <Link className="text-accent" href="/api/admin/export?resource=proyectos">
-            Descargar CSV de proyectos
-          </Link>
-        </p>
       </section>
     </div>
   )

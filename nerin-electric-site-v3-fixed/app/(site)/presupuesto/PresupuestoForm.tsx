@@ -150,7 +150,7 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
       <div className="space-y-5 rounded-3xl border border-border bg-white p-4 shadow-subtle sm:p-6 lg:p-8">
         <h2 className="text-2xl font-semibold text-foreground">¡Solicitud enviada!</h2>
         <p className="text-sm text-slate-600">
-          Recibimos tu pedido. Tu ID de solicitud es <strong>{leadId}</strong>. Te respondemos en 24–48 h.
+          Recibimos tu pedido. Tu ID de solicitud es <strong>{leadId}</strong>. Te respondemos para coordinar. En proyectos grandes, la cotización completa puede tomar 24–48 h.
         </p>
         <Button asChild size="lg">
           <a href={whatsappHref} target="_blank" rel="noreferrer" data-track="whatsapp" data-content-name="WhatsApp presupuesto">
@@ -164,6 +164,9 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
   return (
     <form onSubmit={handleSubmit} className="space-y-5 rounded-3xl border border-border bg-white p-4 shadow-subtle sm:p-6 lg:p-8">
       <AttributionFields />
+      <div className="rounded-2xl border border-cyan-200 bg-cyan-50/60 p-3 text-sm text-cyan-900">
+        Completá lo básico y te contactamos para ordenar el trabajo. Si después querés, agregás más detalle.
+      </div>
       <div className="grid gap-4 md:grid-cols-2">
         <div>
           <Label htmlFor="nombre">Nombre y Apellido *</Label>
@@ -174,17 +177,16 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
           <Input id="telefono" name="telefono" required placeholder="11 5555-5555" />
         </div>
         <div>
-          <Label htmlFor="email">Email *</Label>
-          <Input id="email" name="email" type="email" required placeholder="correo@empresa.com" />
+          <Label htmlFor="email">Email (opcional)</Label>
+          <Input id="email" name="email" type="email" placeholder="correo@empresa.com" />
         </div>
         <div>
-          <Label htmlFor="cliente">Tipo de cliente *</Label>
+          <Label htmlFor="cliente">Tipo de cliente</Label>
           <select
             id="cliente"
             name="cliente"
             defaultValue={defaultClientType}
             className="min-h-11 w-full rounded-xl border border-border bg-white px-4 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
-            required
           >
             {clientTypes.map((option) => (
               <option key={option.value} value={option.value}>
@@ -220,7 +222,7 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
           </select>
         </div>
         <div>
-          <Label htmlFor="urgencia">Urgencia *</Label>
+          <Label htmlFor="urgencia">Prioridad</Label>
           <select
             id="urgencia"
             name="urgencia"
@@ -237,7 +239,7 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
         </div>
       </div>
       <div>
-        <Label htmlFor="detalle">Detalle del pedido *</Label>
+        <Label htmlFor="detalle">¿Qué necesitás resolver? *</Label>
         <Textarea
           id="detalle"
           name="detalle"
@@ -278,12 +280,12 @@ export function PresupuestoForm({ whatsappNumber, leadType, plan }: PresupuestoF
           required
           className="mt-1 h-5 w-5 rounded border-border text-accent focus-visible:ring-accent/40"
         />
-        Acepto contacto por WhatsApp/Email.
+        Acepto que me contacten para coordinar la solicitud.
       </label>
       {status === 'error' && <p className="text-sm text-red-600">{errorMessage}</p>}
-      {status === 'submitting' && <p className="text-sm text-slate-500">Enviando formulario y adjuntos, por favor esperá...</p>}
+      {status === 'submitting' && <p className="text-sm text-slate-500">Enviando solicitud...</p>}
       <Button type="submit" size="lg" disabled={status === 'submitting'} className="w-full sm:w-auto">
-        {status === 'submitting' ? 'Enviando...' : 'Enviar solicitud'}
+        {status === 'submitting' ? 'Enviando...' : 'Enviar solicitud y continuar por WhatsApp'}
       </Button>
     </form>
   )
