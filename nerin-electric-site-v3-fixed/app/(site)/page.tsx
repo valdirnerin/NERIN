@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import Image from 'next/image'
 import Link from 'next/link'
+import type { Route } from 'next'
 import { getMarketingHomeData } from '@/lib/marketing-data'
 import { getSiteContent, getWhatsappHref } from '@/lib/site-content'
 import { Button } from '@/components/ui/button'
@@ -81,7 +82,12 @@ const serviceCards = [
     href: '/presupuestador?mode=PROJECT',
     cta: 'Iniciar cotización',
   },
-]
+] as const satisfies ReadonlyArray<{
+  title: string
+  description: string
+  href: Route
+  cta: string
+}>
 
 const riskPoints = [
   'Solicitud simple y respuesta ordenada para que no quedes esperando sin saber.',
