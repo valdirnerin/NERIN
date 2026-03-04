@@ -12,7 +12,7 @@ export function AdminTopbar({ onToggleSidebar }: AdminTopbarProps) {
   const pathname = usePathname()
   const match = findAdminNavMatch(pathname)
   const sectionLabel = match?.sectionLabel ?? adminNav[0]?.label ?? 'Admin'
-  const title = match?.title ?? 'Panel administrativo'
+  const title = match?.title ?? 'Inicio admin'
 
   return (
     <div className="sticky top-0 z-20 border-b border-border bg-white/95 px-4 py-3 backdrop-blur sm:px-6 sm:py-4">
@@ -33,10 +33,19 @@ export function AdminTopbar({ onToggleSidebar }: AdminTopbarProps) {
             <h1 className="text-lg font-semibold text-foreground sm:text-xl">{title}</h1>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="hidden items-center gap-2 rounded-full border border-border bg-slate-50 px-3 py-2 text-xs text-slate-500 md:flex">
-            Buscar (próximamente)
-          </div>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/admin"
+            className="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+          >
+            Centro admin
+          </Link>
+          <Link
+            href="/admin/leads"
+            className="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+          >
+            Consultas
+          </Link>
           <Link
             href="/"
             className="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"

@@ -12,39 +12,32 @@ export type AdminNavSection = {
 
 export const adminNav: AdminNavSection[] = [
   {
-    label: 'Dashboard',
+    label: 'Centro de control',
     items: [
-      { title: 'Dashboard', href: '/admin' as Route },
-      { title: 'Leads', href: '/admin/leads' as Route },
+      { title: 'Inicio admin', href: '/admin' as Route },
+      { title: 'Consultas (leads)', href: '/admin/leads' as Route },
     ],
   },
   {
-    label: 'Operaciones (Ops)',
+    label: 'Gestión comercial',
     items: [
-      { title: 'Panel Ops', href: '/admin/ops' as Route },
-      { title: 'Proyectos', href: '/admin/ops/projects' as Route },
-      { title: 'Certificados', href: '/admin/ops/certificates' as Route },
-      { title: 'Adicionales', href: '/admin/ops/projects?tab=adicionales' as Route },
-      { title: 'Clientes', href: '/admin/ops/clients' as Route },
-    ],
-  },
-  {
-    label: 'Packs',
-    items: [{ title: 'Packs comerciales', href: '/admin/packs' as Route }],
-  },
-  {
-    label: 'Contenido',
-    items: [
-      { title: 'Textos del sitio', href: '/admin' as Route },
+      { title: 'Packs y precios', href: '/admin/packs' as Route },
       { title: 'Noticias', href: '/admin/noticias' as Route },
     ],
   },
   {
-    label: 'Ajustes',
+    label: 'Operaciones',
     items: [
-      { title: 'Config general', href: '/admin/ajustes' as Route },
-      { title: 'CAC/IVA operativo', href: '/admin/operativo' as Route },
+      { title: 'Panel operativo', href: '/admin/ops' as Route },
+      { title: 'Proyectos', href: '/admin/ops/projects' as Route },
+      { title: 'Certificados', href: '/admin/ops/certificates' as Route },
+      { title: 'Clientes', href: '/admin/ops/clients' as Route },
+      { title: 'CAC / IVA', href: '/admin/operativo' as Route },
     ],
+  },
+  {
+    label: 'Sistema',
+    items: [{ title: 'Ajustes generales', href: '/admin/ajustes' as Route }],
   },
 ]
 

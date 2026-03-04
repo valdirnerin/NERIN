@@ -34,12 +34,12 @@ const modeCards: Array<{ mode: WizardSummary['mode']; title: string; description
   {
     mode: 'EXPRESS',
     title: 'Servicio puntual',
-    description: 'Para resolver un trabajo concreto y directo.',
+    description: 'Para trabajos puntuales con una solicitud simple y resolución ordenada.',
   },
   {
     mode: 'PROJECT',
     title: 'Obra / reforma / instalación',
-    description: 'Para trabajos de mayor alcance que requieren definición técnica.',
+    description: 'Para obras y reformas con alcance definido, etapas y seguimiento.',
   },
 ]
 
@@ -225,7 +225,10 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
       <section className="grid gap-5 lg:grid-cols-[1.35fr_0.9fr] xl:gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Completá tu solicitud</CardTitle>
+            <CardTitle>Armá tu solicitud y recibí propuesta</CardTitle>
+            <p className="text-sm text-slate-600">
+              Completá estos datos para que podamos ordenar tu caso y darte una propuesta clara.
+            </p>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="grid gap-3">
@@ -254,7 +257,7 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
 
             <div className="grid gap-4 md:grid-cols-2">
               <div>
-                <Label>Unidades</Label>
+                <Label>Unidades (estimación rápida)</Label>
                 <Input
                   type="number"
                   min={1}
@@ -263,7 +266,7 @@ export function ConfiguratorWizard({ packs, adicionales, defaultPackId, initialM
                 />
               </div>
               <div>
-                <Label>Urgencia</Label>
+                <Label>Prioridad</Label>
                 <select
                   className="h-11 w-full rounded-xl border border-border bg-white px-4 text-sm"
                   value={summary.urgencyMultiplier}
