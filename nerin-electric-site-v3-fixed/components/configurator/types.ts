@@ -72,4 +72,10 @@ export interface WizardSummary {
     cantidad: number
   }>
   comentarios?: string
+  attachments?: Array<{
+    originalName: string
+    publicUrl: string
+    size: number
+  }>
 }
+
