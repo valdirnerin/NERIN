@@ -34,23 +34,10 @@ export async function generateMetadata() {
   }
 }
 
-const doors = [
-  {
-    title: 'Solicitud puntual',
-    description: 'Para resolver tareas concretas en vivienda, comercio u oficina.',
-    href: '/presupuestador?mode=EXPRESS',
-  },
-  {
-    title: 'Proyecto / obra / reforma',
-    description: 'Para trabajos de mayor escala con planificación y alcance definido.',
-    href: '/presupuestador?mode=PROJECT',
-  },
-]
-
 const howItWorks = [
-  'Completás datos clave de forma simple.',
-  'Definimos tipo de servicio y prioridad.',
-  'Recibís propuesta y continuás por el canal más cómodo.',
+  'Paso 1 · Elegí modalidad y tipo de trabajo en segundos.',
+  'Paso 2 · Revisá alcance, precio estimado y cobertura en la misma pantalla.',
+  'Paso 3 · Enviá datos y reservá el avance comercial sin fricción.',
 ]
 
 export default async function PresupuestadorPage({
@@ -82,45 +69,53 @@ export default async function PresupuestadorPage({
   }))
 
   return (
-    <div className="space-y-8 sm:space-y-10">
-      <header className="space-y-4 rounded-3xl border border-border/70 bg-slate-950 p-6 text-white sm:p-8">
-        <Badge className="w-fit border-cyan-300/50 bg-cyan-500/20 text-cyan-100">Presupuestador</Badge>
-        <h1 className="text-3xl sm:text-4xl">Enviá solicitud y avanzá con una propuesta clara</h1>
-        <p className="max-w-3xl text-base text-slate-200 sm:text-lg">
-          Este flujo está pensado para que puedas resolver trabajos puntuales o proyectos de obra sin
-          complicarte.
-        </p>
+    <div className="space-y-10 bg-slate-50/80 p-1 sm:space-y-12">
+      <header className="grid gap-6 rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm sm:grid-cols-[1.25fr_0.75fr] sm:p-10">
+        <div className="space-y-6">
+          <Badge className="w-fit border-slate-300 bg-slate-100 text-slate-700">Configurador NERIN</Badge>
+          <div className="space-y-3">
+            <h1 className="text-4xl font-semibold leading-tight tracking-tight text-slate-900 sm:text-5xl">
+              Cotizalo
+            </h1>
+            <p className="max-w-3xl text-lg leading-relaxed text-slate-600 sm:text-xl">
+              Elegí servicio, completá datos y recibí una propuesta clara para avanzar.
+            </p>
+          </div>
+          <Button asChild className="h-12 bg-slate-900 px-7 text-base font-semibold text-white hover:bg-slate-800">
+            <a href="#configurador-nerin">Comenzar ahora</a>
+          </Button>
+        </div>
+
+        <aside className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-slate-500">Qué vas a definir</p>
+          <div className="mt-4 space-y-3 text-sm text-slate-700">
+            <p className="rounded-xl border border-slate-200 bg-white px-3 py-2">Modalidad del trabajo (puntual u obra).</p>
+            <p className="rounded-xl border border-slate-200 bg-white px-3 py-2">Servicio exacto con vista previa de alcance.</p>
+            <p className="rounded-xl border border-slate-200 bg-white px-3 py-2">Prioridad, cobertura y datos para reservar.</p>
+          </div>
+          <div className="mt-4 grid gap-2 text-xs font-medium text-slate-600">
+            <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-center">Decisión guiada</span>
+            <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-center">Precio estimado visible</span>
+          </div>
+        </aside>
       </header>
 
-      <section className="grid gap-3 sm:grid-cols-3">
+      <section className="grid gap-4 sm:grid-cols-3">
         {howItWorks.map((item) => (
-          <article key={item} className="rounded-2xl border border-border bg-white p-4">
-            <p className="text-sm text-slate-700">{item}</p>
+          <article key={item} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <p className="text-base font-medium text-slate-700">{item}</p>
           </article>
         ))}
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2">
-        {doors.map((door) => (
-          <article
-            key={door.title}
-            className="rounded-2xl border border-border bg-gradient-to-b from-white to-cyan-50/40 p-5"
-          >
-            <h2 className="text-base font-semibold text-slate-900">{door.title}</h2>
-            <p className="mt-2 text-sm text-slate-700">{door.description}</p>
-            <Button className="mt-4 w-full bg-cyan-700 hover:bg-cyan-800" asChild>
-              <a href={door.href}>Elegir opción</a>
-            </Button>
-          </article>
-        ))}
-      </section>
-
-      <ConfiguratorWizard
-        packs={wizardPacks}
-        adicionales={wizardAdicionales}
-        defaultPackId={defaultPack}
-        initialMode={searchParams.mode}
-      />
+      <div id="configurador-nerin">
+        <ConfiguratorWizard
+          packs={wizardPacks}
+          adicionales={wizardAdicionales}
+          defaultPackId={defaultPack}
+          initialMode={searchParams.mode}
+        />
+      </div>
     </div>
   )
 }

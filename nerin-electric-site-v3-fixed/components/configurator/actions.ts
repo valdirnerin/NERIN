@@ -28,6 +28,13 @@ const QuoteSchema = z.object({
   comentarios: z.string().optional(),
   email: z.string().email().optional(),
   nombre: z.string().optional(),
+  attachments: z.array(
+    z.object({
+      originalName: z.string(),
+      publicUrl: z.string(),
+      size: z.number(),
+    }),
+  ).optional(),
 })
 
 export async function createConfiguratorQuote(data: z.infer<typeof QuoteSchema>) {
