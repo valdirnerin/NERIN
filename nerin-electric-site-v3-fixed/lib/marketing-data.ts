@@ -208,7 +208,8 @@ const fallbackPacks: PackForUI[] = [
     id: 'fallback-pack-2',
     slug: 'casa-country-1',
     name: 'Casa Country 1',
-    description: 'Pack para viviendas premium hasta 250 m² con doble tablero y previsión de domótica.',
+    description:
+      'Pack para viviendas premium hasta 250 m² con doble tablero y previsión de domótica.',
     scope: 'Hasta 250 m² / 10 ambientes / 120 bocas estimadas',
     basePrice: 5_200_000,
     advancePrice: 1_800_000,
@@ -307,6 +308,20 @@ const fallbackBrands: BrandForUI[] = [
   { id: 'fallback-brand-5', nombre: 'Genrock' },
 ]
 
+const isProductionRuntime = process.env.NODE_ENV === 'production'
+
+function shouldUseDemoFallback() {
+  return !isProductionRuntime
+}
+
+function fallbackOrEmpty<T>(fallback: T, reason: string, emptyValue: T): T {
+  if (shouldUseDemoFallback()) {
+    console.info('[shop] fallback used', reason)
+    return fallback
+  }
+  console.info('[shop] fallback used', `${reason}:disabled-in-production`)
+  return emptyValue
+}
 const fallbackTechnicians: TechnicianForUI[] = [
   {
     id: 'fallback-tech-1',
@@ -357,14 +372,14 @@ export async function getPacksForMarketing(): Promise<PackForUI[]> {
     })
 
     if (!packs.length) {
-      return fallbackPacks
+      return fallbackOrEmpty(fallbackPacks, 'packs:no-db-records', [])
     }
 
     const normalized = packs.map(normalizePack).filter((pack) => pack.active)
-    return normalized.length ? normalized : fallbackPacks
+    return normalized.length ? normalized : fallbackOrEmpty(fallbackPacks, 'packs:all-inactive', [])
   } catch (error) {
     logFallback('packs', error)
-    return fallbackPacks
+    return fallbackOrEmpty(fallbackPacks, 'packs:exception', [])
   }
 }
 
@@ -375,7 +390,7 @@ export async function getMaintenancePlansForMarketing(): Promise<MaintenancePlan
     })
 
     if (!plans.length) {
-      return fallbackMaintenancePlans
+      return fallbackOrEmpty(fallbackMaintenancePlans, 'maintenance:no-db-records', [])
     }
 
     return plans.map((plan) => ({
@@ -389,7 +404,7 @@ export async function getMaintenancePlansForMarketing(): Promise<MaintenancePlan
     }))
   } catch (error) {
     logFallback('maintenance plans', error)
-    return fallbackMaintenancePlans
+    return fallbackOrEmpty(fallbackMaintenancePlans, 'maintenance:exception', [])
   }
 }
 
@@ -401,7 +416,7 @@ export async function getCaseStudiesForMarketing(): Promise<CaseStudyForUI[]> {
     })
 
     if (!caseStudies.length) {
-      return fallbackCaseStudies
+      return fallbackOrEmpty(fallbackCaseStudies, 'case-studies:no-db-records', [])
     }
 
     return caseStudies.map((cs) => ({
@@ -415,7 +430,7 @@ export async function getCaseStudiesForMarketing(): Promise<CaseStudyForUI[]> {
     }))
   } catch (error) {
     logFallback('case studies', error)
-    return fallbackCaseStudies
+    return fallbackOrEmpty(fallbackCaseStudies, 'case-studies:exception', [])
   }
 }
 
@@ -423,7 +438,11 @@ export async function getCaseStudyBySlug(slug: string): Promise<CaseStudyForUI |
   try {
     const caseStudy = await prisma.caseStudy.findUnique({ where: { slug } })
     if (!caseStudy) {
-      return fallbackCaseStudies.find((item) => item.slug === slug) ?? null
+      return (
+        fallbackOrEmpty(fallbackCaseStudies, 'case-studies:no-db-records', []).find(
+          (item) => item.slug === slug,
+        ) ?? null
+      )
     }
 
     return {
@@ -437,7 +456,11 @@ export async function getCaseStudyBySlug(slug: string): Promise<CaseStudyForUI |
     }
   } catch (error) {
     logFallback(`case study ${slug}`, error)
-    return fallbackCaseStudies.find((item) => item.slug === slug) ?? null
+    return (
+      fallbackOrEmpty(fallbackCaseStudies, 'case-studies:exception', []).find(
+        (item) => item.slug === slug,
+      ) ?? null
+    )
   }
 }
 
@@ -445,7 +468,7 @@ export async function getBrandsForMarketing(): Promise<BrandForUI[]> {
   try {
     const brands = await prisma.brand.findMany({ orderBy: { nombre: 'asc' } })
     if (!brands.length) {
-      return fallbackBrands
+      return fallbackOrEmpty(fallbackBrands, 'brands:no-db-records', [])
     }
     return brands.map((brand) => ({
       id: brand.id,
@@ -454,7 +477,7 @@ export async function getBrandsForMarketing(): Promise<BrandForUI[]> {
     }))
   } catch (error) {
     logFallback('brands', error)
-    return fallbackBrands
+    return fallbackOrEmpty(fallbackBrands, 'brands:exception', [])
   }
 }
 
@@ -466,7 +489,7 @@ export async function getTechniciansForMarketing(): Promise<TechnicianForUI[]> {
     })
 
     if (!technicians.length) {
-      return fallbackTechnicians
+      return fallbackOrEmpty(fallbackTechnicians, 'technicians:no-db-records', [])
     }
 
     return technicians.map((tech) => ({
@@ -477,7 +500,7 @@ export async function getTechniciansForMarketing(): Promise<TechnicianForUI[]> {
     }))
   } catch (error) {
     logFallback('technicians', error)
-    return fallbackTechnicians
+    return fallbackOrEmpty(fallbackTechnicians, 'technicians:exception', [])
   }
 }
 
@@ -505,12 +528,23 @@ export async function getConfiguratorData(): Promise<{
     }))
 
     return {
-      packs: activePacks.length ? activePacks : fallbackPacks,
-      adicionales: normalizedAdicionales.length ? normalizedAdicionales : fallbackAdditionalItems,
+      packs: activePacks.length
+        ? activePacks
+        : fallbackOrEmpty(fallbackPacks, 'configurator:packs-empty', []),
+      adicionales: normalizedAdicionales.length
+        ? normalizedAdicionales
+        : fallbackOrEmpty(fallbackAdditionalItems, 'configurator:additional-empty', []),
     }
   } catch (error) {
     logFallback('configurator data', error)
-    return { packs: fallbackPacks, adicionales: fallbackAdditionalItems }
+    return {
+      packs: fallbackOrEmpty(fallbackPacks, 'configurator:exception:packs', []),
+      adicionales: fallbackOrEmpty(
+        fallbackAdditionalItems,
+        'configurator:exception:additional',
+        [],
+      ),
+    }
   }
 }
 
