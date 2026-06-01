@@ -77,5 +77,9 @@ export async function saveSiteContent(payload: SiteExperience) {
 }
 
 export function getWhatsappHref(site: SiteExperience): string {
-  return `https://wa.me/${site.contact.whatsappNumber}?text=${encodeURIComponent(site.contact.whatsappMessage)}`
+  const normalized = site.contact.whatsappNumber.replace(/\D/g, '')
+  if (!normalized || /0{6,}$/.test(normalized)) {
+    return '/contacto'
+  }
+  return `https://wa.me/${normalized}?text=${encodeURIComponent(site.contact.whatsappMessage)}`
 }

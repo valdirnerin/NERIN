@@ -7,7 +7,7 @@ import { storeMediaFile } from '@/lib/media'
 const LeadSchema = z.object({
   name: z.string().min(2),
   phone: z.string().min(6),
-  email: z.string().email(),
+  email: z.string().email().optional().or(z.literal('')),
   clientType: z.string().min(1),
   location: z.string().min(2),
   address: z.string().optional().or(z.literal('')),
@@ -108,7 +108,7 @@ export async function POST(request: Request) {
     const lead = await store.createLead({
       name: parsed.data.name,
       phone: parsed.data.phone,
-      email: parsed.data.email,
+      email: parsed.data.email || '',
       clientType: parsed.data.clientType,
       location: parsed.data.location,
       address: parsed.data.address || null,
@@ -180,7 +180,7 @@ export async function POST(request: Request) {
       console.info('[LEADS] SALES_TO_EMAIL not configured, lead stored', { id: lead.id })
     }
 
-    if (lead.email) {
+    if (lead.email && lead.email.includes('@')) {
       await sendTransactionalEmail({
         to: lead.email,
         subject: 'Recibimos tu solicitud de presupuesto',

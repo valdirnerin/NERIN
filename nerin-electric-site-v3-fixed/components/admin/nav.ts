@@ -14,30 +14,35 @@ export const adminNav: AdminNavSection[] = [
   {
     label: 'Centro de control',
     items: [
-      { title: 'Inicio admin', href: '/admin' as Route },
-      { title: 'Consultas (leads)', href: '/admin/leads' as Route },
-    ],
-  },
-  {
-    label: 'Gestión comercial',
-    items: [
-      { title: 'Packs y precios', href: '/admin/packs' as Route },
-      { title: 'Noticias', href: '/admin/noticias' as Route },
-    ],
-  },
-  {
-    label: 'Operaciones',
-    items: [
-      { title: 'Panel operativo', href: '/admin/ops' as Route },
-      { title: 'Proyectos', href: '/admin/ops/projects' as Route },
-      { title: 'Certificados', href: '/admin/ops/certificates' as Route },
+      { title: 'Dashboard', href: '/admin' as Route },
+      { title: 'Leads', href: '/admin/leads' as Route },
       { title: 'Clientes', href: '/admin/ops/clients' as Route },
-      { title: 'CAC / IVA', href: '/admin/operativo' as Route },
+      { title: 'Presupuestos', href: '/admin/ops' as Route },
     ],
   },
   {
-    label: 'Sistema',
-    items: [{ title: 'Ajustes generales', href: '/admin/ajustes' as Route }],
+    label: 'Operacion',
+    items: [
+      { title: 'Obras', href: '/admin/ops/projects' as Route },
+      { title: 'Certificados', href: '/admin/ops/certificates' as Route },
+      { title: 'Mantenimiento', href: '/admin/operativo' as Route },
+      { title: 'Visitas tecnicas', href: '/admin/ops' as Route },
+    ],
+  },
+  {
+    label: 'Finanzas',
+    items: [
+      { title: 'Ingresos', href: '/admin/ops' as Route },
+      { title: 'Gastos', href: '/admin/ops' as Route },
+    ],
+  },
+  {
+    label: 'Contenido y oferta',
+    items: [
+      { title: 'Servicios y packs', href: '/admin/packs' as Route },
+      { title: 'Contenido web', href: '/admin' as Route },
+      { title: 'Configuracion', href: '/admin/ajustes' as Route },
+    ],
   },
 ]
 

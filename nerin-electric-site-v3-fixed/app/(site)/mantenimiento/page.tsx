@@ -1,93 +1,43 @@
-export const dynamic = 'force-dynamic'
-
 import Link from 'next/link'
-import { getMaintenancePlansForMarketing } from '@/lib/marketing-data'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { getSiteContent } from '@/lib/site-content'
+import { CheckCircle2 } from 'lucide-react'
+import { maintenancePlans } from '@/lib/nerin-electricidad'
 
-export const revalidate = 60
-
-export async function generateMetadata() {
-  const site = await getSiteContent()
-  const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
-  const title = 'Mantenimiento eléctrico | NERIN'
-  const description = 'Planes de mantenimiento con visitas y tareas definidas.'
-
-  return {
-    title,
-    description,
-    alternates: {
-      canonical: '/mantenimiento',
-    },
-    openGraph: {
-      title,
-      description,
-      url: `${siteUrl}/mantenimiento`,
-      siteName: site.name,
-      images: [{ url: '/nerin/og-cover.png', width: 1200, height: 630, alt: 'NERIN Electric' }],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-      images: ['/nerin/og-cover.png'],
-    },
-  }
+export const metadata = {
+  title: 'Mantenimiento electrico mensual | NERIN',
+  description: 'Planes BASIC, PRO y ENTERPRISE para locales, oficinas, edificios, comercios activos y clientes criticos.',
 }
 
-export default async function MantenimientoPage() {
-  const plans = await getMaintenancePlansForMarketing()
-  const site = await getSiteContent()
-
+export default function MantenimientoPage() {
   return (
-    <div className="space-y-10 sm:space-y-12">
-      <header className="space-y-4">
-        <Badge>Mantenimiento</Badge>
-        <h1>{site.maintenancePage.introTitle}</h1>
-        <p className="max-w-3xl text-lg text-slate-600">{site.maintenancePage.introDescription}</p>
-      </header>
-
-      <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-        {plans.map((plan) => (
-          <Card key={plan.id} className="flex flex-col justify-between">
-            <CardHeader>
-              <Badge className="bg-muted text-slate-500">{plan.slug.toUpperCase()}</Badge>
-              <CardTitle>{plan.nombre}</CardTitle>
-              <p className="text-sm text-slate-500">${Number(plan.precioMensual).toLocaleString('es-AR')} / mes</p>
-            </CardHeader>
-            <CardContent className="space-y-4 text-sm text-slate-600">
-              <p className="font-medium text-foreground">Incluye:</p>
-              <ul className="space-y-2">
-                {plan.incluyeTareasFijas.map((task) => (
-                  <li key={task}>• {task}</li>
-                ))}
-              </ul>
-              <p>{plan.visitasMes} visita(s) por mes.</p>
-              <div className="flex flex-col gap-2">
-                <Button asChild>
-                  <Link href={`/presupuesto?tipo=mantenimiento&plan=${plan.slug}`}>Solicitar plan</Link>
-                </Button>
-                <Button asChild variant="secondary">
-                  <Link href="/contacto">Contacto</Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </section>
-
-      <section className="rounded-3xl border border-border bg-white p-5 shadow-subtle sm:p-8 lg:p-10">
-        <h2 className="text-2xl font-semibold text-foreground">Alcance</h2>
-        <div className="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {site.maintenancePage.cards.map((card) => (
-            <div key={card.title}>
-              <h3 className="text-lg font-semibold text-foreground">{card.title}</h3>
-              <p className="text-sm text-slate-600">{card.description}</p>
-            </div>
-          ))}
+    <div className="bg-white">
+      <section className="border-b border-slate-200 bg-slate-50 py-14">
+        <div className="container max-w-4xl">
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Mantenimiento mensual</p>
+          <h1 className="mt-3 text-4xl font-semibold text-slate-950 sm:text-5xl">Menos cortes, menos urgencias y mas control.</h1>
+          <p className="mt-4 text-lg leading-8 text-slate-600">
+            Para comercios, edificios y empresas donde una falla electrica frena operacion, genera reclamos o termina saliendo mas cara.
+          </p>
         </div>
+      </section>
+      <section className="container grid gap-5 py-14 lg:grid-cols-3">
+        {maintenancePlans.map((plan) => (
+          <article key={plan.name} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-2xl font-semibold text-slate-950">{plan.name}</h2>
+            <p className="mt-2 text-2xl font-semibold text-slate-950">{plan.price}</p>
+            <p className="mt-3 text-sm leading-6 text-slate-600">{plan.fit}</p>
+            <ul className="mt-5 space-y-2">
+              {plan.bullets.map((item) => (
+                <li key={item} className="flex items-center gap-2 text-sm text-slate-700">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <Link href={`/presupuestador?tipo=Mantenimiento ${plan.name}`} className="mt-6 inline-flex rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white">
+              Solicitar plan
+            </Link>
+          </article>
+        ))}
       </section>
     </div>
   )
