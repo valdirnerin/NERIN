@@ -1,79 +1,43 @@
-export const dynamic = 'force-dynamic'
-
 import Link from 'next/link'
-import { getPacksForMarketing } from '@/lib/marketing-data'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { getSiteContent } from '@/lib/site-content'
+import { ArrowRight, CheckCircle2 } from 'lucide-react'
+import { packs } from '@/lib/nerin-electricidad'
 
-export const revalidate = 60
-
-export async function generateMetadata() {
-  const site = await getSiteContent()
-  const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
-  const title = 'Packs técnicos | NERIN'
-  const description = 'Referencia de bases de mano de obra.'
-
-  return {
-    title,
-    description,
-    alternates: {
-      canonical: '/packs',
-    },
-    openGraph: {
-      title,
-      description,
-      url: `${siteUrl}/packs`,
-      siteName: site.name,
-      images: [{ url: '/nerin/og-cover.png', width: 1200, height: 630, alt: 'NERIN Electric' }],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-      images: ['/nerin/og-cover.png'],
-    },
-  }
+export const metadata = {
+  title: 'Packs electricos con precios desde | NERIN',
+  description: 'Packs de mano de obra para vivienda estandar, casa country 1 y casa country 2.',
 }
 
-export default async function PacksPage() {
-  const packs = await getPacksForMarketing()
-
+export default function PacksPage() {
   return (
-    <div className="space-y-10">
-      <header className="space-y-4 rounded-2xl border border-border bg-muted/20 p-6">
-        <Badge>Packs técnicos</Badge>
-        <h1>Bases de mano de obra</h1>
-        <p className="max-w-3xl text-base text-slate-600">Esta página es una referencia técnica.</p>
-        <Button asChild>
-          <Link href="/presupuestador">Iniciar cotización</Link>
-        </Button>
-      </header>
-
-      <section className="grid gap-5">
+    <div className="bg-white">
+      <section className="border-b border-slate-200 bg-slate-950 py-14 text-white">
+        <div className="container max-w-4xl">
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-amber-300">Packs electricos</p>
+          <h1 className="mt-3 text-4xl font-semibold text-white sm:text-5xl">Mano de obra con precio desde, alcance y condiciones claras.</h1>
+          <p className="mt-4 text-lg leading-8 text-slate-300">
+            Valores orientativos de mano de obra. Materiales, artefactos y proyecto electrico se cotizan por separado.
+          </p>
+        </div>
+      </section>
+      <section className="container grid gap-5 py-14 lg:grid-cols-3">
         {packs.map((pack) => (
-          <Card key={pack.id} id={pack.slug} className="scroll-mt-32">
-            <CardHeader>
-              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                <div>
-                  <CardTitle>{pack.name}</CardTitle>
-                  <p className="text-sm text-slate-500">{pack.description}</p>
-                </div>
-                <p className="text-xl font-semibold text-foreground">
-                  Base ${Number(pack.basePrice).toLocaleString('es-AR')}
-                </p>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm text-slate-600">
-              <p>{pack.scope}</p>
-              <ul className="grid gap-2 sm:grid-cols-2">
-                {pack.features.slice(0, 4).map((item) => (
-                  <li key={item}>• {item}</li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
+          <article key={pack.name} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-2xl font-semibold text-slate-950">{pack.name}</h2>
+            <p className="mt-3 text-3xl font-semibold text-slate-950">{pack.price}</p>
+            <p className="mt-3 text-sm leading-6 text-slate-600">{pack.description}</p>
+            <ul className="mt-5 space-y-2">
+              {pack.bullets.map((item) => (
+                <li key={item} className="flex items-center gap-2 text-sm text-slate-700">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <Link href={`/presupuestador?tipo=${encodeURIComponent(pack.name)}`} className="mt-6 inline-flex items-center text-sm font-semibold text-slate-950">
+              Cotizar pack
+              <ArrowRight className="ml-1 h-4 w-4" />
+            </Link>
+          </article>
         ))}
       </section>
     </div>

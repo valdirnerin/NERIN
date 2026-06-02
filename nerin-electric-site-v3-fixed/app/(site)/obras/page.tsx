@@ -1,56 +1,45 @@
-export const dynamic = 'force-dynamic'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { getSiteContent } from '@/lib/site-content'
-import { fetchPublicJson } from '@/lib/public-api'
+import Link from 'next/link'
+import { ArrowRight } from 'lucide-react'
+import { featuredExperience } from '@/lib/nerin-electricidad'
 
-type Project = {
-  id?: string
-  title: string
-  description: string
-  tags?: string[]
-  locationText?: string | null
+export const metadata = {
+  title: 'Obras electricas y experiencia | NERIN',
+  description: 'Experiencia en locales comerciales, gimnasios, supermercados y edificios residenciales sin inventar datos especificos.',
 }
 
-export const revalidate = 60
-
-export default async function ObrasPage() {
-  const site = await getSiteContent()
-  let projects: Project[] = []
-  try {
-    projects = await fetchPublicJson<Project[]>('/api/public/projects')
-  } catch (error) {
-    projects = []
-  }
-
+export default function ObrasPage() {
   return (
-    <div className="space-y-8">
-      <header className="space-y-4">
-        <Badge>Obras destacadas</Badge>
-        <h1>{site.works.introTitle}</h1>
-        <p className="text-lg text-slate-600">{site.works.introDescription}</p>
-      </header>
-      <section className="grid gap-6 md:grid-cols-2">
-        {projects.map((project) => (
-          <Card key={project.id ?? project.title} className="flex flex-col">
-            <CardHeader>
-              <CardTitle>{project.title}</CardTitle>
-              <p className="text-sm text-slate-500">{project.locationText ?? ''}</p>
-            </CardHeader>
-            <CardContent className="mt-auto space-y-3 text-sm text-slate-600">
-              <p>{project.description}</p>
-              {project.tags && project.tags.length > 0 ? (
-                <div className="flex flex-wrap gap-2 text-xs text-slate-500">
-                  {project.tags.map((tag) => (
-                    <span key={tag} className="rounded-full bg-muted px-2 py-1">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              ) : null}
-            </CardContent>
-          </Card>
+    <div className="bg-white">
+      <section className="border-b border-slate-200 bg-slate-950 py-14 text-white">
+        <div className="container max-w-4xl">
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-amber-300">Obras y experiencia</p>
+          <h1 className="mt-3 text-4xl font-semibold text-white sm:text-5xl">Instalaciones electricas para obra, comercio y edificios.</h1>
+          <p className="mt-4 text-lg leading-8 text-slate-300">
+            Se muestran referencias profesionales sin inventar metros, montos, fechas ni responsables. Los detalles reales se cargan desde admin cuando esten disponibles.
+          </p>
+        </div>
+      </section>
+      <section className="container grid gap-5 py-14 md:grid-cols-2">
+        {featuredExperience.map((name) => (
+          <article key={name} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-2xl font-semibold text-slate-950">{name}</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-600">
+              Experiencia en instalaciones electricas para locales comerciales, gimnasios, supermercados y edificios residenciales.
+            </p>
+          </article>
         ))}
+      </section>
+      <section className="border-t border-slate-200 bg-slate-50 py-12">
+        <div className="container flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-2xl font-semibold text-slate-950">Tenes una obra proxima a iniciar?</h2>
+            <p className="mt-1 text-sm text-slate-600">Pedi una visita tecnica y ordena alcance, etapas, materiales y certificados.</p>
+          </div>
+          <Link href="/presupuestador?tipo=Obra electrica" className="inline-flex items-center rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white">
+            Iniciar solicitud
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
+        </div>
       </section>
     </div>
   )

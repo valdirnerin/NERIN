@@ -1,76 +1,37 @@
-export const dynamic = 'force-dynamic'
-import Image from 'next/image'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { getTechniciansForMarketing } from '@/lib/marketing-data'
-import { getSiteContent } from '@/lib/site-content'
+import { CheckCircle2 } from 'lucide-react'
 
-export const revalidate = 60
+const process = ['Relevamiento', 'Diagnostico', 'Presupuesto claro', 'Ejecucion prolija', 'Seguimiento y cierre']
 
-export default async function EmpresaPage() {
-  const technicians = await getTechniciansForMarketing()
-  const site = await getSiteContent()
+export const metadata = {
+  title: 'Empresa de electricidad en CABA y GBA | NERIN',
+  description: 'NERIN Electricidad, empresa de servicios electricos para hogares, comercios, edificios, empresas y obras.',
+}
 
+export default function EmpresaPage() {
   return (
-    <div className="space-y-12">
-      <header className="space-y-4">
-        <Badge>Empresa</Badge>
-        <h1>{site.company.introTitle}</h1>
-        <p className="max-w-3xl text-lg text-slate-600">{site.company.introDescription}</p>
-        <p className="max-w-2xl text-sm text-slate-500">{site.company.mission}</p>
-      </header>
-
-      <section className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>{site.company.protocolsTitle}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm text-slate-600">
-            <p>Planificamos cada obra con cronograma, responsables y controles de calidad.</p>
-            <ul className="space-y-2">
-              {site.company.protocols.map((item) => (
-                <li key={item}>• {item}</li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>{site.company.complianceTitle}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm text-slate-600">
-            <ul className="space-y-2">
-              {site.company.compliance.map((item) => (
-                <li key={item}>• {item}</li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
+    <div className="bg-white">
+      <section className="border-b border-slate-200 bg-slate-50 py-14">
+        <div className="container max-w-4xl">
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Empresa</p>
+          <h1 className="mt-3 text-4xl font-semibold text-slate-950 sm:text-5xl">Electricidad profesional sin improvisar.</h1>
+          <p className="mt-4 text-lg leading-8 text-slate-600">
+            NERIN trabaja sobre fallas, tableros, instalaciones, mantenimiento y obras. La web esta preparada para cargar datos oficiales reales cuando correspondan, sin mostrar datos falsos.
+          </p>
+        </div>
       </section>
-
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold text-foreground">{site.company.teamTitle}</h2>
-        <div className="grid gap-6 md:grid-cols-3">
-          {technicians.map((tech) => (
-            <Card key={tech.id} className="space-y-3">
-              <CardHeader>
-                <CardTitle>{tech.nombre}</CardTitle>
-                <p className="text-sm text-slate-500">{tech.credenciales.join(' · ')}</p>
-              </CardHeader>
-              {tech.fotoUrl ? (
-                <Image
-                  src={tech.fotoUrl}
-                  width={400}
-                  height={300}
-                  alt={`Técnico NERIN ${tech.nombre}`}
-                  className="h-40 w-full rounded-2xl object-cover"
-                />
-              ) : (
-                <div className="flex h-40 items-center justify-center rounded-2xl bg-muted text-sm text-slate-500">
-                  Foto pendiente
-                </div>
-              )}
-            </Card>
+      <section className="container grid gap-8 py-14 lg:grid-cols-[0.8fr_1.2fr]">
+        <div>
+          <h2 className="text-3xl font-semibold text-slate-950">Como trabajamos</h2>
+          <p className="mt-3 text-sm leading-6 text-slate-600">
+            La prioridad es que entiendas el problema, el costo y el alcance antes de aprobar. Materiales y mano de obra se separan para evitar confusiones.
+          </p>
+        </div>
+        <div className="grid gap-3">
+          {process.map((item) => (
+            <div key={item} className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-sm">
+              <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+              <span className="font-semibold text-slate-900">{item}</span>
+            </div>
           ))}
         </div>
       </section>

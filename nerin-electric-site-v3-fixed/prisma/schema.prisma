@@ -530,3 +530,188 @@ model PaymentEvent {
 
   @@unique([provider, externalId])
 }
+
+model Customer {
+  id             String   @id @default(cuid())
+  name           String
+  type           String   @default("particular")
+  whatsapp       String?
+  email          String?
+  address        String?
+  cuit           String?
+  status         String   @default("activo")
+  internalNotes  String   @default("")
+  potentialValue Int      @default(0)
+  leadSource     String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  quotes         Quote[]
+  jobs           Job[]
+  visits         TechnicalVisit[]
+  maintenance    MaintenanceContract[]
+  incomes        Income[]
+  expenses       Expense[]
+}
+
+model Quote {
+  id              String      @id @default(cuid())
+  customerId      String?
+  serviceType     String
+  laborAmount     Int         @default(0)
+  materialsAmount Int         @default(0)
+  additionalAmount Int        @default(0)
+  discountAmount  Int         @default(0)
+  estimatedMargin Int         @default(0)
+  totalAmount     Int         @default(0)
+  status          String      @default("borrador")
+  expiresAt       DateTime?
+  observations    String      @default("")
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  customer        Customer?   @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  items           QuoteItem[]
+  jobs            Job[]
+  incomes         Income[]
+}
+
+model QuoteItem {
+  id          String   @id @default(cuid())
+  quoteId     String
+  description String
+  quantity    Float    @default(1)
+  unitPrice   Int      @default(0)
+  subtotal    Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  quote       Quote    @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+}
+
+model Job {
+  id              String   @id @default(cuid())
+  customerId      String?
+  quoteId         String?
+  title           String
+  address         String?
+  jobType         String   @default("obra electrica")
+  status          String   @default("pendiente")
+  startsAt        DateTime?
+  estimatedEndsAt DateTime?
+  responsible     String?
+  progressPercent Int      @default(0)
+  notes           String   @default("")
+  photos          String   @default("[]")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  customer        Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  quote           Quote?   @relation(fields: [quoteId], references: [id], onDelete: SetNull)
+  incomes         Income[]
+  expenses        Expense[]
+}
+
+model MaintenanceContract {
+  id           String   @id @default(cuid())
+  customerId   String?
+  plan         String   @default("BASIC")
+  monthlyAmount Int     @default(0)
+  frequency    String   @default("mensual")
+  nextVisitAt  DateTime?
+  paymentStatus String  @default("pendiente")
+  status       String   @default("activo")
+  visitHistory String   @default("[]")
+  observations String   @default("")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  customer     Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+}
+
+model TechnicalVisit {
+  id             String   @id @default(cuid())
+  customerId     String?
+  address        String?
+  scheduledAt    DateTime?
+  timeWindow     String?
+  reason         String
+  assignedTo     String?
+  status         String   @default("pendiente")
+  visitCost      Int      @default(0)
+  result         String   @default("")
+  convertedQuoteId String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  customer       Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+}
+
+model Income {
+  id          String   @id @default(cuid())
+  customerId  String?
+  quoteId     String?
+  jobId       String?
+  date        DateTime @default(now())
+  concept     String
+  amount      Int      @default(0)
+  paymentMethod String?
+  status      String   @default("pendiente")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  customer    Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  quote       Quote?    @relation(fields: [quoteId], references: [id], onDelete: SetNull)
+  job         Job?      @relation(fields: [jobId], references: [id], onDelete: SetNull)
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  customerId  String?
+  jobId       String?
+  date        DateTime @default(now())
+  category    String   @default("Otros")
+  provider    String?
+  concept     String
+  amount      Int      @default(0)
+  paymentMethod String?
+  receiptUrl  String?
+  status      String   @default("pendiente")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  customer    Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  job         Job?      @relation(fields: [jobId], references: [id], onDelete: SetNull)
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  priceFrom   Int      @default(0)
+  benefits    String   @default("[]")
+  visible     Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model WebsiteContent {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  title       String?
+  content     String   @default("{}")
+  visible     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model CompanySettings {
+  id                    String   @id @default(cuid())
+  tradeName             String   @default("NERIN Electricidad")
+  legalName             String?
+  cuit                  String?
+  address               String?
+  whatsapp              String?
+  email                 String?
+  instagram             String?
+  linkedin              String?
+  technicalLicenses     String   @default("[]")
+  logoUrl               String?
+  fiscalData            String   @default("{}")
+  legalTexts            String   @default("{}")
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}

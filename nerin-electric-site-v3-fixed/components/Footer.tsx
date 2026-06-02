@@ -2,16 +2,17 @@ import Link from 'next/link'
 import type { SiteExperience } from '@/types/site'
 import { getWhatsappHref } from '@/lib/site-content'
 
-const legalLinks = [
-  { href: '/terminos', label: 'Términos y condiciones' },
-  { href: '/privacidad', label: 'Política de privacidad' },
-] as const
-
 const quickLinks = [
   { href: '/servicios', label: 'Servicios' },
-  { href: '/presupuestador?mode=PROJECT', label: 'Obras' },
-  { href: '/obras', label: 'Casos' },
+  { href: '/packs', label: 'Packs' },
+  { href: '/mantenimiento', label: 'Mantenimiento' },
+  { href: '/obras', label: 'Obras' },
   { href: '/contacto', label: 'Contacto' },
+] as const
+
+const legalLinks = [
+  { href: '/terminos', label: 'Terminos y condiciones' },
+  { href: '/privacidad', label: 'Politica de privacidad' },
 ] as const
 
 interface FooterProps {
@@ -20,110 +21,93 @@ interface FooterProps {
 
 export function Footer({ site }: FooterProps) {
   const whatsappHref = getWhatsappHref(site)
+  const isWhatsappExternal = whatsappHref.startsWith('http')
 
   return (
-    <footer className="border-t border-border bg-white">
-      <div className="border-b border-red-200 bg-red-50 py-3">
-        <div className="container flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between">
-          <p className="font-semibold text-red-700">
-            🔥 Últimos servicios del día: confirmá ahora por WhatsApp.
+    <footer className="border-t border-slate-200 bg-white">
+      <div className="border-b border-slate-200 bg-slate-950 py-4 text-white">
+        <div className="container flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm font-semibold text-white">
+            Una instalacion mal resuelta puede salir mas cara despues. Pedi diagnostico y presupuesto claro.
           </p>
           <a
             href={whatsappHref}
-            className="inline-flex w-fit items-center rounded-full bg-red-600 px-4 py-1.5 text-xs font-bold uppercase tracking-wide text-white hover:bg-red-700 pulse-ring"
+            target={isWhatsappExternal ? '_blank' : undefined}
+            rel={isWhatsappExternal ? 'noopener noreferrer' : undefined}
+            className="inline-flex w-fit items-center rounded-full bg-[#25D366] px-4 py-2 text-xs font-bold uppercase tracking-wide text-black hover:bg-[#1ebe5a]"
             data-track="whatsapp"
-            data-content-name="WhatsApp promo footer"
+            data-content-name="WhatsApp footer"
           >
-            Cerrar turno ahora
+            Pedir presupuesto
           </a>
         </div>
       </div>
 
-      <div className="container grid gap-8 py-10 sm:py-12 lg:grid-cols-[1.25fr_1fr_1fr_1fr]">
+      <div className="container grid gap-8 py-10 sm:py-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div className="space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.34em] text-muted-foreground">
-            NERIN
+          <p className="text-xs font-semibold uppercase tracking-[0.34em] text-slate-500">NERIN Electricidad</p>
+          <p className="max-w-sm text-sm font-medium text-slate-900">
+            Servicios electricos para viviendas, comercios, edificios, empresas y obras en CABA/GBA.
           </p>
-          <p className="text-sm font-medium text-foreground">
-            Contratista eléctrico en CABA y GBA.
+          <p className="text-sm text-slate-600">{site.contact.serviceArea}</p>
+          <p className="text-xs text-slate-500">
+            Datos legales, responsables tecnicos y matriculas se muestran cuando esten cargados en configuracion.
           </p>
-          <p className="text-sm text-muted-foreground">{site.contact.serviceArea}</p>
-          <div className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">
-            Agenda activa · Respuesta rápida
-          </div>
-          <a
-            href={whatsappHref}
-            className="inline-flex items-center rounded-full bg-[#25D366] px-4 py-2 text-sm font-semibold text-black transition hover:bg-[#1ebe5a]"
-            data-track="whatsapp"
-            data-content-name="WhatsApp footer principal"
-          >
-            WhatsApp directo
-          </a>
         </div>
 
         <div>
-          <h4 className="text-xs font-semibold uppercase tracking-[0.34em] text-muted-foreground">
-            Accesos
-          </h4>
-          <ul className="mt-3 space-y-2 text-sm text-foreground">
+          <h4 className="text-xs font-semibold uppercase tracking-[0.34em] text-slate-500">Accesos</h4>
+          <ul className="mt-3 space-y-2 text-sm text-slate-700">
             {quickLinks.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className="transition-colors hover:text-foreground">
-                  {item.label}
-                </Link>
+                <Link href={item.href}>{item.label}</Link>
               </li>
             ))}
           </ul>
         </div>
 
         <div>
-          <h4 className="text-xs font-semibold uppercase tracking-[0.34em] text-muted-foreground">
-            Contacto
-          </h4>
-          <ul className="mt-3 space-y-2 text-sm text-foreground">
+          <h4 className="text-xs font-semibold uppercase tracking-[0.34em] text-slate-500">Contacto</h4>
+          <ul className="mt-3 space-y-2 text-sm text-slate-700">
             <li>
               <a
                 href={whatsappHref}
-                className="hover:text-foreground"
+                target={isWhatsappExternal ? '_blank' : undefined}
+                rel={isWhatsappExternal ? 'noopener noreferrer' : undefined}
                 data-track="whatsapp"
-                data-content-name="WhatsApp footer"
+                data-content-name="WhatsApp footer link"
               >
                 WhatsApp
               </a>
             </li>
-            <li>
-              <a href={`mailto:${site.contact.email}`} className="hover:text-foreground break-all">
-                {site.contact.email}
-              </a>
-            </li>
+            {site.contact.email ? (
+              <li>
+                <a href={`mailto:${site.contact.email}`} className="break-all">
+                  {site.contact.email}
+                </a>
+              </li>
+            ) : null}
           </ul>
         </div>
 
         <div>
-          <h4 className="text-xs font-semibold uppercase tracking-[0.34em] text-muted-foreground">
-            Legales
-          </h4>
-          <ul className="mt-3 space-y-2 text-sm text-foreground">
+          <h4 className="text-xs font-semibold uppercase tracking-[0.34em] text-slate-500">Sistema</h4>
+          <ul className="mt-3 space-y-2 text-sm text-slate-700">
             {legalLinks.map((item) => (
               <li key={item.href}>
-                <Link className="hover:text-foreground" href={item.href}>
-                  {item.label}
-                </Link>
+                <Link href={item.href}>{item.label}</Link>
               </li>
             ))}
+            <li>
+              <Link href="/admin">Panel admin</Link>
+            </li>
           </ul>
         </div>
       </div>
 
-      <div className="border-t border-border bg-muted py-6">
-        <div className="container flex flex-col gap-3 text-sm text-muted-foreground lg:flex-row lg:items-center lg:justify-between">
-          <span>© {new Date().getFullYear()} NERIN Electric.</span>
-          <Link
-            href="/admin"
-            className="text-xs uppercase tracking-[0.3em] text-muted-foreground hover:text-foreground"
-          >
-            Panel admin
-          </Link>
+      <div className="border-t border-slate-200 bg-slate-50 py-5">
+        <div className="container text-sm text-slate-500">
+          <span>© {new Date().getFullYear()} NERIN Electricidad.</span>
         </div>
       </div>
     </footer>

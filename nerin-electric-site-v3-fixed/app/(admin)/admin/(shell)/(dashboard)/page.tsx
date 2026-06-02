@@ -1,233 +1,159 @@
 export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
-import dynamicImport from 'next/dynamic'
 import { prisma } from '@/lib/db'
-import { getSiteContent } from '@/lib/site-content'
 import { DB_ENABLED } from '@/lib/dbMode'
-import { createAdditional, createCertificate } from '../../actions'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { StatCard } from '@/components/admin/ui/StatCard'
-import { CaseStudyForm } from './case-study-form'
-import { MaintenanceForm } from './maintenance-form'
-import { SiteExperienceDesigner } from './SiteExperienceDesigner'
-import { BrandManager } from './BrandManager'
-import { BlogManager } from './BlogManager'
-import { ServicesManager } from './ServicesManager'
-import { ProjectsManager } from './ProjectsManager'
 
-const AdminPacks = dynamicImport(() => import('./AdminPacks'), { ssr: false })
-
-export const revalidate = 0
-
-const moduleCards = [
-  {
-    title: 'Contenido del sitio',
-    description: 'Home, textos clave, contacto y estructura comercial.',
-    href: '#contenido',
-  },
-  {
-    title: 'Servicios y proyectos',
-    description: 'Actualizá catálogo, casos y material visual.',
-    href: '#servicios',
-  },
-  {
-    title: 'Precios y packs',
-    description: 'Mantené oferta comercial, adicionales y mantenimiento.',
-    href: '#precios',
-  },
-  {
-    title: 'Operaciones',
-    description: 'Consultas, proyectos, certificados y clientes.',
-    href: '#operaciones',
-  },
+const pipeline = [
+  'Nuevo',
+  'Contactado',
+  'Esperando fotos',
+  'Presupuesto pendiente',
+  'Presupuesto enviado',
+  'Negociando',
+  'Ganado',
+  'Perdido',
 ]
+
+const alerts = [
+  'Revisar leads nuevos antes de terminar el dia.',
+  'Separar siempre materiales de mano de obra en presupuestos.',
+  'No publicar datos legales, matriculas o responsables hasta cargarlos oficialmente.',
+]
+
+function Stat({ label, value, detail }: { label: string; value: string | number; detail?: string }) {
+  return (
+    <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{label}</p>
+      <p className="mt-3 text-3xl font-semibold text-slate-950">{value}</p>
+      {detail ? <p className="mt-1 text-sm text-slate-500">{detail}</p> : null}
+    </article>
+  )
+}
 
 export default async function AdminPage() {
   if (!DB_ENABLED) {
     return (
       <div className="space-y-4">
         <Badge>Panel administrativo</Badge>
-        <h1>Panel no configurado</h1>
-        <p className="text-sm text-slate-600">La base de datos está deshabilitada. Activala para gestionar contenido.</p>
+        <h1 className="text-3xl font-semibold text-slate-950">Panel no configurado</h1>
+        <p className="text-sm text-slate-600">La base de datos esta deshabilitada. Activala para gestionar contenido y leads.</p>
       </div>
     )
   }
 
-  const site = await getSiteContent()
-  const [packs, adicionales, plans, projects, brands] = await Promise.all([
-    prisma.pack.findMany({ orderBy: { createdAt: 'desc' } }),
-    prisma.additionalItem.findMany({ orderBy: { createdAt: 'desc' } }),
-    prisma.maintenancePlan.findMany({ orderBy: { createdAt: 'desc' } }),
-    prisma.project.findMany({ orderBy: { createdAt: 'desc' } }),
-    prisma.brand.findMany({ orderBy: { nombre: 'asc' } }),
+  const [leads, packs, plans, projects, clients, certificates] = await Promise.all([
+    prisma.lead.findMany({ orderBy: { createdAt: 'desc' }, take: 8 }),
+    prisma.pack.count(),
+    prisma.maintenancePlan.count(),
+    prisma.project.count(),
+    prisma.opsClient.count().catch(() => 0),
+    prisma.opsProgressCertificate.count().catch(() => 0),
   ])
 
+  const currentMonth = new Date().toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })
+
   return (
-    <div className="space-y-10">
-      <header className="rounded-3xl border border-border bg-white p-5 sm:p-7">
-        <div className="space-y-3">
-          <Badge>Centro admin NERIN</Badge>
-          <h1 className="text-2xl font-semibold text-slate-900 sm:text-3xl">
-            Admin reestructurado por módulos
-          </h1>
-          <p className="max-w-3xl text-sm text-slate-600 sm:text-base">
-            Todo está organizado para usarlo fácil: elegí un módulo, hacé el cambio y seguí al próximo.
-          </p>
-        </div>
-        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {moduleCards.map((item) => (
-            <a
-              key={item.title}
-              href={item.href}
-              className="rounded-2xl border border-border bg-slate-50 p-4 text-left transition hover:border-slate-300 hover:bg-white"
-            >
-              <p className="text-sm font-semibold text-slate-900">{item.title}</p>
-              <p className="mt-1 text-xs text-slate-600">{item.description}</p>
-            </a>
-          ))}
+    <div className="space-y-8">
+      <header className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <Badge>Centro de control NERIN Electricidad</Badge>
+        <div className="mt-4 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <h1 className="text-3xl font-semibold text-slate-950">Dashboard comercial, operativo y financiero</h1>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+              Admin interno para controlar leads, presupuestos, obras, certificados, mantenimiento, ingresos, gastos y contenido web.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild className="bg-slate-950 hover:bg-slate-800">
+              <Link href="/admin/leads">Ver leads</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/admin/packs">Servicios y packs</Link>
+            </Button>
+          </div>
         </div>
       </header>
 
-      <section className="grid gap-4 md:grid-cols-4">
-        <StatCard label="Packs" value={packs.length} />
-        <StatCard label="Adicionales" value={adicionales.length} />
-        <StatCard label="Planes" value={plans.length} />
-        <StatCard label="Proyectos" value={projects.length} />
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <Stat label="Leads nuevos" value={leads.length} detail="ultimos registros visibles" />
+        <Stat label="Presupuestos pendientes" value="0" detail="preparado para Quote" />
+        <Stat label="Obras activas" value={projects} detail="proyectos actuales" />
+        <Stat label="Mantenimientos activos" value={plans} detail="planes configurados" />
+        <Stat label="Ingresos del mes" value="$0" detail={currentMonth} />
+        <Stat label="Gastos del mes" value="$0" detail="categorias listas" />
+        <Stat label="Clientes" value={clients} detail="base operativa" />
+        <Stat label="Certificados" value={certificates} detail="avance y cobro" />
       </section>
 
-      <section id="contenido" className="space-y-4">
-        <h2 className="text-lg font-semibold text-foreground">Módulo 1 · Contenido del sitio</h2>
-        <SiteExperienceDesigner initialData={site} />
-      </section>
-
-      <section id="servicios" className="space-y-4">
-        <h2 className="text-lg font-semibold text-foreground">Módulo 2 · Servicios, marcas y proyectos</h2>
-        <div className="grid gap-6 lg:grid-cols-2">
-          <ServicesManager />
-          <ProjectsManager />
-          <BrandManager initialBrands={brands} />
-          <BlogManager />
-        </div>
-      </section>
-
-      <section id="precios" className="space-y-4">
-        <h2 className="text-lg font-semibold text-foreground">Módulo 3 · Precios y oferta comercial</h2>
-
-        <section className="space-y-3">
-          <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-slate-500">Packs</h3>
-          <AdminPacks />
-        </section>
-
-        <div className="grid gap-6 lg:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Agregar adicional</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form action={createAdditional} className="grid gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="adicional-nombre">Nombre</Label>
-                  <Input id="adicional-nombre" name="nombre" required />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="adicional-descripcion">Descripción</Label>
-                  <Textarea id="adicional-descripcion" name="descripcion" required />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="adicional-unidad">Unidad</Label>
-                    <Input id="adicional-unidad" name="unidad" required />
-                  </div>
-                  <div>
-                    <Label htmlFor="adicional-precio">Precio mano de obra</Label>
-                    <Input id="adicional-precio" name="precioUnitarioManoObra" type="number" required />
-                  </div>
-                </div>
-                <Button type="submit">Guardar adicional</Button>
-              </form>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Plan de mantenimiento</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <MaintenanceForm />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Caso real / obra destacada</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CaseStudyForm />
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      <section id="operaciones" className="space-y-4">
-        <h2 className="text-lg font-semibold text-foreground">Módulo 4 · Operaciones y certificados</h2>
-
-        <div className="flex flex-wrap gap-3">
-          <Button variant="outline" asChild>
-            <Link href="/admin/leads">Ver consultas nuevas</Link>
-          </Button>
-          <Button variant="outline" asChild>
-            <Link href="/admin/ops">Ir al panel operativo</Link>
-          </Button>
-          <Button variant="outline" asChild>
-            <Link href="/admin/ops/projects">Ver proyectos</Link>
-          </Button>
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Crear certificado de avance</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <form action={createCertificate} className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="projectId">Proyecto</Label>
-                <select
-                  id="projectId"
-                  name="projectId"
-                  className="h-11 w-full rounded-xl border border-border bg-white px-4 text-sm"
-                  required
-                >
-                  {projects.map((project) => (
-                    <option key={project.id} value={project.id}>
-                      {project.nombre}
-                    </option>
-                  ))}
-                </select>
+      <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-semibold text-slate-950">Pipeline comercial</h2>
+              <p className="mt-1 text-sm text-slate-500">Estados recomendados para convertir consultas en trabajos.</p>
+            </div>
+            <Link href="/admin/leads" className="text-sm font-semibold text-slate-950">
+              Abrir leads
+            </Link>
+          </div>
+          <div className="mt-5 grid gap-3 md:grid-cols-4">
+            {pipeline.map((state) => (
+              <div key={state} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <p className="text-sm font-semibold text-slate-950">{state}</p>
+                <p className="mt-2 text-2xl font-semibold text-slate-400">0</p>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="porcentaje">Porcentaje</Label>
-                  <Input id="porcentaje" name="porcentaje" type="number" required />
-                </div>
-                <div>
-                  <Label htmlFor="cacActual">CAC actual</Label>
-                  <Input id="cacActual" name="cacActual" type="number" step="0.01" required />
-                </div>
-              </div>
-              <label className="flex items-center gap-2 text-sm text-slate-600">
-                <input type="checkbox" name="aplicaIVA" defaultChecked />
-                Aplicar IVA
-              </label>
-              <Button type="submit">Crear certificado</Button>
-            </form>
-          </CardContent>
-        </Card>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 bg-slate-950 p-5 text-white shadow-sm">
+          <h2 className="text-xl font-semibold text-white">Alertas criticas</h2>
+          <div className="mt-4 space-y-3">
+            {alerts.map((alert) => (
+              <p key={alert} className="rounded-2xl border border-white/10 bg-white/5 p-3 text-sm text-slate-200">
+                {alert}
+              </p>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <h2 className="text-xl font-semibold text-slate-950">Ultimos leads</h2>
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full min-w-[720px] text-left text-sm">
+            <thead className="text-xs uppercase tracking-[0.16em] text-slate-500">
+              <tr>
+                <th className="border-b border-slate-200 py-3">Cliente</th>
+                <th className="border-b border-slate-200 py-3">Trabajo</th>
+                <th className="border-b border-slate-200 py-3">Urgencia</th>
+                <th className="border-b border-slate-200 py-3">Zona</th>
+                <th className="border-b border-slate-200 py-3">Fecha</th>
+              </tr>
+            </thead>
+            <tbody>
+              {leads.map((lead) => (
+                <tr key={lead.id} className="border-b border-slate-100">
+                  <td className="py-3 font-medium text-slate-950">{lead.name}</td>
+                  <td className="py-3 text-slate-600">{lead.workType}</td>
+                  <td className="py-3 text-slate-600">{lead.urgency}</td>
+                  <td className="py-3 text-slate-600">{lead.location}</td>
+                  <td className="py-3 text-slate-600">{lead.createdAt.toLocaleDateString('es-AR')}</td>
+                </tr>
+              ))}
+              {leads.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="py-6 text-center text-slate-500">
+                    Todavia no hay leads registrados.
+                  </td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        </div>
       </section>
     </div>
   )

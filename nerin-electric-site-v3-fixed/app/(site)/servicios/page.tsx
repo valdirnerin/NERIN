@@ -1,146 +1,50 @@
 import Link from 'next/link'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { fetchPublicJson } from '@/lib/public-api'
-import { getSiteContent } from '@/lib/site-content'
+import { ArrowRight, CheckCircle2 } from 'lucide-react'
+import { serviceCards, trustItems } from '@/lib/nerin-electricidad'
 
-type Service = {
-  id?: string
-  title: string
-  description: string
+export const metadata = {
+  title: 'Servicios electricos en CABA y GBA | NERIN',
+  description: 'Fallas, tableros, instalaciones, comercios, edificios, mantenimiento y circuitos dedicados con precio desde.',
 }
 
-const serviceSystem = [
-  {
-    title: 'Solicitud simple',
-    description: 'Podés arrancar por WhatsApp o formulario según tu caso.',
-  },
-  {
-    title: 'Definición clara',
-    description: 'Ordenamos alcance y prioridad para que sepas cómo seguimos.',
-  },
-  {
-    title: 'Ejecución y seguimiento',
-    description: 'Coordinamos y cerramos el trabajo con comunicación ordenada.',
-  },
-]
-
-export async function generateMetadata() {
-  const site = await getSiteContent()
-  const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
-  const title = 'Servicios eléctricos en CABA y GBA | NERIN'
-  const description =
-    'Servicios para hogares, comercios y obras con solicitud simple, respuesta rápida y ejecución prolija.'
-
-  return {
-    title,
-    description,
-    alternates: {
-      canonical: '/servicios',
-    },
-    openGraph: {
-      title,
-      description,
-      url: `${siteUrl}/servicios`,
-      siteName: site.name,
-      images: [{ url: '/nerin/og-cover.png', width: 1200, height: 630, alt: 'NERIN Electric' }],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-      images: ['/nerin/og-cover.png'],
-    },
-  }
-}
-
-export default async function ServiciosPage() {
-  const site = await getSiteContent()
-  const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
-  let services: Service[] = []
-  try {
-    services = await fetchPublicJson<Service[]>('/api/public/services')
-  } catch (error) {
-    services = site.services.items.map((item) => ({
-      title: item.title,
-      description: item.description,
-    }))
-  }
-
-  const servicesSchema = {
-    '@context': 'https://schema.org',
-    '@graph': services.map((service) => ({
-      '@type': 'Service',
-      name: service.title,
-      description: service.description,
-      provider: {
-        '@type': 'LocalBusiness',
-        name: site.name,
-        url: siteUrl,
-      },
-      areaServed: site.contact.serviceArea,
-      serviceType: service.title,
-    })),
-  }
-
+export default function ServiciosPage() {
   return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(servicesSchema) }} />
-      <div className="space-y-10">
-        <header className="space-y-5 rounded-3xl border border-border/70 bg-slate-950 p-6 text-white sm:p-8">
-          <Badge className="w-fit border-cyan-300/50 bg-cyan-500/20 text-cyan-100">Servicios</Badge>
-          <h1 className="text-3xl font-semibold leading-tight sm:text-5xl">
-            Servicios eléctricos para clientes que valoran rapidez, orden y tranquilidad
-          </h1>
-          <p className="max-w-3xl text-base text-slate-200 sm:text-lg">
-            Desde trabajos puntuales en vivienda hasta proyectos de obra. El objetivo es uno: que
-            avances rápido y sepas siempre qué sigue.
+    <div className="bg-white">
+      <section className="border-b border-slate-200 bg-slate-50 py-14">
+        <div className="container max-w-4xl">
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Servicios</p>
+          <h1 className="mt-3 text-4xl font-semibold text-slate-950 sm:text-5xl">Resolucion electrica clara, sin esconder precios.</h1>
+          <p className="mt-4 text-lg leading-8 text-slate-600">
+            Elegi el problema, revisa el precio desde y envia la solicitud. Si el alcance cambia, se presupuestan materiales,
+            adicionales y obra antes de avanzar.
           </p>
-          <div className="flex flex-wrap gap-3">
-            <Button className="bg-[#25D366] font-bold text-black hover:bg-[#1ebe5a]" asChild>
-              <Link href="/presupuestador">Enviar solicitud</Link>
-            </Button>
-            <Button className="bg-red-600 font-bold hover:bg-red-700" asChild>
-              <Link href="/presupuestador?mode=PROJECT">Cotización para obra</Link>
-            </Button>
-          </div>
-        </header>
-
-        <section className="space-y-4 rounded-2xl border border-border bg-white p-5 sm:p-6">
-          <h2 className="text-2xl font-semibold text-slate-900">Sistema de trabajo</h2>
-          <div className="grid gap-3 md:grid-cols-3">
-            {serviceSystem.map((item) => (
-              <article key={item.title} className="rounded-xl border border-border bg-muted/20 p-4">
-                <h3 className="text-base font-semibold text-slate-900">{item.title}</h3>
-                <p className="mt-1 text-sm text-slate-600">{item.description}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="grid gap-6 md:grid-cols-2">
-          {services.map((service) => (
-            <Card
-              key={service.id ?? service.title}
-              className="space-y-4 border-cyan-100 bg-gradient-to-b from-white to-cyan-50/30"
-            >
-              <CardHeader>
-                <CardTitle>{service.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm text-slate-700">
-                <p>{service.description}</p>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-700">
-                  Solicitud clara + ejecución prolija + seguimiento
-                </p>
-                <Button variant="secondary" asChild className="w-full">
-                  <Link href="/presupuestador">Solicitar este servicio</Link>
-                </Button>
-              </CardContent>
-            </Card>
+        </div>
+      </section>
+      <section className="container py-14">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {serviceCards.map((service) => (
+            <article key={service.title} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <h2 className="text-xl font-semibold text-slate-950">{service.title}</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">{service.description}</p>
+              <p className="mt-4 text-sm font-bold text-slate-950">{service.price}</p>
+              <Link href={service.href} className="mt-4 inline-flex items-center text-sm font-semibold text-slate-950">
+                Pedir presupuesto
+                <ArrowRight className="ml-1 h-4 w-4" />
+              </Link>
+            </article>
           ))}
-        </section>
-      </div>
-    </>
+        </div>
+      </section>
+      <section className="border-t border-slate-200 bg-slate-50 py-14">
+        <div className="container grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {trustItems.map((item) => (
+            <div key={item} className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800">
+              <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+              {item}
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
   )
 }
