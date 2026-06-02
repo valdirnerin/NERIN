@@ -1,7 +1,15 @@
 import Link from 'next/link'
-import { AlertTriangle, ArrowRight, CheckCircle2, MessageCircle, ShieldCheck, Zap } from 'lucide-react'
+import { ArrowRight, CheckCircle2, MessageCircle, Search, ShieldAlert, Zap } from 'lucide-react'
 import { getSiteContent, getWhatsappHref } from '@/lib/site-content'
-import { featuredExperience, maintenancePlans, packs, serviceCards, trustItems } from '@/lib/nerin-electricidad'
+import {
+  featuredExperience,
+  majorWorks,
+  manualReviewMessage,
+  renovationCards,
+  serviceCatalog,
+  specialServices,
+  trustItems,
+} from '@/lib/nerin-electricidad'
 import { LeadWizard } from '@/components/LeadWizard'
 import { Button } from '@/components/ui/button'
 
@@ -9,9 +17,9 @@ export const revalidate = 60
 
 export async function generateMetadata() {
   const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
-  const title = 'Instalaciones electricas profesionales en CABA y GBA | NERIN'
+  const title = 'Instalaciones y trabajos electricos profesionales en CABA y GBA | NERIN'
   const description =
-    'Fallas, tableros, obras, mantenimiento y packs electricos con presupuesto claro, respuesta rapida y seguimiento por WhatsApp.'
+    'Trabajos chicos, refacciones electricas y obras completas con presupuesto claro, ejecucion prolija y seguimiento real.'
 
   return {
     title,
@@ -34,60 +42,55 @@ export default async function HomePage() {
   return (
     <div className="bg-white">
       <section className="border-b border-slate-200 bg-[linear-gradient(180deg,#fff_0%,#f8fafc_100%)]">
-        <div className="container grid min-h-[calc(100vh-7rem)] gap-10 py-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:py-16">
+        <div className="container grid min-h-[calc(100vh-7rem)] gap-10 py-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:py-16">
           <div className="space-y-7">
             <div className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold uppercase tracking-[0.18em] text-slate-900">
               <Zap className="h-4 w-4 text-amber-500" />
-              Respuesta prioritaria en CABA y GBA
+              Trabajos chicos, refacciones y obras electricas
             </div>
             <div className="space-y-5">
               <h1 className="max-w-4xl text-4xl font-semibold leading-[1.03] tracking-tight text-slate-950 sm:text-6xl">
-                Instalaciones electricas profesionales en CABA y GBA
+                Instalaciones y trabajos electricos profesionales en CABA y GBA
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-slate-600">
-                Fallas, tableros, obras, mantenimiento y packs electricos para viviendas, comercios, edificios y
-                empresas. Presupuesto claro, ejecucion prolija y respuesta rapida.
+                Trabajos chicos, refacciones electricas y obras completas con presupuesto claro, ejecucion prolija y
+                seguimiento real.
               </p>
             </div>
             <div className="grid gap-3 sm:flex">
+              <Button asChild size="lg" className="h-12 bg-slate-950 px-6 text-base font-bold text-white hover:bg-slate-800">
+                <Link href="/trabajos-electricos">
+                  <Search className="mr-2 h-5 w-5" />
+                  Buscar un trabajo electrico
+                </Link>
+              </Button>
               <Button asChild size="lg" className="h-12 bg-[#25D366] px-6 text-base font-bold text-black hover:bg-[#1ebe5a]">
                 <a href={whatsappHref} target={isWhatsappExternal ? '_blank' : undefined} rel={isWhatsappExternal ? 'noopener noreferrer' : undefined}>
                   <MessageCircle className="mr-2 h-5 w-5" />
-                  Pedir presupuesto por WhatsApp
+                  Pedir presupuesto
                 </a>
               </Button>
               <Button asChild size="lg" variant="outline" className="h-12 px-6 text-base">
-                <Link href="/servicios">
-                  Ver servicios y precios
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
+                <Link href="/obras-electricas">Ver obras</Link>
               </Button>
-            </div>
-            <div className="grid gap-2 sm:grid-cols-2">
-              {['Respuesta prioritaria', 'Visita tecnica disponible', 'Presupuesto claro antes de avanzar', 'Evita fallas, cortes y riesgos electricos'].map((item) => (
-                <div key={item} className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                  {item}
-                </div>
-              ))}
             </div>
           </div>
 
           <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
             <div className="rounded-2xl bg-slate-950 p-6 text-white">
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-300">Diagnostico primero</p>
-              <h2 className="mt-4 text-3xl font-semibold text-white">Una falla electrica no se deja para despues.</h2>
-              <p className="mt-4 text-sm leading-6 text-slate-300">
-                Un tablero mal armado puede quemar equipos. Una instalacion improvisada termina costando mas. En
-                comercios y edificios, cada corte implica tiempo perdido y plata parada.
-              </p>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-300">Buscador comercial</p>
+              <h2 className="mt-4 text-3xl font-semibold text-white">Precios orientativos cuando el trabajo se puede estandarizar.</h2>
+              <p className="mt-4 text-sm leading-6 text-slate-300">{manualReviewMessage}</p>
             </div>
             <div className="mt-4 grid gap-3">
-              {['Revisar', 'Diagnosticar', 'Presupuestar', 'Ejecutar bien'].map((item) => (
-                <div key={item} className="flex items-center justify-between rounded-2xl border border-slate-200 px-4 py-3">
-                  <span className="font-semibold text-slate-900">{item}</span>
-                  <ShieldCheck className="h-5 w-5 text-slate-500" />
-                </div>
+              {serviceCatalog.slice(0, 4).map((item) => (
+                <Link key={item.slug} href={`/trabajos-electricos/${item.slug}`} className="flex items-center justify-between rounded-2xl border border-slate-200 px-4 py-3 hover:border-slate-950">
+                  <span>
+                    <span className="block font-semibold text-slate-900">{item.name}</span>
+                    <span className="block text-sm text-slate-500">{item.priceFrom ?? 'A presupuestar'}</span>
+                  </span>
+                  <ArrowRight className="h-5 w-5 text-slate-500" />
+                </Link>
               ))}
             </div>
           </div>
@@ -95,18 +98,25 @@ export default async function HomePage() {
       </section>
 
       <section className="container py-14">
-        <div className="mb-8 max-w-2xl">
-          <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Servicios principales</p>
-          <h2 className="mt-2 text-3xl font-semibold text-slate-950">Precio desde, alcance claro y CTA directo.</h2>
+        <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div className="max-w-2xl">
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Trabajos chicos</p>
+            <h2 className="mt-2 text-3xl font-semibold text-slate-950">Catalogo de servicios puntuales con precio desde.</h2>
+          </div>
+          <Link href="/trabajos-electricos" className="inline-flex items-center text-sm font-semibold text-slate-950">
+            Ver catalogo
+            <ArrowRight className="ml-1 h-4 w-4" />
+          </Link>
         </div>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {serviceCards.map((service) => (
-            <article key={service.title} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <h3 className="text-lg font-semibold text-slate-950">{service.title}</h3>
-              <p className="mt-2 text-sm leading-6 text-slate-600">{service.description}</p>
-              <p className="mt-4 text-sm font-bold text-slate-950">{service.price}</p>
-              <Link href={service.href} className="mt-4 inline-flex items-center text-sm font-semibold text-slate-950">
-                Consultar
+          {serviceCatalog.slice(0, 8).map((service) => (
+            <article key={service.slug} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{service.category}</p>
+              <h3 className="mt-2 text-lg font-semibold text-slate-950">{service.name}</h3>
+              <p className="mt-2 text-sm leading-6 text-slate-600">{service.shortDescription}</p>
+              <p className="mt-4 text-sm font-bold text-slate-950">{service.priceFrom ?? 'A presupuestar'}</p>
+              <Link href={`/trabajos-electricos/${service.slug}`} className="mt-4 inline-flex items-center text-sm font-semibold text-slate-950">
+                Pedir este trabajo
                 <ArrowRight className="ml-1 h-4 w-4" />
               </Link>
             </article>
@@ -115,20 +125,20 @@ export default async function HomePage() {
       </section>
 
       <section className="border-y border-slate-200 bg-slate-50 py-14">
-        <div className="container grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="container grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Packs electricos</p>
-            <h2 className="mt-2 text-3xl font-semibold text-slate-950">Mano de obra clara desde el principio.</h2>
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Refacciones electricas</p>
+            <h2 className="mt-2 text-3xl font-semibold text-slate-950">Trabajos medianos con relevamiento y presupuesto guiado.</h2>
             <p className="mt-4 text-sm leading-6 text-slate-600">
-              Valores orientativos de mano de obra. Materiales, artefactos y proyecto electrico se cotizan por separado.
+              No tienen precio unico: dependen del estado de la instalacion, cantidad de bocas, tablero, materiales,
+              canalizacion y alcance real.
             </p>
           </div>
-          <div className="grid gap-4 md:grid-cols-3">
-            {packs.map((pack) => (
-              <article key={pack.name} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <h3 className="text-xl font-semibold text-slate-950">{pack.name}</h3>
-                <p className="mt-2 text-2xl font-semibold text-slate-950">{pack.price}</p>
-                <p className="mt-2 text-sm leading-6 text-slate-600">{pack.description}</p>
+          <div className="grid gap-4 md:grid-cols-2">
+            {renovationCards.map((item) => (
+              <article key={item.title} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <h3 className="text-xl font-semibold text-slate-950">{item.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-600">{item.description}</p>
               </article>
             ))}
           </div>
@@ -138,16 +148,14 @@ export default async function HomePage() {
       <section className="container py-14">
         <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Mantenimiento mensual</p>
-            <h2 className="mt-2 text-3xl font-semibold text-slate-950">Prevenir sale menos que apagar incendios.</h2>
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Obras grandes</p>
+            <h2 className="mt-2 text-3xl font-semibold text-slate-950">Presupuesto por alcance, avance y certificados por etapa.</h2>
           </div>
-          <div className="grid gap-4 md:grid-cols-3">
-            {maintenancePlans.map((plan) => (
-              <article key={plan.name} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <h3 className="text-lg font-semibold text-slate-950">{plan.name}</h3>
-                <p className="mt-1 font-bold text-slate-950">{plan.price}</p>
-                <p className="mt-2 text-sm leading-6 text-slate-600">{plan.fit}</p>
-              </article>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {majorWorks.map((item) => (
+              <div key={item} className="rounded-2xl border border-slate-200 bg-white px-4 py-4 text-sm font-semibold text-slate-800 shadow-sm">
+                {item}
+              </div>
             ))}
           </div>
         </div>
@@ -156,17 +164,15 @@ export default async function HomePage() {
       <section className="border-y border-slate-200 bg-slate-950 py-14 text-white">
         <div className="container grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.24em] text-amber-300">Experiencia</p>
-            <h2 className="mt-2 text-3xl font-semibold text-white">Obras, locales y edificios con criterio profesional.</h2>
-            <p className="mt-4 text-sm leading-6 text-slate-300">
-              Experiencia en instalaciones electricas para locales comerciales, gimnasios, supermercados y edificios residenciales.
-            </p>
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-amber-300">Servicios especiales</p>
+            <h2 className="mt-2 text-3xl font-semibold text-white">Consultas que generan confianza y mejores decisiones.</h2>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {featuredExperience.map((item) => (
-              <article key={item} className="rounded-2xl border border-white/10 bg-white/5 p-5">
-                <h3 className="text-xl font-semibold text-white">{item}</h3>
-                <p className="mt-2 text-sm text-slate-300">Referencia de experiencia por tipo de obra. Datos especificos editables cuando se carguen.</p>
+          <div className="grid gap-4 md:grid-cols-2">
+            {specialServices.slice(0, 4).map((item) => (
+              <article key={item.title} className="rounded-2xl border border-white/10 bg-white/5 p-5">
+                <h3 className="text-lg font-semibold text-white">{item.title}</h3>
+                <p className="mt-1 text-sm font-semibold text-amber-200">{item.price}</p>
+                <p className="mt-2 text-sm leading-6 text-slate-300">{item.description}</p>
               </article>
             ))}
           </div>
@@ -176,8 +182,8 @@ export default async function HomePage() {
       <section className="container py-14">
         <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Confianza</p>
-            <h2 className="mt-2 text-3xl font-semibold text-slate-950">Seriedad visual, proceso claro y seguimiento real.</h2>
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Por que elegir NERIN</p>
+            <h2 className="mt-2 text-3xl font-semibold text-slate-950">Vender mejor, presupuestar mejor y controlar costos.</h2>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             {trustItems.map((item) => (
@@ -190,20 +196,35 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="border-t border-slate-200 bg-slate-50 py-14">
-        <div className="container grid gap-8 lg:grid-cols-[0.75fr_1.25fr]">
+      <section className="border-y border-slate-200 bg-slate-50 py-14">
+        <div className="container grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
-            <p className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-3 py-2 text-xs font-bold uppercase tracking-[0.18em] text-red-700">
-              <AlertTriangle className="h-4 w-4" />
-              Solicitud rapida
-            </p>
-            <h2 className="mt-4 text-3xl font-semibold text-slate-950">Contanos el problema y priorizamos la respuesta.</h2>
-            <p className="mt-3 text-sm leading-6 text-slate-600">
-              Menos vueltas, mas claridad: tipo de trabajo, zona, urgencia, fotos si tenes y WhatsApp para avanzar.
-            </p>
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Obras realizadas</p>
+            <h2 className="mt-2 text-3xl font-semibold text-slate-950">Experiencia sin inventar datos oficiales.</h2>
           </div>
-          <LeadWizard whatsappHref={whatsappHref} />
+          <div className="grid gap-4 sm:grid-cols-2">
+            {featuredExperience.map((item) => (
+              <article key={item} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <h3 className="text-xl font-semibold text-slate-950">{item}</h3>
+                <p className="mt-2 text-sm text-slate-600">Referencia de experiencia profesional. Detalles reales editables cuando esten cargados.</p>
+              </article>
+            ))}
+          </div>
         </div>
+      </section>
+
+      <section className="container grid gap-8 py-14 lg:grid-cols-[0.75fr_1.25fr]">
+        <div>
+          <p className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-3 py-2 text-xs font-bold uppercase tracking-[0.18em] text-red-700">
+            <ShieldAlert className="h-4 w-4" />
+            Solicitud
+          </p>
+          <h2 className="mt-4 text-3xl font-semibold text-slate-950">Pedilo como trabajo chico, refaccion, obra o servicio especial.</h2>
+          <p className="mt-3 text-sm leading-6 text-slate-600">
+            Todo lo especial, riesgoso, fuera de zona o no catalogado pasa a revision manual por Valdir Nerin.
+          </p>
+        </div>
+        <LeadWizard whatsappHref={whatsappHref} />
       </section>
     </div>
   )

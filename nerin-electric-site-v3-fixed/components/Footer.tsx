@@ -3,10 +3,11 @@ import type { SiteExperience } from '@/types/site'
 import { getWhatsappHref } from '@/lib/site-content'
 
 const quickLinks = [
-  { href: '/servicios', label: 'Servicios' },
-  { href: '/packs', label: 'Packs' },
-  { href: '/mantenimiento', label: 'Mantenimiento' },
-  { href: '/obras', label: 'Obras' },
+  { href: '/trabajos-electricos', label: 'Trabajos chicos' },
+  { href: '/refacciones-electricas', label: 'Refacciones' },
+  { href: '/obras-electricas', label: 'Obras electricas' },
+  { href: '/servicios-especiales', label: 'Servicios especiales' },
+  { href: '/obras', label: 'Obras realizadas' },
   { href: '/contacto', label: 'Contacto' },
 ] as const
 
@@ -47,7 +48,7 @@ export function Footer({ site }: FooterProps) {
         <div className="space-y-3">
           <p className="text-xs font-semibold uppercase tracking-[0.34em] text-slate-500">NERIN Electricidad</p>
           <p className="max-w-sm text-sm font-medium text-slate-900">
-            Servicios electricos para viviendas, comercios, edificios, empresas y obras en CABA/GBA.
+            Plataforma comercial y operativa para trabajos chicos, refacciones, obras y servicios electricos especiales.
           </p>
           <p className="text-sm text-slate-600">{site.contact.serviceArea}</p>
           <p className="text-xs text-slate-500">

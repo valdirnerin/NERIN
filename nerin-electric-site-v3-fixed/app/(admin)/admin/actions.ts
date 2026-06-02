@@ -84,7 +84,7 @@ export async function createMaintenance(
     })
 
     revalidatePath('/admin')
-    revalidatePath('/mantenimiento')
+    revalidatePath('/servicios-especiales')
 
     return { success: true }
   } catch (error) {

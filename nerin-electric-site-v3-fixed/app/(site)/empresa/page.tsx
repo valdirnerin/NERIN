@@ -15,7 +15,7 @@ export default function EmpresaPage() {
           <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Empresa</p>
           <h1 className="mt-3 text-4xl font-semibold text-slate-950 sm:text-5xl">Electricidad profesional sin improvisar.</h1>
           <p className="mt-4 text-lg leading-8 text-slate-600">
-            NERIN trabaja sobre fallas, tableros, instalaciones, mantenimiento y obras. La web esta preparada para cargar datos oficiales reales cuando correspondan, sin mostrar datos falsos.
+            NERIN trabaja sobre trabajos chicos, refacciones electricas, servicios especiales y obras. La web esta preparada para cargar datos oficiales reales cuando correspondan, sin mostrar datos falsos.
           </p>
         </div>
       </section>

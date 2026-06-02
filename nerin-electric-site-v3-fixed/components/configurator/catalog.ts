@@ -191,8 +191,8 @@ export const quoteServices: QuoteService[] = [
     excludes: ['Obra civil asociada'],
   },
   {
-    id: 'mantenimiento-programado',
-    name: 'Mantenimiento técnico programado',
+    id: 'relevamiento-tecnico',
+    name: 'Relevamiento tecnico',
     description: 'Servicio periódico para garantizar continuidad y seguridad eléctrica.',
     flow: 'SURVEY',
     path: 'OBRA',

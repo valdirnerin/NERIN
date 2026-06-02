@@ -108,6 +108,11 @@ model Project {
   invoices             Invoice[]
   tickets              Ticket[]
   photos               ProjectPhoto[]
+  projectProgress      ProjectProgress[]
+  materialCosts        ProjectMaterialCost[]
+  laborCosts           ProjectLaborCost[]
+  projectExpenses      ProjectExpense[]
+  projectPayments      ProjectPayment[]
 }
 
 model Pack {
@@ -548,9 +553,11 @@ model Customer {
   quotes         Quote[]
   jobs           Job[]
   visits         TechnicalVisit[]
-  maintenance    MaintenanceContract[]
   incomes        Income[]
   expenses       Expense[]
+  serviceRequests ServiceRequest[]
+  smallJobs      SmallJob[]
+  renovationJobs RenovationJob[]
 }
 
 model Quote {
@@ -606,22 +613,6 @@ model Job {
   quote           Quote?   @relation(fields: [quoteId], references: [id], onDelete: SetNull)
   incomes         Income[]
   expenses        Expense[]
-}
-
-model MaintenanceContract {
-  id           String   @id @default(cuid())
-  customerId   String?
-  plan         String   @default("BASIC")
-  monthlyAmount Int     @default(0)
-  frequency    String   @default("mensual")
-  nextVisitAt  DateTime?
-  paymentStatus String  @default("pendiente")
-  status       String   @default("activo")
-  visitHistory String   @default("[]")
-  observations String   @default("")
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  customer     Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
 }
 
 model TechnicalVisit {
@@ -684,6 +675,231 @@ model Service {
   benefits    String   @default("[]")
   visible     Boolean  @default(true)
   sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ServiceCategory {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String   @default("")
+  visible     Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  items       ServiceCatalogItem[]
+}
+
+model ServiceCatalogItem {
+  id              String   @id @default(cuid())
+  categoryId      String?
+  name            String
+  slug            String   @unique
+  shortDescription String  @default("")
+  longDescription String   @default("")
+  priceFrom       Int      @default(0)
+  priceType       String   @default("desde")
+  estimatedLabor  Int      @default(0)
+  estimatedMaterials Int   @default(0)
+  estimatedTravel Int      @default(0)
+  estimatedDuration String @default("")
+  enabledZone     String   @default("CABA y GBA con confirmacion")
+  urgencyLevel    String   @default("normal")
+  includes        String   @default("[]")
+  excludes        String   @default("[]")
+  priceChangeReasons String @default("[]")
+  manualReviewReasons String @default("[]")
+  safetyCancelReasons String @default("[]")
+  visible         Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  category        ServiceCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  variants        ServiceVariant[]
+  requests        ServiceRequest[]
+  smallJobs       SmallJob[]
+}
+
+model ServiceVariant {
+  id             String   @id @default(cuid())
+  serviceItemId  String
+  name           String
+  description    String   @default("")
+  priceFrom      Int      @default(0)
+  priceType      String   @default("desde")
+  visible        Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  serviceItem    ServiceCatalogItem @relation(fields: [serviceItemId], references: [id], onDelete: Cascade)
+}
+
+model ServiceRequest {
+  id             String   @id @default(cuid())
+  customerId     String?
+  serviceItemId  String?
+  type           String   @default("trabajo chico")
+  selectedVariant String?
+  customerName   String
+  whatsapp       String
+  email          String?
+  zone           String
+  approximateAddress String?
+  urgency        String   @default("esta semana")
+  description    String   @default("")
+  preferredTime  String?
+  photos         String   @default("[]")
+  status         String   @default("Nueva")
+  requiresManualReview Boolean @default(false)
+  reviewReason   String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  customer       Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  serviceItem    ServiceCatalogItem? @relation(fields: [serviceItemId], references: [id], onDelete: SetNull)
+  smallJobs      SmallJob[]
+  renovationJobs RenovationJob[]
+}
+
+model SmallJob {
+  id              String   @id @default(cuid())
+  requestId       String?
+  customerId      String?
+  serviceItemId   String?
+  title           String
+  address         String?
+  status          String   @default("Nueva")
+  technician      String?
+  estimatedPrice  Int      @default(0)
+  finalPrice      Int      @default(0)
+  estimatedCost   Int      @default(0)
+  materialsCost   Int      @default(0)
+  expensesCost    Int      @default(0)
+  collectedAmount Int      @default(0)
+  notes           String   @default("")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  request         ServiceRequest? @relation(fields: [requestId], references: [id], onDelete: SetNull)
+  customer        Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  serviceItem     ServiceCatalogItem? @relation(fields: [serviceItemId], references: [id], onDelete: SetNull)
+}
+
+model RenovationJob {
+  id                    String   @id @default(cuid())
+  requestId             String?
+  customerId            String?
+  address               String?
+  propertyType          String?
+  scope                 String   @default("")
+  rooms                 Int      @default(0)
+  estimatedPoints       Int      @default(0)
+  existingPanel         String?
+  currentInstallationState String?
+  estimatedMaterials    Int      @default(0)
+  estimatedLabor        Int      @default(0)
+  estimatedDuration     String?
+  quoteStatus           String   @default("Nueva solicitud")
+  jobStatus             String   @default("Nueva solicitud")
+  loadedCosts           Int      @default(0)
+  collectedAmount       Int      @default(0)
+  expensesAmount        Int      @default(0)
+  notes                 String   @default("")
+  photos                String   @default("[]")
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  request               ServiceRequest? @relation(fields: [requestId], references: [id], onDelete: SetNull)
+  customer              Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+}
+
+model ProjectProgress {
+  id          String   @id @default(cuid())
+  projectId   String
+  date        DateTime @default(now())
+  description String
+  percent     Int      @default(0)
+  area        String?
+  observations String  @default("")
+  photos      String   @default("[]")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model ProjectMaterialCost {
+  id          String   @id @default(cuid())
+  projectId   String
+  date        DateTime @default(now())
+  description String
+  provider    String?
+  quantity    Float    @default(1)
+  unit        String?
+  unitCost    Int      @default(0)
+  totalCost   Int      @default(0)
+  stage       String?
+  observations String  @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model ProjectLaborCost {
+  id          String   @id @default(cuid())
+  projectId   String
+  date        DateTime @default(now())
+  person      String
+  hours       Float    @default(0)
+  dayCost     Int      @default(0)
+  task        String   @default("")
+  observations String  @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model ProjectExpense {
+  id          String   @id @default(cuid())
+  projectId   String
+  date        DateTime @default(now())
+  category    String   @default("Otros")
+  concept     String
+  amount      Int      @default(0)
+  observations String  @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model ProjectPayment {
+  id          String   @id @default(cuid())
+  projectId   String
+  certificateId String?
+  date        DateTime @default(now())
+  concept     String
+  amount      Int      @default(0)
+  paymentMethod String?
+  status      String   @default("pendiente")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model CoverageZone {
+  id          String   @id @default(cuid())
+  name        String
+  type        String   @default("CABA")
+  enabled     Boolean  @default(true)
+  requiresConfirmation Boolean @default(false)
+  notes       String   @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ManagementAlert {
+  id          String   @id @default(cuid())
+  type        String
+  title       String
+  description String   @default("")
+  relatedType String?
+  relatedId   String?
+  status      String   @default("pendiente")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

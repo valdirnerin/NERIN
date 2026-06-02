@@ -20,19 +20,20 @@ interface HeaderProps {
 
 const navigation = [
   { href: '/', label: 'Inicio' },
-  { href: '/servicios', label: 'Servicios' },
-  { href: '/packs', label: 'Packs' },
-  { href: '/mantenimiento', label: 'Mantenimiento' },
-  { href: '/obras', label: 'Obras' },
+  { href: '/trabajos-electricos', label: 'Trabajos chicos' },
+  { href: '/refacciones-electricas', label: 'Refacciones' },
+  { href: '/obras-electricas', label: 'Obras electricas' },
+  { href: '/servicios-especiales', label: 'Servicios especiales' },
+  { href: '/obras', label: 'Obras realizadas' },
   { href: '/empresa', label: 'Empresa' },
   { href: '/contacto', label: 'Contacto' },
 ] as const
 
 const marqueeMessages = [
-  'Respuesta prioritaria para fallas electricas',
-  'Presupuesto claro antes de avanzar',
-  'Materiales separados de la mano de obra',
-  'CABA y GBA',
+  'Trabajos chicos con precios orientativos',
+  'Refacciones y obras con revision por Valdir Nerin',
+  'Materiales, jornales y costos separados',
+  'CABA y GBA con confirmacion de zona',
 ]
 
 export function Header({ contact, logo }: HeaderProps) {

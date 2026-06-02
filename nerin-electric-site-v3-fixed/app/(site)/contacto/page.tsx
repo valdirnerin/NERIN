@@ -3,7 +3,7 @@ import { LeadWizard } from '@/components/LeadWizard'
 
 export const metadata = {
   title: 'Contacto y presupuesto electrico | NERIN',
-  description: 'Solicita presupuesto para fallas, tableros, instalaciones, mantenimiento y obras electricas en CABA/GBA.',
+  description: 'Solicita presupuesto para trabajos chicos, refacciones, obras y servicios electricos especiales en CABA/GBA.',
 }
 
 export default async function ContactoPage() {

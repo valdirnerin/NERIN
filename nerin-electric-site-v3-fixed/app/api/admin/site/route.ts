@@ -29,6 +29,9 @@ export async function POST(req: Request) {
   revalidatePath('/obras')
   revalidatePath('/blog')
   revalidatePath('/packs')
-  revalidatePath('/mantenimiento')
+  revalidatePath('/trabajos-electricos')
+  revalidatePath('/refacciones-electricas')
+  revalidatePath('/obras-electricas')
+  revalidatePath('/servicios-especiales')
   return NextResponse.json({ ok: true, site: body })
 }

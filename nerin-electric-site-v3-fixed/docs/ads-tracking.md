@@ -41,14 +41,14 @@ Configurar estos valores en el entorno (ver `.env.example`):
 | Click WhatsApp | `Lead` | `generate_lead` | `channel="whatsapp"`. |
 | Enviar formulario (Presupuesto / Contacto) | `Lead` | `generate_lead` | Solo en submit exitoso. |
 | Agendar visita técnica | `Schedule` | `book_appointment` | CTA y formulario `tipo=visita`. |
-| Solicitar alta del plan | `Lead` | `generate_lead` | Incluye `plan_tier`. |
+| Pedir relevamiento | `Lead` | `generate_lead` | Incluye tipo de solicitud y zona. |
 | Checkout (si existiese) | `InitiateCheckout` / `Purchase` | `begin_checkout` / `purchase` | Eventos listos en `trackEvent`. |
 
 ### Ubicaciones principales
 
 - Home: “Pedir presupuesto”, “Agendar visita técnica”, “Configurar pack”, “Ver alcance completo”, CTA final.
 - Packs: “Configurar pack online” y “Elegir este pack”.
-- Mantenimiento: “Solicitar alta del plan” y “Hablar con un asesor”.
+- Solicitudes de obra/refaccion: “Pedir relevamiento”, “Pedir presupuesto” y “Hablar con un asesor”.
 - Contacto y Presupuesto: envío exitoso del formulario + WhatsApp de seguimiento.
 - Header/Footer/WhatsApp flotante: click directo a WhatsApp.
 
