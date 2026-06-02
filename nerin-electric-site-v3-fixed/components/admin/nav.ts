@@ -12,35 +12,27 @@ export type AdminNavSection = {
 
 export const adminNav: AdminNavSection[] = [
   {
-    label: 'Centro de control',
+    label: 'Panel de NERIN',
     items: [
-      { title: 'Dashboard', href: '/admin' as Route },
-      { title: 'Leads', href: '/admin/leads' as Route },
-      { title: 'Clientes', href: '/admin/ops/clients' as Route },
-      { title: 'Presupuestos', href: '/admin/ops' as Route },
+      { title: 'Inicio', href: '/admin' as Route },
+      { title: 'Solicitudes', href: '/admin/solicitudes' as Route },
     ],
   },
   {
     label: 'Operacion',
     items: [
-      { title: 'Obras', href: '/admin/ops/projects' as Route },
-      { title: 'Certificados', href: '/admin/ops/certificates' as Route },
-      { title: 'Mantenimiento', href: '/admin/operativo' as Route },
-      { title: 'Visitas tecnicas', href: '/admin/ops' as Route },
+      { title: 'Trabajos chicos', href: '/admin/trabajos-chicos' as Route },
+      { title: 'Refacciones', href: '/admin/refacciones' as Route },
+      { title: 'Obras', href: '/admin/obras' as Route },
+      { title: 'Clientes', href: '/admin/clientes' as Route },
+      { title: 'Presupuestos', href: '/admin/presupuestos' as Route },
     ],
   },
   {
-    label: 'Finanzas',
+    label: 'Gestion',
     items: [
-      { title: 'Ingresos', href: '/admin/ops' as Route },
-      { title: 'Gastos', href: '/admin/ops' as Route },
-    ],
-  },
-  {
-    label: 'Contenido y oferta',
-    items: [
-      { title: 'Servicios y packs', href: '/admin/packs' as Route },
-      { title: 'Contenido web', href: '/admin' as Route },
+      { title: 'Dinero', href: '/admin/dinero' as Route },
+      { title: 'Catalogo web', href: '/admin/catalogo-web' as Route },
       { title: 'Configuracion', href: '/admin/ajustes' as Route },
     ],
   },

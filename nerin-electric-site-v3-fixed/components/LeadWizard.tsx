@@ -2,20 +2,43 @@
 
 import { FormEvent, useMemo, useState } from 'react'
 import { CheckCircle2, Loader2, MessageCircle } from 'lucide-react'
-import { leadWorkTypes, propertyTypes, urgencyOptions } from '@/lib/nerin-electricidad'
+import {
+  coverageZones,
+  manualReviewMessage,
+  propertyTypes,
+  requestTypes,
+  safetyNotice,
+  urgencyOptions,
+} from '@/lib/nerin-electricidad'
 import { Button } from '@/components/ui/button'
 
 type LeadWizardProps = {
   whatsappHref: string
   initialWorkType?: string
+  initialRequestType?: string
+  serviceName?: string
 }
 
-const zones = ['CABA', 'GBA'] as const
+type LeadFormState = {
+  requestType: string
+  workType: string
+  zone: string
+  location: string
+  propertyType: string
+  urgency: string
+  details: string
+  phone: string
+  name: string
+  email: string
+  preferredTime: string
+  consent: boolean
+}
 
-export function LeadWizard({ whatsappHref, initialWorkType }: LeadWizardProps) {
-  const [form, setForm] = useState({
-    workType: initialWorkType || leadWorkTypes[0],
-    zone: 'CABA',
+export function LeadWizard({ whatsappHref, initialWorkType, initialRequestType, serviceName }: LeadWizardProps) {
+  const [form, setForm] = useState<LeadFormState>({
+    requestType: initialRequestType || requestTypes[0],
+    workType: initialWorkType || serviceName || '',
+    zone: coverageZones[0],
     location: '',
     propertyType: propertyTypes[0],
     urgency: urgencyOptions[0],
@@ -23,6 +46,7 @@ export function LeadWizard({ whatsappHref, initialWorkType }: LeadWizardProps) {
     phone: '',
     name: '',
     email: '',
+    preferredTime: '',
     consent: true,
   })
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
@@ -30,8 +54,15 @@ export function LeadWizard({ whatsappHref, initialWorkType }: LeadWizardProps) {
   const isWhatsappExternal = whatsappHref.startsWith('http')
 
   const summary = useMemo(
-    () => [form.workType, form.zone, form.location || 'localidad a confirmar', form.urgency].join(' · '),
-    [form.location, form.urgency, form.workType, form.zone],
+    () =>
+      [
+        form.requestType,
+        form.workType || 'servicio a definir',
+        form.zone,
+        form.location || 'localidad a confirmar',
+        form.urgency,
+      ].join(' · '),
+    [form.location, form.requestType, form.urgency, form.workType, form.zone],
   )
 
   const update = (key: keyof typeof form, value: string | boolean) => {
@@ -47,8 +78,10 @@ export function LeadWizard({ whatsappHref, initialWorkType }: LeadWizardProps) {
     formData.set('clientType', form.propertyType)
     formData.set('location', `${form.zone} - ${form.location}`)
     formData.set('address', form.location)
-    formData.set('leadType', 'public-wizard')
+    formData.set('leadType', form.requestType)
+    formData.set('workType', form.workType || form.requestType)
     formData.set('reason', form.urgency)
+    formData.set('details', `${form.details}${form.preferredTime ? `\nHorario preferido: ${form.preferredTime}` : ''}`)
     formData.set('consent', form.consent ? 'true' : 'false')
 
     try {
@@ -59,7 +92,7 @@ export function LeadWizard({ whatsappHref, initialWorkType }: LeadWizardProps) {
       const payload = (await response.json().catch(() => ({}))) as { error?: string }
       if (!response.ok) throw new Error(payload.error || 'No pudimos enviar la solicitud.')
       setStatus('success')
-      setMessage('Solicitud recibida. Si es urgente, reforzala por WhatsApp para priorizar la respuesta.')
+      setMessage('Solicitud recibida. Si el caso es especial, riesgoso o fuera de zona, pasa a revision por Valdir Nerin.')
     } catch (error) {
       setStatus('error')
       setMessage(error instanceof Error ? error.message : 'No pudimos enviar la solicitud.')
@@ -70,42 +103,44 @@ export function LeadWizard({ whatsappHref, initialWorkType }: LeadWizardProps) {
     <form onSubmit={handleSubmit} className="grid gap-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
       <div className="grid gap-4 lg:grid-cols-2">
         <fieldset className="space-y-3">
-          <legend className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">1. Que necesitas</legend>
+          <legend className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">1. Tipo de solicitud</legend>
           <div className="grid gap-2 sm:grid-cols-2">
-            {leadWorkTypes.map((item) => (
+            {requestTypes.map((item) => (
               <label key={item} className="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 has-[:checked]:border-slate-950 has-[:checked]:bg-slate-950 has-[:checked]:text-white">
                 <input
                   className="sr-only"
                   type="radio"
-                  name="workType"
+                  name="requestType"
                   value={item}
-                  checked={form.workType === item}
-                  onChange={(event) => update('workType', event.target.value)}
+                  checked={form.requestType === item}
+                  onChange={(event) => update('requestType', event.target.value)}
                 />
                 {item}
               </label>
             ))}
           </div>
+          <input
+            name="workType"
+            value={form.workType}
+            onChange={(event) => update('workType', event.target.value)}
+            placeholder="Servicio o trabajo elegido"
+            className="h-11 w-full rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-slate-950"
+          />
         </fieldset>
 
         <fieldset className="space-y-3">
-          <legend className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">2. Donde es</legend>
+          <legend className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">2. Zona y propiedad</legend>
           <div className="grid gap-3">
-            <div className="grid grid-cols-2 gap-2">
-              {zones.map((zone) => (
-                <label key={zone} className="flex cursor-pointer items-center justify-center rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold has-[:checked]:border-slate-950 has-[:checked]:bg-slate-950 has-[:checked]:text-white">
-                  <input
-                    className="sr-only"
-                    type="radio"
-                    name="zone"
-                    value={zone}
-                    checked={form.zone === zone}
-                    onChange={(event) => update('zone', event.target.value)}
-                  />
-                  {zone}
-                </label>
+            <select
+              name="zone"
+              value={form.zone}
+              onChange={(event) => update('zone', event.target.value)}
+              className="h-11 rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-slate-950"
+            >
+              {coverageZones.map((zone) => (
+                <option key={zone}>{zone}</option>
               ))}
-            </div>
+            </select>
             <input
               name="locationInput"
               value={form.location}
@@ -154,7 +189,7 @@ export function LeadWizard({ whatsappHref, initialWorkType }: LeadWizardProps) {
             name="details"
             value={form.details}
             onChange={(event) => update('details', event.target.value)}
-            placeholder="Contanos que pasa, desde cuando, si hay cortes, olor, chispazos, tablero, obra o mantenimiento."
+            placeholder="Contanos que pasa, que queres hacer, si hay riesgo, cortes, fotos o datos de la instalacion."
             className="min-h-32 rounded-xl border border-slate-200 px-3 py-3 text-sm outline-none focus:border-slate-950 lg:col-span-2"
             required
           />
@@ -183,11 +218,18 @@ export function LeadWizard({ whatsappHref, initialWorkType }: LeadWizardProps) {
             className="h-11 rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-slate-950"
           />
           <input
+            name="preferredTime"
+            value={form.preferredTime}
+            onChange={(event) => update('preferredTime', event.target.value)}
+            placeholder="Horario preferido"
+            className="h-11 rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-slate-950"
+          />
+          <input
             name="adjuntos"
             type="file"
             multiple
             accept="image/*,.pdf"
-            className="h-11 rounded-xl border border-slate-200 px-3 py-2 text-sm"
+            className="h-11 rounded-xl border border-slate-200 px-3 py-2 text-sm lg:col-span-2"
           />
         </div>
       </fieldset>
@@ -195,8 +237,11 @@ export function LeadWizard({ whatsappHref, initialWorkType }: LeadWizardProps) {
       <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
         <p className="text-sm font-semibold text-slate-950">Resumen: {summary}</p>
         <p className="mt-1 text-sm text-slate-700">
-          Si hay riesgo, corte o tablero comprometido, conviene diagnosticar antes de que el problema escale.
+          {form.zone === 'Requiere confirmacion'
+            ? 'Por ahora este servicio puede no estar disponible en tu zona. Podes enviar la solicitud y la vamos a revisar manualmente.'
+            : manualReviewMessage}
         </p>
+        <p className="mt-2 text-xs leading-5 text-slate-600">{safetyNotice}</p>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">

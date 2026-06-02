@@ -5,28 +5,24 @@ import { Badge } from '@/components/ui/badge'
 
 const faqs = [
   {
-    q: '¿Los packs incluyen materiales?',
-    a: 'No. Los packs son exclusivamente mano de obra. Los materiales se eligen junto al cliente según marcas preferidas como Schneider, Prysmian, Gimsa, Daisa o Genrock.',
+    q: 'Como se define si es trabajo chico, refaccion u obra?',
+    a: 'Un trabajo chico es puntual y puede tener precio orientativo. Una refaccion tiene mas alcance y requiere relevamiento. Una obra grande se gestiona por etapas, avances, certificados y cobros.',
   },
   {
-    q: '¿Cómo se paga un proyecto?',
-    a: 'Dividimos el proyecto en hitos y emitimos Certificados de Avance. Cada certificado puede abonarse online vía Mercado Pago con el link que enviamos.',
+    q: 'Los precios del catalogo son finales?',
+    a: 'Son precios orientativos cuando el trabajo se puede estandarizar. Materiales, viaticos, variantes, estado de la instalacion y seguridad pueden cambiar el precio.',
   },
   {
-    q: '¿Qué incluye el proyecto eléctrico?',
-    a: 'Incluye cálculos de cargas, planos unifilares, memorias técnicas, selectividad y cómputos de materiales. Tiene un valor base de $500.000 editable desde el panel de administración.',
+    q: 'Cuando pasa a revision por Valdir Nerin?',
+    a: 'Cuando el pedido esta fuera de catalogo, fuera de zona, tiene riesgo electrico, requiere fotos complejas, refaccion, obra o demasiadas variantes.',
   },
   {
-    q: '¿Trabajan con técnicos propios?',
-    a: 'Sí. Todo el personal es propio, con ART y seguros de RC vigentes. Coordinamos ingreso a obras y consorcios con protocolos claros.',
+    q: 'Que pasa si la instalacion es insegura?',
+    a: 'NERIN puede cancelar, reprogramar o pasar a presupuesto manual cualquier trabajo si hay riesgo, falta de acceso, humedad, recalentamiento o cableado deteriorado.',
   },
   {
-    q: '¿Pueden integrarse con otras obras?',
-    a: 'Participamos en coordinación con HVAC, datos, audio y obra civil. Compartimos cronograma y documentación en formato digital para evitar interferencias.',
-  },
-  {
-    q: '¿Ofrecen soporte post obra?',
-    a: 'Sí. Podés contratar uno de nuestros planes de mantenimiento BASIC, PRO o ENTERPRISE para visitas programadas y soporte correctivo.',
+    q: 'Como se manejan las obras grandes?',
+    a: 'Se trabajan con presupuesto por alcance, seguimiento de avance, costos separados, certificados por etapa y cobros asociados.',
   },
 ]
 
@@ -37,7 +33,7 @@ export default function FAQPage() {
         <Badge>FAQ</Badge>
         <h1>Preguntas frecuentes</h1>
         <p className="text-lg text-slate-600">
-          Respuestas rápidas sobre procesos, garantías y alcance de nuestros servicios eléctricos.
+          Respuestas rapidas sobre trabajos chicos, refacciones, obras y presupuestacion manual.
         </p>
       </header>
       <Accordion>

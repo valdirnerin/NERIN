@@ -1,4 +1,4 @@
-import fs from 'fs'
+﻿import fs from 'fs'
 import path from 'path'
 import type { SiteExperience } from '@/types/site'
 
@@ -13,11 +13,11 @@ export function getStorageDir() {
 const SITE_FILE = 'site.json'
 
 export const SITE_DEFAULTS: SiteExperience = {
-  name: 'NERIN · Ingeniería Eléctrica',
-  tagline: 'Instalaciones de alta performance con trazabilidad completa.',
+  name: 'NERIN Â· IngenierÃ­a ElÃ©ctrica',
+  tagline: 'Trabajos electricos, refacciones y obras con presupuesto claro.',
   logo: {
     title: 'NERIN',
-    subtitle: 'Ingeniería Eléctrica',
+    subtitle: 'IngenierÃ­a ElÃ©ctrica',
     imageUrl: '',
   },
   accent: '#f59e0b',
@@ -27,25 +27,25 @@ export const SITE_DEFAULTS: SiteExperience = {
   },
   contact: {
     email: 'hola@nerin.com.ar',
-    phone: '+54 11 0000 0000',
-    secondaryPhones: ['+54 11 5555 5555'],
-    address: 'Villa Ortúzar · CABA, Argentina',
+    phone: '',
+    secondaryPhones: [],
+    address: 'CABA y GBA',
     schedule: 'Lunes a viernes de 08:00 a 18:00',
-    serviceArea: 'Ciudad Autónoma de Buenos Aires y GBA',
-    whatsappNumber: '5491100000000',
-    whatsappMessage: 'Hola, soy [Nombre]. Quiero cotizar un servicio eléctrico con NERIN.',
+    serviceArea: 'Ciudad AutÃ³noma de Buenos Aires y GBA',
+    whatsappNumber: '',
+    whatsappMessage: 'Hola, quiero solicitar un trabajo electrico con NERIN.',
     whatsappCtaLabel: 'Hablar ahora',
   },
   hero: {
-    badge: 'Contratista eléctrico para obras y mantenimiento',
-    title: 'Contratista eléctrico para obras, comercios y consorcios en CABA',
-    subtitle: 'Presupuesto en 24–48 h. Cumplimiento normativo. Experiencia real en obra.',
+    badge: 'Trabajos chicos, refacciones y obras electricas',
+    title: 'Contratista elÃ©ctrico para obras, comercios y consorcios en CABA',
+    subtitle: 'Presupuesto en 24â€“48 h. Cumplimiento normativo. Experiencia real en obra.',
     backgroundImage:
       'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=900&q=80',
-    caption: 'Tablero general edificio 4.000 m² · Ensayos y certificaciones completas.',
-    primaryCta: { label: 'Quiero una visita técnica', href: '/contacto?motivo=Visita técnica' },
+    caption: 'Tablero general edificio 4.000 mÂ² Â· Ensayos y certificaciones completas.',
+    primaryCta: { label: 'Quiero una visita tÃ©cnica', href: '/contacto?motivo=Visita tÃ©cnica' },
     secondaryCta: { label: 'Necesito presupuesto de obra', href: '/contacto?motivo=Presupuesto de obra' },
-    tertiaryCta: { label: 'Pedir mantenimiento', href: '/contacto?motivo=Mantenimiento' },
+    tertiaryCta: { label: 'Buscar trabajo electrico', href: '/trabajos-electricos' },
     highlights: [
       {
         title: 'Experiencia en locales y edificios',
@@ -53,48 +53,48 @@ export const SITE_DEFAULTS: SiteExperience = {
       },
       {
         title: 'Tiempos de respuesta claros',
-        description: 'Presupuestos en 24–48 h y seguimiento semanal.',
+        description: 'Presupuestos en 24â€“48 h y seguimiento semanal.',
       },
     ],
     stats: [
       {
-        label: 'Coordinación sin fricciones',
-        description: 'Equipo propio, seguros al día y reportes fotográficos.',
+        label: 'CoordinaciÃ³n sin fricciones',
+        description: 'Equipo propio, seguros al dÃ­a y reportes fotogrÃ¡ficos.',
       },
       {
         label: 'Cumplimiento normativo',
-        description: 'AEA 90364-7-771 con trazabilidad y documentación.',
+        description: 'AEA 90364-7-771 con trazabilidad y documentaciÃ³n.',
       },
     ],
   },
   services: {
-    title: 'Servicios eléctricos de punta a punta',
+    title: 'Servicios elÃ©ctricos de punta a punta',
     description:
-      'Intervenimos en obra nueva, adecuaciones y expansión. Documentación completa, planos as-built y soporte post entrega.',
+      'Intervenimos en obra nueva, adecuaciones y expansiÃ³n. DocumentaciÃ³n completa, planos as-built y soporte post entrega.',
     items: [
       {
-        title: 'Instalaciones eléctricas completas',
+        title: 'Instalaciones elÃ©ctricas completas',
         description: 'Proyecto ejecutivo, tableros, canalizaciones y puesta en marcha.',
       },
       {
         title: 'Tableros a medida',
-        description: 'Montaje, ensayo y certificación de tableros generales, seccionales y CCM.',
+        description: 'Montaje, ensayo y certificaciÃ³n de tableros generales, seccionales y CCM.',
       },
       {
-        title: 'Puesta a tierra y descargas atmosféricas',
+        title: 'Puesta a tierra y descargas atmosfÃ©ricas',
         description: 'Mallas, jabalinas, mediciones con informes certificados y adecuaciones AEA.',
       },
       {
         title: 'Canalizaciones y bandejas portacables',
-        description: 'Tendidos prolijos, registro fotográfico y planimetría actualizada.',
+        description: 'Tendidos prolijos, registro fotogrÃ¡fico y planimetrÃ­a actualizada.',
       },
       {
         title: 'Datos, CCTV y audio profesional',
-        description: 'Redes estructuradas, cámaras, audio distribuido y automatización lista para upgrades.',
+        description: 'Redes estructuradas, cÃ¡maras, audio distribuido y automatizaciÃ³n lista para upgrades.',
       },
       {
         title: 'Aires acondicionados',
-        description: 'Instalación integral con cañería de cobre, vacío, carga y alimentación eléctrica.',
+        description: 'InstalaciÃ³n integral con caÃ±erÃ­a de cobre, vacÃ­o, carga y alimentaciÃ³n elÃ©ctrica.',
       },
     ],
   },
@@ -103,126 +103,126 @@ export const SITE_DEFAULTS: SiteExperience = {
     subtitle: 'Procesos claros, reportes y experiencia comprobada en obra.',
     experience: 'Experiencia en locales y edificios (KFC / Smart Fit / DIA / Viviendas)',
     metrics: [
-      { value: '+X m²', label: 'instalados' },
+      { value: '+X mÂ²', label: 'instalados' },
       { value: '+X', label: 'tableros armados' },
       { value: '+X', label: 'proyectos' },
     ],
     testimonials: [
       {
-        name: 'Mariana López',
-        role: 'Administración de consorcios',
+        name: 'Mariana LÃ³pez',
+        role: 'AdministraciÃ³n de consorcios',
         quote: 'Equipo prolijo, reportes claros y tiempos de respuesta reales.',
       },
       {
-        name: 'Juan Pérez',
+        name: 'Juan PÃ©rez',
         role: 'Facility Manager',
-        quote: 'Cumplieron normativa y entregaron documentación lista para auditorías.',
+        quote: 'Cumplieron normativa y entregaron documentaciÃ³n lista para auditorÃ­as.',
       },
       {
-        name: 'Lucía Gómez',
-        role: 'Dirección de obra',
-        quote: 'Coordinación ágil en obra y comunicación constante.',
+        name: 'LucÃ­a GÃ³mez',
+        role: 'DirecciÃ³n de obra',
+        quote: 'CoordinaciÃ³n Ã¡gil en obra y comunicaciÃ³n constante.',
       },
     ],
     gallery: [
       { title: 'Tableros certificados', description: 'Fotos y checklist por visita (placeholder).' },
-      { title: 'Obra comercial', description: 'Canalizaciones prolijas y señalización (placeholder).' },
+      { title: 'Obra comercial', description: 'Canalizaciones prolijas y seÃ±alizaciÃ³n (placeholder).' },
       { title: 'Puesta a tierra', description: 'Mediciones certificadas y reporte (placeholder).' },
-      { title: 'Locales activos', description: 'Trabajos sin interrumpir operación (placeholder).' },
+      { title: 'Locales activos', description: 'Trabajos sin interrumpir operaciÃ³n (placeholder).' },
     ],
   },
   packs: {
-    title: 'Packs eléctricos para viviendas y countries',
+    title: 'Refacciones electricas y trabajos medianos',
     description:
-      'Packs 100% mano de obra especializada. Materiales a elección del cliente, sin sobreprecios ocultos.',
-    ctaLabel: 'Configurar pack',
+      'Trabajos de mayor alcance que requieren relevamiento, fotos, alcance real y presupuesto por Valdir Nerin.',
+    ctaLabel: 'Pedir relevamiento',
     ctaHref: '/presupuestador',
-    note: 'Proyecto eléctrico se cotiza aparte (base $500.000).',
+    note: 'Proyecto elÃ©ctrico se cotiza aparte (base $500.000).',
   },
   maintenance: {
-    title: 'Planes de mantenimiento con SLAs reales',
+    title: 'Servicios especiales con revision tecnica',
     description:
-      'Diseñados para oficinas, cadenas de retail y consorcios. Cantidades fijas inalterables, visitas programadas y reportes digitales.',
+      'Diagnosticos, informes, revision de tablero, puesta a tierra y relevamientos para decidir sin calcular a ciegas.',
     cards: [
       {
         title: 'Visitas preventivas',
         description:
-          'Revisión de tableros, medición de temperaturas, apriete de borneras y reposición de consumibles.',
+          'RevisiÃ³n de tableros, mediciÃ³n de temperaturas, apriete de borneras y reposiciÃ³n de consumibles.',
       },
       {
         title: 'Soporte correctivo',
         description:
-          'Atención de urgencias dentro de las 24 h hábiles. Priorizamos sistemas críticos definidos en SLA.',
+          'AtenciÃ³n de urgencias dentro de las 24 h hÃ¡biles. Priorizamos sistemas crÃ­ticos definidos en SLA.',
       },
       {
         title: 'Reporte ejecutivo',
         description:
-          'Informe mensual con hallazgos, fotos geolocalizadas y recomendaciones de inversión.',
+          'Informe mensual con hallazgos, fotos geolocalizadas y recomendaciones de inversiÃ³n.',
       },
     ],
   },
   works: {
-    title: 'Casos de éxito',
+    title: 'Casos de Ã©xito',
     description:
-      'Resultados medibles y documentación lista para auditorías de seguros, ART y entes reguladores.',
+      'Resultados medibles y documentaciÃ³n lista para auditorÃ­as de seguros, ART y entes reguladores.',
     introTitle: 'Obras destacadas',
     introDescription:
-      'Selección de proyectos donde NERIN lideró ingeniería eléctrica, montaje y certificaciones.',
+      'SelecciÃ³n de proyectos donde NERIN liderÃ³ ingenierÃ­a elÃ©ctrica, montaje y certificaciones.',
   },
   blog: {
-    title: 'Insights eléctricos y buenas prácticas',
+    title: 'Insights elÃ©ctricos y buenas prÃ¡cticas',
     description:
-      'Consejos prácticos para administradores, desarrolladores y equipos de facilities.',
+      'Consejos prÃ¡cticos para administradores, desarrolladores y equipos de facilities.',
     introTitle: 'Blog',
     introDescription:
-      'Contenido editorial para acompañar decisiones técnicas y de gestión eléctrica.',
+      'Contenido editorial para acompaÃ±ar decisiones tÃ©cnicas y de gestiÃ³n elÃ©ctrica.',
   },
   brands: {
-    title: 'Marcas que trabajamos todos los días',
-    note: 'Coordinamos materiales con Schneider Electric, Prysmian, Gimsa, Daisa, Genrock y más.',
+    title: 'Marcas que trabajamos todos los dÃ­as',
+    note: 'Coordinamos materiales con Schneider Electric, Prysmian, Gimsa, Daisa, Genrock y mÃ¡s.',
   },
   faq: {
     title: 'Preguntas frecuentes',
     description:
-      'Transparencia total: contratos claros, avances certificados y soporte técnico en menos de 24 h hábil.',
+      'Transparencia total: contratos claros, avances certificados y soporte tÃ©cnico en menos de 24 h hÃ¡bil.',
     items: [
       {
-        question: '¿Los packs incluyen materiales?',
+        question: 'Â¿Los packs incluyen materiales?',
         answer:
-          'No. Los packs son solo mano de obra certificada. Los materiales se cotizan aparte según elección de marcas.',
+          'No. Los packs son solo mano de obra certificada. Los materiales se cotizan aparte segÃºn elecciÃ³n de marcas.',
       },
       {
-        question: '¿El proyecto eléctrico está incluido?',
+        question: 'Â¿El proyecto elÃ©ctrico estÃ¡ incluido?',
         answer:
-          'El proyecto eléctrico se cotiza aparte. Tiene un valor base configurable desde este panel.',
+          'El proyecto elÃ©ctrico se cotiza aparte. Tiene un valor base configurable desde este panel.',
       },
       {
-        question: '¿Trabajan bajo normativa AEA?',
+        question: 'Â¿Trabajan bajo normativa AEA?',
         answer:
-          'Sí. Las instalaciones cumplen AEA 90364-7-771 (2006) y reglamentaciones locales. Documentamos cada etapa.',
+          'SÃ­. Las instalaciones cumplen AEA 90364-7-771 (2006) y reglamentaciones locales. Documentamos cada etapa.',
       },
       {
-        question: '¿Cómo se paga el avance de obra?',
+        question: 'Â¿CÃ³mo se paga el avance de obra?',
         answer:
-          'Emitimos Certificados de Avance con porcentaje ejecutado. Podés abonarlos online vía Mercado Pago.',
+          'Emitimos Certificados de Avance con porcentaje ejecutado. PodÃ©s abonarlos online vÃ­a Mercado Pago.',
       },
     ],
   },
   closingCta: {
-    title: 'Listos para ejecutar tu obra eléctrica con excelencia',
+    title: 'Listos para ejecutar tu obra elÃ©ctrica con excelencia',
     description:
-      'Coordinamos visita técnica, entregamos presupuesto detallado y planificamos el cronograma completo.',
-    primary: { label: 'Solicitar alta del plan', href: '/presupuesto?tipo=mantenimiento' },
-    secondary: { label: 'Pedir presupuesto rápido', href: '/presupuesto' },
+      'Coordinamos visita tÃ©cnica, entregamos presupuesto detallado y planificamos el cronograma completo.',
+    primary: { label: 'Pedir trabajo electrico', href: '/presupuestador' },
+    secondary: { label: 'Ver catalogo', href: '/trabajos-electricos' },
   },
   company: {
-    introTitle: 'NERIN: ingeniería eléctrica con protocolos y trazabilidad',
+    introTitle: 'NERIN: ingenierÃ­a elÃ©ctrica con protocolos y trazabilidad',
     introDescription:
-      'Equipo multidisciplinario con más de 15 años en obras eléctricas para retail, gimnasios, corporativos y viviendas premium.',
+      'Equipo multidisciplinario con mÃ¡s de 15 aÃ±os en obras elÃ©ctricas para retail, gimnasios, corporativos y viviendas premium.',
     protocolsTitle: 'Protocolos de trabajo',
     protocols: [
       'Ingreso de personal con ART Swiss Medical y certificado de aptitud.',
-      'Checklist diario de seguridad y reportes fotográficos.',
+      'Checklist diario de seguridad y reportes fotogrÃ¡ficos.',
       'Entrega de carpeta final con planos, memorias y certificados.',
     ],
     complianceTitle: 'Compliance y seguros',
@@ -231,69 +231,69 @@ export const SITE_DEFAULTS: SiteExperience = {
       'Contratos transparentes con pagos escalonados por certificados.',
       'Cumplimiento de normativa AEA 90364-7-771, NFPA 70 y reglamentos locales.',
     ],
-    mission: 'Hacer que cada instalación eléctrica sea auditada, segura y preparada para crecer.',
-    teamTitle: 'Equipo técnico',
+    mission: 'Hacer que cada instalaciÃ³n elÃ©ctrica sea auditada, segura y preparada para crecer.',
+    teamTitle: 'Equipo tÃ©cnico',
   },
   contactPage: {
-    introTitle: 'Coordinemos tu obra eléctrica',
+    introTitle: 'Coordinemos tu obra elÃ©ctrica',
     introDescription:
-      'Completá el formulario y un técnico senior se contactará dentro de las próximas 24 horas hábiles.',
+      'CompletÃ¡ el formulario y un tÃ©cnico senior se contactarÃ¡ dentro de las prÃ³ximas 24 horas hÃ¡biles.',
     highlightBullets: [
       'Equipo propio con ART y seguros vigentes.',
-      'Certificados de avance con pago online vía Mercado Pago.',
-      'Reportes fotográficos y checklist digital en cada visita.',
+      'Certificados de avance con pago online vÃ­a Mercado Pago.',
+      'Reportes fotogrÃ¡ficos y checklist digital en cada visita.',
       'Trabajo bajo normativa AEA 90364-7-771 (2006).',
-      'Separación transparente entre mano de obra y materiales.',
+      'SeparaciÃ³n transparente entre mano de obra y materiales.',
     ],
     typeformUrl: 'https://nerin.typeform.com/to/xxxxx',
   },
   packsPage: {
-    introTitle: 'Packs eléctricos para viviendas exigentes',
+    introTitle: 'Packs elÃ©ctricos para viviendas exigentes',
     introDescription:
-      'Mano de obra certificada. Materiales no incluidos para que elijas marcas según tu presupuesto.',
-    note: 'Proyecto eléctrico se cotiza aparte (base $500.000).',
+      'Mano de obra certificada. Materiales no incluidos para que elijas marcas segÃºn tu presupuesto.',
+    note: 'Proyecto elÃ©ctrico se cotiza aparte (base $500.000).',
   },
   maintenancePage: {
-    introTitle: 'Planes de mantenimiento eléctrico con respuesta garantizada',
+    introTitle: 'Servicios especiales con revision tecnica',
     introDescription:
-      'Supervisión programada, chequeos preventivos y atención de emergencias para edificios, oficinas y cadenas comerciales.',
+      'Diagnosticos, informes y relevamientos para trabajos que no conviene presupuestar a ciegas.',
     cards: [
       {
         title: 'Visitas preventivas',
         description:
-          'Revisión de tableros, medición de temperaturas, apriete de borneras y reposición de consumibles.',
+          'RevisiÃ³n de tableros, mediciÃ³n de temperaturas, apriete de borneras y reposiciÃ³n de consumibles.',
       },
       {
         title: 'Soporte correctivo',
         description:
-          'Atención de urgencias dentro de las 24 h hábiles. Priorizamos bombas, tableros generales y sistemas críticos.',
+          'AtenciÃ³n de urgencias dentro de las 24 h hÃ¡biles. Priorizamos bombas, tableros generales y sistemas crÃ­ticos.',
       },
       {
         title: 'Reporte ejecutivo',
         description:
-          'Informe mensual con hallazgos, fotos geolocalizadas y recomendaciones de inversión.',
+          'Informe mensual con hallazgos, fotos geolocalizadas y recomendaciones de inversiÃ³n.',
       },
     ],
   },
   responsive: {
     headline: 'Experiencia optimizada para escritorio, iPad y iPhone',
     bulletPoints: [
-      'Componentes responsive con breakpoints específicos para obra en campo.',
-      'Formularios con teclado numérico y máscaras en móviles.',
-      'Accesibilidad AA garantizada en contraste y navegación.',
+      'Componentes responsive con breakpoints especÃ­ficos para obra en campo.',
+      'Formularios con teclado numÃ©rico y mÃ¡scaras en mÃ³viles.',
+      'Accesibilidad AA garantizada en contraste y navegaciÃ³n.',
     ],
   },
   seo: {
-    metaTitle: 'NERIN · Ingeniería eléctrica certificada en CABA y GBA',
+    metaTitle: 'NERIN Â· IngenierÃ­a elÃ©ctrica certificada en CABA y GBA',
     metaDescription:
-      'Instalaciones eléctricas premium, tableros, mantenimiento y proyectos llave en mano con documentación completa.',
+      'Trabajos electricos, refacciones, servicios especiales y obras con presupuesto claro.',
     keywords: [
-      'instalaciones eléctricas',
-      'contratista eléctrico',
-      'tableros eléctricos',
+      'instalaciones elÃ©ctricas',
+      'contratista elÃ©ctrico',
+      'tableros elÃ©ctricos',
       'puesta a tierra',
       'consorcios',
-      'obras eléctricas CABA',
+      'obras elÃ©ctricas CABA',
     ],
   },
 }
@@ -359,3 +359,4 @@ export function deleteMarkdown(type: string, slug: string) {
   const file = getItemFile(type, slug)
   if (fs.existsSync(file)) fs.unlinkSync(file)
 }
+
