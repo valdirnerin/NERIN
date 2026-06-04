@@ -15,20 +15,20 @@ export const revalidate = 60
 
 const clientPaths = [
   {
-    title: 'Trabajo chico',
-    description: 'Fallas, tomas, luces, tableros y pedidos simples con precio orientativo.',
-    href: '/trabajos-electricos',
+    title: 'Trabajos chicos',
+    description: 'Pedidos simples: tomas, llaves de luz, fallas, luminarias y pequenas reparaciones con fotos.',
+    href: '/trabajos-chicos',
     cta: 'Ver trabajos chicos',
   },
   {
-    title: 'Refaccion electrica',
-    description: 'Renovacion electrica de departamentos, locales y espacios existentes.',
+    title: 'Refacciones electricas',
+    description: 'Trabajos medianos en departamentos, locales, oficinas y reformas parciales con relevamiento.',
     href: '/refacciones-electricas',
     cta: 'Pedir relevamiento',
   },
   {
-    title: 'Obra electrica',
-    description: 'Instalaciones para locales, edificios y proyectos con seguimiento por etapas.',
+    title: 'Obras electricas',
+    description: 'Locales, edificios y obras nuevas con planificacion, presupuesto formal y seguimiento por etapas.',
     href: '/obras-electricas',
     cta: 'Consultar por obra',
   },
@@ -92,9 +92,9 @@ export default async function HomePage() {
                 </a>
               </Button>
               <Button asChild size="lg" variant="outline" className="h-12 px-6 text-base">
-                <Link href="/trabajos-electricos">
+                <Link href="/trabajos-chicos">
                   <Search className="mr-2 h-5 w-5" />
-                  Ver precios de trabajos chicos
+                  Enviar fotos para cotizar
                 </Link>
               </Button>
             </div>
@@ -123,7 +123,7 @@ export default async function HomePage() {
             <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Trabajos chicos</p>
             <h2 className="mt-2 text-3xl font-semibold text-slate-950">Catalogo de servicios puntuales con precio desde.</h2>
           </div>
-          <Link href="/trabajos-electricos" className="inline-flex items-center text-sm font-semibold text-slate-950">
+          <Link href="/trabajos-chicos" className="inline-flex items-center text-sm font-semibold text-slate-950">
             Ver catalogo
             <ArrowRight className="ml-1 h-4 w-4" />
           </Link>
@@ -135,8 +135,8 @@ export default async function HomePage() {
               <h3 className="mt-2 text-lg font-semibold text-slate-950">{service.name}</h3>
               <p className="mt-2 text-sm leading-6 text-slate-600">{service.shortDescription}</p>
               <p className="mt-4 text-sm font-bold text-slate-950">{service.priceFrom ?? 'A presupuestar'}</p>
-              <Link href={`/trabajos-electricos/${service.slug}`} className="mt-4 inline-flex items-center text-sm font-semibold text-slate-950">
-                Pedir este trabajo
+              <Link href={`/trabajos-chicos/${service.slug}`} className="mt-4 inline-flex items-center text-sm font-semibold text-slate-950">
+                Enviar fotos para cotizar
                 <ArrowRight className="ml-1 h-4 w-4" />
               </Link>
             </article>
@@ -148,11 +148,14 @@ export default async function HomePage() {
         <div className="container grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Refacciones electricas</p>
-            <h2 className="mt-2 text-3xl font-semibold text-slate-950">Trabajos medianos con relevamiento y presupuesto guiado.</h2>
+            <h2 className="mt-2 text-3xl font-semibold text-slate-950">Trabajos medianos con relevamiento, alcance y presupuesto.</h2>
             <p className="mt-4 text-sm leading-6 text-slate-600">
-              No tienen precio unico: dependen del estado de la instalacion, cantidad de bocas, tablero, materiales,
-              canalizacion y alcance real.
+              En refacciones, el precio depende del estado existente, cantidad de bocas, tablero, canalizaciones y alcance real.
             </p>
+            <Link href="/refacciones-electricas" className="mt-5 inline-flex items-center rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white">
+              Pedir relevamiento
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             {renovationCards.map((item) => (
@@ -169,7 +172,14 @@ export default async function HomePage() {
         <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Obras grandes</p>
-            <h2 className="mt-2 text-3xl font-semibold text-slate-950">Presupuesto por alcance, avance y certificados por etapa.</h2>
+            <h2 className="mt-2 text-3xl font-semibold text-slate-950">Planificacion por etapas, presupuesto formal y portal cliente.</h2>
+            <p className="mt-4 text-sm leading-6 text-slate-600">
+              Para constructores, locales comerciales, edificios e instalaciones completas con seguimiento y certificados de avance cuando corresponda.
+            </p>
+            <Link href="/obras-electricas" className="mt-5 inline-flex items-center rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white">
+              Consultar obra electrica
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             {majorWorks.map((item) => (
@@ -239,7 +249,7 @@ export default async function HomePage() {
             <ShieldAlert className="h-4 w-4" />
             Solicitud
           </p>
-          <h2 className="mt-4 text-3xl font-semibold text-slate-950">Pedilo como trabajo chico, refaccion, obra o servicio especial.</h2>
+          <h2 className="mt-4 text-3xl font-semibold text-slate-950">Elegi el camino correcto para tu solicitud.</h2>
           <p className="mt-3 text-sm leading-6 text-slate-600">
             Todo lo especial, riesgoso, fuera de zona o no catalogado pasa a revision manual por Valdir Nerin.
           </p>
