@@ -15,7 +15,7 @@ export default function ObrasPage() {
           <p className="text-xs font-bold uppercase tracking-[0.24em] text-amber-300">Obras y experiencia</p>
           <h1 className="mt-3 text-4xl font-semibold text-white sm:text-5xl">Instalaciones electricas para obra, comercio y edificios.</h1>
           <p className="mt-4 text-lg leading-8 text-slate-300">
-            Se muestran referencias profesionales sin inventar metros, montos, fechas ni responsables. Los detalles reales se cargan desde admin cuando esten disponibles.
+            Experiencia en espacios comerciales, gimnasios, supermercados y edificios residenciales, con alcance definido por relevamiento.
           </p>
         </div>
       </section>
