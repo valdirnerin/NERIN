@@ -22,9 +22,8 @@ const navigation = [
   { href: '/', label: 'Inicio' },
   { href: '/trabajos-electricos', label: 'Trabajos chicos' },
   { href: '/refacciones-electricas', label: 'Refacciones' },
-  { href: '/obras-electricas', label: 'Obras electricas' },
-  { href: '/servicios-especiales', label: 'Servicios especiales' },
-  { href: '/obras', label: 'Obras realizadas' },
+  { href: '/obras-electricas', label: 'Obras' },
+  { href: '/obras', label: 'Casos reales' },
   { href: '/empresa', label: 'Empresa' },
   { href: '/contacto', label: 'Contacto' },
 ] as const
@@ -80,11 +79,6 @@ export function Header({ contact, logo }: HeaderProps) {
                 WhatsApp
               </a>
             </Button>
-            <Button size="sm" asChild className="hidden bg-slate-950 hover:bg-slate-800 lg:inline-flex">
-              <Link href="/presupuestador" data-track="lead" data-content-name="Presupuesto header">
-                Pedir presupuesto
-              </Link>
-            </Button>
 
             <button
               type="button"
@@ -114,10 +108,7 @@ export function Header({ contact, logo }: HeaderProps) {
                 ))}
               </nav>
 
-              <div className="grid gap-2 sm:grid-cols-2">
-                <Button asChild className="bg-slate-950 hover:bg-slate-800" onClick={() => setMenuOpen(false)}>
-                  <Link href="/presupuestador">Pedir presupuesto</Link>
-                </Button>
+              <div className="grid gap-2">
                 <Button asChild className="bg-[#25D366] text-black hover:bg-[#1ebe5a]">
                   <a
                     href={contact.whatsappHref}

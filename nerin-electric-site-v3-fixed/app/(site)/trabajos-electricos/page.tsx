@@ -19,7 +19,7 @@ export default function TrabajosElectricosPage() {
           </p>
           <div className="mt-6 flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-500">
             <Search className="h-5 w-5" />
-            <span className="text-sm">Busca por categoria, nombre o problema. El buscador dinamico queda preparado para el admin.</span>
+            <span className="text-sm">Busca por categoria, nombre o problema y elegi el trabajo que mas se parezca a tu pedido.</span>
           </div>
         </div>
       </section>
