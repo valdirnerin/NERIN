@@ -4,16 +4,44 @@ import { getSiteContent, getWhatsappHref } from '@/lib/site-content'
 import {
   featuredExperience,
   majorWorks,
-  manualReviewMessage,
   renovationCards,
   serviceCatalog,
   specialServices,
-  trustItems,
 } from '@/lib/nerin-electricidad'
 import { LeadWizard } from '@/components/LeadWizard'
 import { Button } from '@/components/ui/button'
 
 export const revalidate = 60
+
+const clientPaths = [
+  {
+    title: 'Trabajo chico',
+    description: 'Fallas, tomas, luces, tableros y pedidos simples con precio orientativo.',
+    href: '/trabajos-electricos',
+    cta: 'Ver trabajos chicos',
+  },
+  {
+    title: 'Refaccion electrica',
+    description: 'Renovacion electrica de departamentos, locales y espacios existentes.',
+    href: '/refacciones-electricas',
+    cta: 'Pedir relevamiento',
+  },
+  {
+    title: 'Obra electrica',
+    description: 'Instalaciones para locales, edificios y proyectos con seguimiento por etapas.',
+    href: '/obras-electricas',
+    cta: 'Consultar por obra',
+  },
+] as const
+
+const clientBenefits = [
+  'Presupuesto claro',
+  'Materiales separados cuando aplica',
+  'Trabajo prolijo',
+  'Seguimiento real',
+  'Criterio de seguridad',
+  'Documentacion cuando corresponde',
+] as const
 
 export async function generateMetadata() {
   const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
@@ -42,62 +70,54 @@ export default async function HomePage() {
   return (
     <div className="bg-white">
       <section className="border-b border-slate-200 bg-[linear-gradient(180deg,#fff_0%,#f8fafc_100%)]">
-        <div className="container grid min-h-[calc(100vh-7rem)] gap-10 py-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:py-16">
-          <div className="space-y-7">
+        <div className="container flex min-h-[calc(100svh-7rem)] items-center py-10 lg:py-16">
+          <div className="max-w-4xl space-y-7">
             <div className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold uppercase tracking-[0.18em] text-slate-900">
               <Zap className="h-4 w-4 text-amber-500" />
               Trabajos chicos, refacciones y obras electricas
             </div>
             <div className="space-y-5">
               <h1 className="max-w-4xl text-4xl font-semibold leading-[1.03] tracking-tight text-slate-950 sm:text-6xl">
-                Instalaciones y trabajos electricos profesionales en CABA y GBA
+                Instalaciones electricas profesionales en CABA y GBA
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-slate-600">
-                Trabajos chicos, refacciones electricas y obras completas con presupuesto claro, ejecucion prolija y
-                seguimiento real.
+                Trabajos chicos, refacciones y obras con presupuesto claro, ejecucion prolija y seguimiento real.
               </p>
             </div>
             <div className="grid gap-3 sm:flex">
-              <Button asChild size="lg" className="h-12 bg-slate-950 px-6 text-base font-bold text-white hover:bg-slate-800">
-                <Link href="/trabajos-electricos">
-                  <Search className="mr-2 h-5 w-5" />
-                  Buscar un trabajo electrico
-                </Link>
-              </Button>
               <Button asChild size="lg" className="h-12 bg-[#25D366] px-6 text-base font-bold text-black hover:bg-[#1ebe5a]">
                 <a href={whatsappHref} target={isWhatsappExternal ? '_blank' : undefined} rel={isWhatsappExternal ? 'noopener noreferrer' : undefined}>
                   <MessageCircle className="mr-2 h-5 w-5" />
-                  Pedir presupuesto
+                  Pedir presupuesto por WhatsApp
                 </a>
               </Button>
               <Button asChild size="lg" variant="outline" className="h-12 px-6 text-base">
-                <Link href="/obras-electricas">Ver obras</Link>
-              </Button>
-            </div>
-          </div>
-
-          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="rounded-2xl bg-slate-950 p-6 text-white">
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-300">Buscador comercial</p>
-              <h2 className="mt-4 text-3xl font-semibold text-white">Precios orientativos cuando el trabajo se puede estandarizar.</h2>
-              <p className="mt-4 text-sm leading-6 text-slate-300">{manualReviewMessage}</p>
-            </div>
-            <div className="mt-4 grid gap-3">
-              {serviceCatalog.slice(0, 4).map((item) => (
-                <Link key={item.slug} href={`/trabajos-electricos/${item.slug}`} className="flex items-center justify-between rounded-2xl border border-slate-200 px-4 py-3 hover:border-slate-950">
-                  <span>
-                    <span className="block font-semibold text-slate-900">{item.name}</span>
-                    <span className="block text-sm text-slate-500">{item.priceFrom ?? 'A presupuestar'}</span>
-                  </span>
-                  <ArrowRight className="h-5 w-5 text-slate-500" />
+                <Link href="/trabajos-electricos">
+                  <Search className="mr-2 h-5 w-5" />
+                  Ver precios de trabajos chicos
                 </Link>
-              ))}
+              </Button>
             </div>
           </div>
         </div>
       </section>
 
       <section className="container py-14">
+        <div className="grid gap-4 lg:grid-cols-3">
+          {clientPaths.map((item) => (
+            <article key={item.title} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="text-2xl font-semibold text-slate-950">{item.title}</h2>
+              <p className="mt-3 text-sm leading-6 text-slate-600">{item.description}</p>
+              <Link href={item.href} className="mt-6 inline-flex items-center rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white">
+                {item.cta}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="container pb-14">
         <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-2xl">
             <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Trabajos chicos</p>
@@ -183,10 +203,10 @@ export default async function HomePage() {
         <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Por que elegir NERIN</p>
-            <h2 className="mt-2 text-3xl font-semibold text-slate-950">Vender mejor, presupuestar mejor y controlar costos.</h2>
+            <h2 className="mt-2 text-3xl font-semibold text-slate-950">Trabajo claro, prolijo y seguro de principio a fin.</h2>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
-            {trustItems.map((item) => (
+            {clientBenefits.map((item) => (
               <div key={item} className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 shadow-sm">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                 {item}
@@ -206,7 +226,7 @@ export default async function HomePage() {
             {featuredExperience.map((item) => (
               <article key={item} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <h3 className="text-xl font-semibold text-slate-950">{item}</h3>
-                <p className="mt-2 text-sm text-slate-600">Referencia de experiencia profesional. Detalles reales editables cuando esten cargados.</p>
+                <p className="mt-2 text-sm text-slate-600">Experiencia profesional en instalaciones electricas para espacios de uso intensivo.</p>
               </article>
             ))}
           </div>
