@@ -17,6 +17,8 @@ type LeadWizardProps = {
   initialWorkType?: string
   initialRequestType?: string
   serviceName?: string
+  submitLabel?: string
+  detailPlaceholder?: string
 }
 
 type LeadFormState = {
@@ -34,7 +36,14 @@ type LeadFormState = {
   consent: boolean
 }
 
-export function LeadWizard({ whatsappHref, initialWorkType, initialRequestType, serviceName }: LeadWizardProps) {
+export function LeadWizard({
+  whatsappHref,
+  initialWorkType,
+  initialRequestType,
+  serviceName,
+  submitLabel = 'Enviar solicitud',
+  detailPlaceholder = 'Contanos que pasa, que queres hacer, si hay riesgo, cortes, fotos o datos de la instalacion.',
+}: LeadWizardProps) {
   const [form, setForm] = useState<LeadFormState>({
     requestType: initialRequestType || requestTypes[0],
     workType: initialWorkType || serviceName || '',
@@ -61,7 +70,7 @@ export function LeadWizard({ whatsappHref, initialWorkType, initialRequestType, 
         form.zone,
         form.location || 'localidad a confirmar',
         form.urgency,
-      ].join(' · '),
+      ].join(' - '),
     [form.location, form.requestType, form.urgency, form.workType, form.zone],
   )
 
@@ -189,7 +198,7 @@ export function LeadWizard({ whatsappHref, initialWorkType, initialRequestType, 
             name="details"
             value={form.details}
             onChange={(event) => update('details', event.target.value)}
-            placeholder="Contanos que pasa, que queres hacer, si hay riesgo, cortes, fotos o datos de la instalacion."
+            placeholder={detailPlaceholder}
             className="min-h-32 rounded-xl border border-slate-200 px-3 py-3 text-sm outline-none focus:border-slate-950 lg:col-span-2"
             required
           />
@@ -259,7 +268,7 @@ export function LeadWizard({ whatsappHref, initialWorkType, initialRequestType, 
         <div className="flex flex-col gap-2 sm:flex-row">
           <Button type="submit" disabled={status === 'submitting'} className="bg-slate-950 hover:bg-slate-800">
             {status === 'submitting' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
-            Enviar solicitud
+            {submitLabel}
           </Button>
           <Button asChild className="bg-[#25D366] text-black hover:bg-[#1ebe5a]">
             <a href={whatsappHref} target={isWhatsappExternal ? '_blank' : undefined} rel={isWhatsappExternal ? 'noopener noreferrer' : undefined}>
