@@ -5,9 +5,9 @@ import { getWhatsappHref } from '@/lib/site-content'
 const quickLinks = [
   { href: '/trabajos-electricos', label: 'Trabajos chicos' },
   { href: '/refacciones-electricas', label: 'Refacciones' },
-  { href: '/obras-electricas', label: 'Obras electricas' },
-  { href: '/servicios-especiales', label: 'Servicios especiales' },
+  { href: '/obras-electricas', label: 'Obras' },
   { href: '/obras', label: 'Obras realizadas' },
+  { href: '/empresa', label: 'Empresa' },
   { href: '/contacto', label: 'Contacto' },
 ] as const
 
@@ -48,12 +48,9 @@ export function Footer({ site }: FooterProps) {
         <div className="space-y-3">
           <p className="text-xs font-semibold uppercase tracking-[0.34em] text-slate-500">NERIN Electricidad</p>
           <p className="max-w-sm text-sm font-medium text-slate-900">
-            Plataforma comercial y operativa para trabajos chicos, refacciones, obras y servicios electricos especiales.
+            Instalaciones electricas profesionales para trabajos chicos, refacciones y obras en CABA y GBA.
           </p>
-          <p className="text-sm text-slate-600">{site.contact.serviceArea}</p>
-          <p className="text-xs text-slate-500">
-            Datos legales, responsables tecnicos y matriculas se muestran cuando esten cargados en configuracion.
-          </p>
+          {site.contact.serviceArea ? <p className="text-sm text-slate-600">{site.contact.serviceArea}</p> : null}
         </div>
 
         <div>
@@ -92,7 +89,7 @@ export function Footer({ site }: FooterProps) {
         </div>
 
         <div>
-          <h4 className="text-xs font-semibold uppercase tracking-[0.34em] text-slate-500">Sistema</h4>
+          <h4 className="text-xs font-semibold uppercase tracking-[0.34em] text-slate-500">Informacion</h4>
           <ul className="mt-3 space-y-2 text-sm text-slate-700">
             {legalLinks.map((item) => (
               <li key={item.href}>
@@ -100,7 +97,7 @@ export function Footer({ site }: FooterProps) {
               </li>
             ))}
             <li>
-              <Link href="/admin">Panel admin</Link>
+              <Link href="/clientes">Portal cliente</Link>
             </li>
           </ul>
         </div>
@@ -108,7 +105,7 @@ export function Footer({ site }: FooterProps) {
 
       <div className="border-t border-slate-200 bg-slate-50 py-5">
         <div className="container text-sm text-slate-500">
-          <span>© {new Date().getFullYear()} NERIN Electricidad.</span>
+          <span>Â© {new Date().getFullYear()} NERIN Electricidad.</span>
         </div>
       </div>
     </footer>
