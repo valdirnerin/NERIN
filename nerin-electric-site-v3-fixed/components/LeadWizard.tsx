@@ -17,6 +17,7 @@ type LeadWizardProps = {
   initialWorkType?: string
   initialRequestType?: string
   serviceName?: string
+  servicePriceFrom?: string
   submitLabel?: string
   detailPlaceholder?: string
 }
@@ -34,6 +35,48 @@ type LeadFormState = {
   email: string
   preferredTime: string
   consent: boolean
+  surfaceOrRooms: string
+  hasExistingPanel: string
+  needsCanalization: string
+  hasPlansOrPhotos: string
+  projectType: string
+  projectStage: string
+  projectSector: string
+  projectScope: string
+  estimatedStartDate: string
+}
+
+const smallJobUrgencies = ['Lo antes posible', 'Esta semana', 'Sin urgencia', 'Solo quiero consultar precio'] as const
+const renovationUrgencies = ['Lo antes posible', 'Esta semana', 'Sin urgencia', 'Estoy evaluando alcance'] as const
+const panelOptions = ['Si', 'No', 'No lo se'] as const
+const canalizationOptions = ['Si', 'No', 'A confirmar'] as const
+const plansOptions = ['Si, tengo planos/fotos', 'Tengo fotos', 'No tengo', 'Puedo enviarlos luego'] as const
+const projectTypes = ['Obra nueva', 'Ampliacion', 'Remodelacion', 'Adecuacion electrica', 'Mantenimiento de obra'] as const
+const projectStages = ['Idea / anteproyecto', 'Proyecto definido', 'Obra por iniciar', 'Obra en curso', 'Finalizacion / entrega'] as const
+const projectSectors = ['Local', 'Edificio', 'Comercio', 'Vivienda', 'Oficina', 'Otro'] as const
+
+const zoneConfirmationMessage =
+  'La zona requiere confirmacion de disponibilidad. Revisaremos el caso antes de confirmar visita o presupuesto.'
+const priceClarification = 'Precio orientativo sujeto a revision segun fotos, zona y alcance.'
+
+function getFlowType(requestType: string) {
+  if (requestType === 'Refaccion electrica') return 'renovation'
+  if (requestType === 'Obra grande') return 'major'
+  return 'small'
+}
+
+function getUrgencyList(requestType: string) {
+  if (requestType === 'Refaccion electrica') return [...renovationUrgencies]
+  if (requestType === 'Obra grande') return [...urgencyOptions]
+  return [...smallJobUrgencies]
+}
+
+function requiresZoneConfirmation(zone: string) {
+  return zone === 'Otra zona / consultar disponibilidad' || zone === 'Requiere confirmacion'
+}
+
+function formatAnswer(label: string, value: string) {
+  return value ? `${label}: ${value}` : null
 }
 
 export function LeadWizard({
@@ -41,26 +84,40 @@ export function LeadWizard({
   initialWorkType,
   initialRequestType,
   serviceName,
+  servicePriceFrom,
   submitLabel = 'Enviar solicitud',
   detailPlaceholder = 'Contanos que pasa, que queres hacer, si hay riesgo, cortes, fotos o datos de la instalacion.',
 }: LeadWizardProps) {
+  const hasPreselectedService = Boolean(initialWorkType || serviceName)
   const [form, setForm] = useState<LeadFormState>({
     requestType: initialRequestType || requestTypes[0],
     workType: initialWorkType || serviceName || '',
     zone: coverageZones[0],
     location: '',
     propertyType: propertyTypes[0],
-    urgency: urgencyOptions[0],
+    urgency: getUrgencyList(initialRequestType || requestTypes[0])[0],
     details: '',
     phone: '',
     name: '',
     email: '',
     preferredTime: '',
     consent: true,
+    surfaceOrRooms: '',
+    hasExistingPanel: panelOptions[2],
+    needsCanalization: canalizationOptions[2],
+    hasPlansOrPhotos: plansOptions[3],
+    projectType: projectTypes[0],
+    projectStage: projectStages[0],
+    projectSector: projectSectors[0],
+    projectScope: '',
+    estimatedStartDate: '',
   })
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [message, setMessage] = useState('')
   const isWhatsappExternal = whatsappHref.startsWith('http')
+  const flowType = getFlowType(form.requestType)
+  const urgencyList = getUrgencyList(form.requestType)
+  const zoneNeedsConfirmation = requiresZoneConfirmation(form.zone)
 
   const summary = useMemo(
     () =>
@@ -78,20 +135,56 @@ export function LeadWizard({
     setForm((prev) => ({ ...prev, [key]: value }))
   }
 
+  const updateRequestType = (value: string) => {
+    const nextUrgencies = getUrgencyList(value)
+    setForm((prev) => ({
+      ...prev,
+      requestType: value,
+      urgency: nextUrgencies.includes(prev.urgency) ? prev.urgency : nextUrgencies[0],
+    }))
+  }
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setStatus('submitting')
     setMessage('')
 
     const formData = new FormData(event.currentTarget)
-    formData.set('clientType', form.propertyType)
+    const structuredDetails = [
+      `Origen del formulario: ${typeof window !== 'undefined' ? window.location.pathname : 'web'}`,
+      formatAnswer('Tipo de solicitud', form.requestType),
+      formatAnswer('Categoria', flowType === 'renovation' ? 'Refaccion' : flowType === 'major' ? 'Obra' : 'Trabajo chico'),
+      formatAnswer('Servicio preseleccionado', hasPreselectedService ? form.workType : ''),
+      formatAnswer('Precio desde visible', servicePriceFrom || ''),
+      formatAnswer('Zona', form.zone),
+      zoneNeedsConfirmation ? zoneConfirmationMessage : null,
+      flowType === 'renovation' ? formatAnswer('Tipo de propiedad', form.propertyType) : null,
+      flowType === 'renovation' ? formatAnswer('Superficie o ambientes', form.surfaceOrRooms) : null,
+      flowType === 'renovation' ? formatAnswer('Tablero existente', form.hasExistingPanel) : null,
+      flowType === 'renovation' ? formatAnswer('Necesita cambiar canalizacion', form.needsCanalization) : null,
+      flowType === 'renovation' ? formatAnswer('Planos/fotos', form.hasPlansOrPhotos) : null,
+      flowType === 'major' ? formatAnswer('Tipo de obra', form.projectType) : null,
+      flowType === 'major' ? formatAnswer('Etapa de obra', form.projectStage) : null,
+      flowType === 'major' ? formatAnswer('Planos disponibles', form.hasPlansOrPhotos) : null,
+      flowType === 'major' ? formatAnswer('Rubro', form.projectSector) : null,
+      flowType === 'major' ? formatAnswer('Alcance buscado', form.projectScope) : null,
+      flowType === 'major' ? formatAnswer('Fecha estimada de inicio', form.estimatedStartDate) : null,
+      formatAnswer('Descripcion', form.details),
+      form.preferredTime ? formatAnswer('Horario preferido', form.preferredTime) : null,
+    ]
+      .filter(Boolean)
+      .join('\n')
+
+    formData.set('clientType', flowType === 'major' ? form.projectSector : form.propertyType)
     formData.set('location', `${form.zone} - ${form.location}`)
     formData.set('address', form.location)
     formData.set('leadType', form.requestType)
     formData.set('workType', form.workType || form.requestType)
     formData.set('reason', form.urgency)
-    formData.set('details', `${form.details}${form.preferredTime ? `\nHorario preferido: ${form.preferredTime}` : ''}`)
+    formData.set('details', structuredDetails)
     formData.set('consent', form.consent ? 'true' : 'false')
+    formData.set('landingPage', typeof window !== 'undefined' ? window.location.pathname : '')
+    formData.set('referrer', typeof document !== 'undefined' ? document.referrer : '')
 
     try {
       const response = await fetch('/api/leads', {
@@ -110,7 +203,14 @@ export function LeadWizard({
 
   return (
     <form onSubmit={handleSubmit} className="grid gap-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Solicitud</p>
+        <p className="mt-1 text-lg font-semibold text-slate-950">{form.workType || form.requestType}</p>
+        {servicePriceFrom ? <p className="mt-1 text-sm font-bold text-slate-950">Precio desde {servicePriceFrom}</p> : null}
+        <p className="mt-2 text-xs leading-5 text-slate-600">{priceClarification}</p>
+      </div>
+
+      {!hasPreselectedService ? (
         <fieldset className="space-y-3">
           <legend className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">1. Tipo de solicitud</legend>
           <div className="grid gap-2 sm:grid-cols-2">
@@ -122,7 +222,7 @@ export function LeadWizard({
                   name="requestType"
                   value={item}
                   checked={form.requestType === item}
-                  onChange={(event) => update('requestType', event.target.value)}
+                  onChange={(event) => updateRequestType(event.target.value)}
                 />
                 {item}
               </label>
@@ -136,28 +236,41 @@ export function LeadWizard({
             className="h-11 w-full rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-slate-950"
           />
         </fieldset>
+      ) : (
+        <input type="hidden" name="workType" value={form.workType} />
+      )}
 
+      <fieldset className="space-y-3">
+        <legend className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">{hasPreselectedService ? '1' : '2'}. Zona</legend>
+        <div className="grid gap-3 lg:grid-cols-2">
+          <select
+            name="zone"
+            value={form.zone}
+            onChange={(event) => update('zone', event.target.value)}
+            className="h-11 rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-slate-950"
+          >
+            {coverageZones.map((zone) => (
+              <option key={zone}>{zone}</option>
+            ))}
+          </select>
+          <input
+            name="locationInput"
+            value={form.location}
+            onChange={(event) => update('location', event.target.value)}
+            placeholder={flowType === 'major' ? 'Ubicacion de la obra' : 'Barrio o localidad'}
+            className="h-11 rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-slate-950"
+            required
+          />
+        </div>
+        {zoneNeedsConfirmation ? (
+          <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">{zoneConfirmationMessage}</p>
+        ) : null}
+      </fieldset>
+
+      {flowType === 'renovation' ? (
         <fieldset className="space-y-3">
-          <legend className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">2. Zona y propiedad</legend>
-          <div className="grid gap-3">
-            <select
-              name="zone"
-              value={form.zone}
-              onChange={(event) => update('zone', event.target.value)}
-              className="h-11 rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-slate-950"
-            >
-              {coverageZones.map((zone) => (
-                <option key={zone}>{zone}</option>
-              ))}
-            </select>
-            <input
-              name="locationInput"
-              value={form.location}
-              onChange={(event) => update('location', event.target.value)}
-              placeholder="Barrio o localidad"
-              className="h-11 rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-slate-950"
-              required
-            />
+          <legend className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">Datos de refaccion</legend>
+          <div className="grid gap-3 lg:grid-cols-2">
             <select
               name="propertyType"
               value={form.propertyType}
@@ -168,14 +281,52 @@ export function LeadWizard({
                 <option key={item}>{item}</option>
               ))}
             </select>
+            <input
+              name="surfaceOrRooms"
+              value={form.surfaceOrRooms}
+              onChange={(event) => update('surfaceOrRooms', event.target.value)}
+              placeholder="Superficie aproximada o cantidad de ambientes"
+              className="h-11 rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-slate-950"
+              required
+            />
+            <SelectField name="hasExistingPanel" label="Tablero existente" value={form.hasExistingPanel} options={panelOptions} onChange={(value) => update('hasExistingPanel', value)} />
+            <SelectField name="needsCanalization" label="Cambiar canalizacion" value={form.needsCanalization} options={canalizationOptions} onChange={(value) => update('needsCanalization', value)} />
+            <SelectField name="hasPlansOrPhotos" label="Planos o fotos" value={form.hasPlansOrPhotos} options={plansOptions} onChange={(value) => update('hasPlansOrPhotos', value)} />
           </div>
         </fieldset>
-      </div>
+      ) : null}
+
+      {flowType === 'major' ? (
+        <fieldset className="space-y-3">
+          <legend className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">Datos de obra</legend>
+          <div className="grid gap-3 lg:grid-cols-2">
+            <SelectField name="projectType" label="Tipo de obra" value={form.projectType} options={projectTypes} onChange={(value) => update('projectType', value)} />
+            <SelectField name="projectStage" label="Etapa de obra" value={form.projectStage} options={projectStages} onChange={(value) => update('projectStage', value)} />
+            <SelectField name="hasPlansOrPhotos" label="Planos disponibles" value={form.hasPlansOrPhotos} options={plansOptions} onChange={(value) => update('hasPlansOrPhotos', value)} />
+            <SelectField name="projectSector" label="Rubro" value={form.projectSector} options={projectSectors} onChange={(value) => update('projectSector', value)} />
+            <input
+              name="estimatedStartDate"
+              value={form.estimatedStartDate}
+              onChange={(event) => update('estimatedStartDate', event.target.value)}
+              placeholder="Fecha estimada de inicio"
+              className="h-11 rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-slate-950"
+            />
+            <textarea
+              name="projectScope"
+              value={form.projectScope}
+              onChange={(event) => update('projectScope', event.target.value)}
+              placeholder="Alcance buscado"
+              className="min-h-24 rounded-xl border border-slate-200 px-3 py-3 text-sm outline-none focus:border-slate-950 lg:col-span-2"
+              required
+            />
+          </div>
+        </fieldset>
+      ) : null}
 
       <fieldset className="space-y-3">
-        <legend className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">3. Urgencia</legend>
+        <legend className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">{hasPreselectedService ? '2' : '3'}. Urgencia</legend>
         <div className="grid gap-2 sm:grid-cols-4">
-          {urgencyOptions.map((item) => (
+          {urgencyList.map((item) => (
             <label key={item} className="flex cursor-pointer items-center justify-center rounded-xl border border-slate-200 px-3 py-2 text-center text-sm font-semibold has-[:checked]:border-amber-400 has-[:checked]:bg-amber-50">
               <input
                 className="sr-only"
@@ -192,16 +343,29 @@ export function LeadWizard({
       </fieldset>
 
       <fieldset className="space-y-3">
-        <legend className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">4. Detalle y contacto</legend>
-        <div className="grid gap-3 lg:grid-cols-2">
+        <legend className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">{hasPreselectedService ? '3' : '4'}. Fotos y descripcion</legend>
+        <div className="grid gap-3">
           <textarea
             name="details"
             value={form.details}
             onChange={(event) => update('details', event.target.value)}
-            placeholder={detailPlaceholder}
-            className="min-h-32 rounded-xl border border-slate-200 px-3 py-3 text-sm outline-none focus:border-slate-950 lg:col-span-2"
+            placeholder={flowType === 'small' ? 'Contanos que pasa o que necesitas.' : detailPlaceholder}
+            className="min-h-28 rounded-xl border border-slate-200 px-3 py-3 text-sm outline-none focus:border-slate-950"
             required
           />
+          <input
+            name="adjuntos"
+            type="file"
+            multiple
+            accept="image/*,.pdf"
+            className="h-11 rounded-xl border border-slate-200 px-3 py-2 text-sm"
+          />
+        </div>
+      </fieldset>
+
+      <fieldset className="space-y-3">
+        <legend className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">{hasPreselectedService ? '4' : '5'}. Contacto</legend>
+        <div className="grid gap-3 lg:grid-cols-2">
           <input
             name="name"
             value={form.name}
@@ -233,23 +397,12 @@ export function LeadWizard({
             placeholder="Horario preferido"
             className="h-11 rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-slate-950"
           />
-          <input
-            name="adjuntos"
-            type="file"
-            multiple
-            accept="image/*,.pdf"
-            className="h-11 rounded-xl border border-slate-200 px-3 py-2 text-sm lg:col-span-2"
-          />
         </div>
       </fieldset>
 
       <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
         <p className="text-sm font-semibold text-slate-950">Resumen: {summary}</p>
-        <p className="mt-1 text-sm text-slate-700">
-          {form.zone === 'Requiere confirmacion'
-            ? 'Por ahora este servicio puede no estar disponible en tu zona. Podes enviar la solicitud y la vamos a revisar manualmente.'
-            : manualReviewMessage}
-        </p>
+        <p className="mt-1 text-sm text-slate-700">{zoneNeedsConfirmation ? zoneConfirmationMessage : manualReviewMessage}</p>
         <p className="mt-2 text-xs leading-5 text-slate-600">{safetyNotice}</p>
       </div>
 
@@ -285,5 +438,35 @@ export function LeadWizard({
         </p>
       ) : null}
     </form>
+  )
+}
+
+function SelectField({
+  name,
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  name: string
+  label: string
+  value: string
+  options: readonly string[]
+  onChange: (value: string) => void
+}) {
+  return (
+    <label className="grid gap-1 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+      {label}
+      <select
+        name={name}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="h-11 rounded-xl border border-slate-200 px-3 text-sm font-normal normal-case tracking-normal text-slate-950 outline-none focus:border-slate-950"
+      >
+        {options.map((item) => (
+          <option key={item}>{item}</option>
+        ))}
+      </select>
+    </label>
   )
 }
