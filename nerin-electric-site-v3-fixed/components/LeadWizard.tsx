@@ -54,6 +54,9 @@ const plansOptions = ['Si, tengo planos/fotos', 'Tengo fotos', 'No tengo', 'Pued
 const projectTypes = ['Obra nueva', 'Ampliacion', 'Remodelacion', 'Adecuacion electrica', 'Mantenimiento de obra'] as const
 const projectStages = ['Idea / anteproyecto', 'Proyecto definido', 'Obra por iniciar', 'Obra en curso', 'Finalizacion / entrega'] as const
 const projectSectors = ['Local', 'Edificio', 'Comercio', 'Vivienda', 'Oficina', 'Otro'] as const
+const zoneOptions = coverageZones.map((zone) =>
+  zone === 'Requiere confirmacion' ? 'Otra zona / consultar disponibilidad' : zone,
+)
 
 const zoneConfirmationMessage =
   'La zona requiere confirmacion de disponibilidad. Revisaremos el caso antes de confirmar visita o presupuesto.'
@@ -92,7 +95,7 @@ export function LeadWizard({
   const [form, setForm] = useState<LeadFormState>({
     requestType: initialRequestType || requestTypes[0],
     workType: initialWorkType || serviceName || '',
-    zone: coverageZones[0],
+    zone: zoneOptions[0],
     location: '',
     propertyType: propertyTypes[0],
     urgency: getUrgencyList(initialRequestType || requestTypes[0])[0],
@@ -249,7 +252,7 @@ export function LeadWizard({
             onChange={(event) => update('zone', event.target.value)}
             className="h-11 rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-slate-950"
           >
-            {coverageZones.map((zone) => (
+            {zoneOptions.map((zone) => (
               <option key={zone}>{zone}</option>
             ))}
           </select>
