@@ -44,7 +44,7 @@ export default function ObraDetallePage({ params }: Props) {
           </Link>
           <div className="mt-6 flex flex-wrap gap-2">
             <Badge>Obra</Badge>
-            <Badge variant="secondary">{caseItem.clientType}</Badge>
+            <Badge className="border-white/10 bg-white/10 text-slate-200">{caseItem.clientType}</Badge>
           </div>
           <h1 className="mt-4 text-4xl font-semibold text-white sm:text-5xl">{caseItem.title}</h1>
           <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-300">{caseItem.scope}</p>
