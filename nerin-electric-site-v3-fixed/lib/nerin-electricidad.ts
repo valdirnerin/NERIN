@@ -318,10 +318,10 @@ export const specialServices = [
 ] as const
 
 export const featuredExperience = [
-  'KFC',
-  'Smart Fit',
-  'Supermercados DIA',
-  'Edificios residenciales',
+  'Local gastronomico de cadena',
+  'Gimnasio comercial',
+  'Supermercado / local de retail',
+  'Edificio residencial',
 ] as const
 
 export const trustItems = [
