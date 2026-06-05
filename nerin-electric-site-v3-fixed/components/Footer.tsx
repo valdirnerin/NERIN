@@ -16,6 +16,10 @@ const legalLinks = [
   { href: '/privacidad', label: 'Politica de privacidad' },
 ] as const
 
+const privateLinks = [
+  { href: '/clientes/login', label: 'Portal cliente' },
+] as const
+
 interface FooterProps {
   site: SiteExperience
 }
@@ -96,16 +100,20 @@ export function Footer({ site }: FooterProps) {
                 <Link href={item.href}>{item.label}</Link>
               </li>
             ))}
-            <li>
-              <Link href="/clientes">Portal cliente</Link>
-            </li>
+            {privateLinks.map((item) => (
+              <li key={item.href}>
+                <Link className="text-xs text-slate-500" href={item.href} rel="nofollow">
+                  {item.label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
       </div>
 
       <div className="border-t border-slate-200 bg-slate-50 py-5">
         <div className="container text-sm text-slate-500">
-          <span>Â© {new Date().getFullYear()} NERIN Electricidad.</span>
+          <span>© {new Date().getFullYear()} NERIN Electricidad.</span>
         </div>
       </div>
     </footer>
