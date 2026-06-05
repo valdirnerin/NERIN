@@ -14,7 +14,6 @@ export default function LoginPage() {
   const router = useRouter()
   const { data: session, status } = useSession()
 
-  const isAdmin = session?.user?.role === 'admin'
   const isClient = session?.user?.role === 'client'
 
   useEffect(() => {
@@ -22,23 +21,14 @@ export default function LoginPage() {
       return
     }
 
-    if (isAdmin) {
-      router.replace('/admin')
-      return
-    }
-
     if (isClient) {
       router.replace('/clientes')
     }
-  }, [status, isAdmin, isClient, router])
+  }, [status, isClient, router])
 
   const redirectMessage = useMemo(() => {
     if (status !== 'authenticated') {
       return null
-    }
-
-    if (isAdmin) {
-      return 'Redirigiendo...'
     }
 
     if (isClient) {
@@ -46,31 +36,38 @@ export default function LoginPage() {
     }
 
     return null
-  }, [status, isAdmin, isClient])
+  }, [status, isClient])
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-8 px-0 py-4 sm:py-8 md:flex-row md:items-start md:gap-10">
       <div className="max-w-md space-y-6">
         <Badge>Portal de clientes</Badge>
-        <h1 className="text-3xl font-semibold tracking-tight">IngresÃ¡ con tu email</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">Ingresa con tu email</h1>
         <p className="text-sm text-slate-600">
-          Te enviamos un enlace mÃ¡gico para que accedas a tus proyectos, certificaciones y documentaciÃ³n. Es rÃ¡pido y seguro,
-          sin contraseÃ±as.
+          Te enviamos un enlace magico para que accedas a tus proyectos, certificaciones y documentacion. Es rapido y seguro,
+          sin contrasenas.
         </p>
         <ul className="space-y-3 text-sm text-slate-600">
           <li className="flex gap-2">
             <span className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
-            RevisÃ¡ los hitos de tu obra y certificaciones de avance.
+            Revisa los hitos de tu obra y certificaciones de avance.
           </li>
           <li className="flex gap-2">
             <span className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
-            DescargÃ¡ presupuestos, documentaciÃ³n tÃ©cnica y comprobantes.
+            Descarga presupuestos, documentacion tecnica y comprobantes.
           </li>
           <li className="flex gap-2">
             <span className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
-            CoordinÃ¡ visitas y soporte con el equipo NERIN.
+            Coordina visitas y soporte con el equipo NERIN.
           </li>
         </ul>
+        <p className="text-xs text-slate-500">
+          Si todavia no tenes acceso, escribinos a{' '}
+          <a className="font-medium underline" href="mailto:hola@nerin.com.ar">
+            hola@nerin.com.ar
+          </a>
+          .
+        </p>
       </div>
       <div className="flex w-full max-w-md shrink-0 justify-center md:justify-end">
         {redirectMessage ? (
