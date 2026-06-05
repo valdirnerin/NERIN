@@ -1,2 +1,16 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /clientes
+Disallow: /clientes/
+Disallow: /tecnico
+Disallow: /tecnico/
+Disallow: /api/admin
+Disallow: /api/admin/
+Disallow: /api/quotes
+Disallow: /api/quotes/
+Disallow: /api/upload/project-photo
+Disallow: /api/upload/project-photo/
+
+Sitemap: https://www.nerin.com.ar/sitemap.xml
