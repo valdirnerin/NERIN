@@ -10,6 +10,7 @@ export const runtime = 'nodejs'
 type SearchParams = {
   tipo?: string
   urgencia?: string
+  zona?: string
 }
 
 const filters = [
@@ -19,7 +20,7 @@ const filters = [
   ['Refacciones', '/admin/solicitudes?tipo=Refaccion electrica'],
   ['Obras', '/admin/solicitudes?tipo=Obra grande'],
   ['Servicios especiales', '/admin/solicitudes?tipo=Servicio especial'],
-  ['Urgentes', '/admin/solicitudes?urgencia=Hoy'],
+  ['Urgentes', '/admin/solicitudes?urgencia=Lo antes posible'],
   ['A revisar por Valdir Nerin', '/admin/solicitudes?estado=revision'],
   ['Fuera de zona', '/admin/solicitudes?zona=fuera'],
 ] as const
@@ -37,12 +38,21 @@ export default async function LeadsPage({ searchParams }: { searchParams?: Searc
   await requireAdmin()
   const leadType = searchParams?.tipo
   const urgency = searchParams?.urgencia
+  const zoneFilter = searchParams?.zona
 
   const leads = await prisma.lead.findMany({
     include: { attachments: true },
     where: {
       ...(leadType ? { leadType } : {}),
       ...(urgency ? { urgency } : {}),
+      ...(zoneFilter === 'fuera'
+        ? {
+            OR: [
+              { location: { contains: 'Otra zona' } },
+              { location: { contains: 'Requiere confirmacion' } },
+            ],
+          }
+        : {}),
     },
     orderBy: { createdAt: 'desc' },
   })
