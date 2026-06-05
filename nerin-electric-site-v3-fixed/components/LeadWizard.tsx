@@ -68,7 +68,7 @@ function getFlowType(requestType: string) {
   return 'small'
 }
 
-function getUrgencyList(requestType: string) {
+function getUrgencyList(requestType: string): string[] {
   if (requestType === 'Refaccion electrica') return [...renovationUrgencies]
   if (requestType === 'Obra grande') return [...urgencyOptions]
   return [...smallJobUrgencies]
