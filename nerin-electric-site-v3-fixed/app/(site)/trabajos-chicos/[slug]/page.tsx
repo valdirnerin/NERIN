@@ -72,6 +72,7 @@ export default async function TrabajoChicoPage({ params }: { params: { slug: str
             initialRequestType="Trabajo chico"
             initialWorkType={service.name}
             serviceName={service.name}
+            servicePriceFrom={service.priceFrom}
             submitLabel="Enviar fotos para cotizar"
             detailPlaceholder="Contanos que pasa y adjunta fotos del punto, tablero, toma, llave, luminaria o falla. Si hay olor, recalentamiento o humedad, avisalo."
           />
