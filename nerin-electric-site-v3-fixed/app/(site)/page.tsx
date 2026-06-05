@@ -2,13 +2,13 @@ import Link from 'next/link'
 import { ArrowRight, CheckCircle2, MessageCircle, Search, ShieldAlert, Zap } from 'lucide-react'
 import { getSiteContent, getWhatsappHref } from '@/lib/site-content'
 import {
-  featuredExperience,
   majorWorks,
   renovationCards,
   serviceCatalog,
   specialServices,
 } from '@/lib/nerin-electricidad'
 import { LeadWizard } from '@/components/LeadWizard'
+import { realCases } from '@/lib/real-cases'
 import { Button } from '@/components/ui/button'
 
 export const revalidate = 60
@@ -66,6 +66,7 @@ export default async function HomePage() {
   const site = await getSiteContent()
   const whatsappHref = getWhatsappHref(site)
   const isWhatsappExternal = whatsappHref.startsWith('http')
+  const featuredCases = realCases.slice(0, 4)
 
   return (
     <div className="bg-white">
@@ -230,13 +231,22 @@ export default async function HomePage() {
         <div className="container grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Obras realizadas</p>
-            <h2 className="mt-2 text-3xl font-semibold text-slate-950">Experiencia sin inventar datos oficiales.</h2>
+            <h2 className="mt-2 text-3xl font-semibold text-slate-950">Casos reales comunicados con prudencia tecnica.</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-600">
+              Referencias por rubro, alcance y resultado. No usamos logos ni presentamos marcas como clientes directos sin permiso confirmado.
+            </p>
+            <Link href="/obras" className="mt-5 inline-flex items-center rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white">
+              Ver casos reales
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            {featuredExperience.map((item) => (
-              <article key={item} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <h3 className="text-xl font-semibold text-slate-950">{item}</h3>
-                <p className="mt-2 text-sm text-slate-600">Experiencia profesional en instalaciones electricas para espacios de uso intensivo.</p>
+            {featuredCases.map((item) => (
+              <article key={item.slug} className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{item.clientType}</p>
+                <h3 className="mt-2 text-xl font-semibold text-slate-950">{item.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-600">{item.workType}</p>
+                <p className="mt-3 text-sm leading-6 text-slate-600">{item.result}</p>
               </article>
             ))}
           </div>
