@@ -3,6 +3,7 @@ import { Camera } from 'lucide-react'
 import { getSiteContent, getWhatsappHref } from '@/lib/site-content'
 import { getServiceBySlug, manualReviewMessage, safetyNotice, serviceCatalog } from '@/lib/nerin-electricidad'
 import { LeadWizard } from '@/components/LeadWizard'
+import { breadcrumbJsonLd, buildSeoMetadata, serviceJsonLd } from '@/lib/seo'
 
 export function generateStaticParams() {
   return serviceCatalog.map((service) => ({ slug: service.slug }))
@@ -11,10 +12,12 @@ export function generateStaticParams() {
 export function generateMetadata({ params }: { params: { slug: string } }) {
   const service = getServiceBySlug(params.slug)
   if (!service) return {}
-  return {
-    title: `${service.name} | Trabajos chicos NERIN`,
-    description: `${service.shortDescription} Precio desde ${service.priceFrom ?? 'a presupuestar'}. Envia fotos para cotizar.`,
-  }
+
+  return buildSeoMetadata({
+    title: `${service.name} en CABA | NERIN`,
+    description: `${service.shortDescription} Precio orientativo desde ${service.priceFrom ?? 'a confirmar segun alcance'}. Envia fotos para cotizar el trabajo electrico.`,
+    path: `/trabajos-chicos/${service.slug}`,
+  })
 }
 
 export default async function TrabajoChicoPage({ params }: { params: { slug: string } }) {
@@ -23,9 +26,17 @@ export default async function TrabajoChicoPage({ params }: { params: { slug: str
 
   const site = await getSiteContent()
   const whatsappHref = getWhatsappHref(site)
+  const breadcrumbs = breadcrumbJsonLd([
+    { name: 'Inicio', path: '/' },
+    { name: 'Trabajos chicos', path: '/trabajos-chicos' },
+    { name: service.name, path: `/trabajos-chicos/${service.slug}` },
+  ])
+  const serviceSchema = serviceJsonLd(service)
 
   return (
     <div className="bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
       <section className="border-b border-slate-200 bg-slate-50 py-14">
         <div className="container grid gap-8 lg:grid-cols-[0.85fr_0.55fr]">
           <div>
