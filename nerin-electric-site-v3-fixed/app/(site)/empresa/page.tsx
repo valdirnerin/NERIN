@@ -1,15 +1,23 @@
 import { CheckCircle2 } from 'lucide-react'
+import { breadcrumbJsonLd, buildSeoMetadata } from '@/lib/seo'
 
 const process = ['Relevamiento', 'Diagnostico', 'Presupuesto claro', 'Ejecucion prolija', 'Seguimiento y cierre']
 
-export const metadata = {
-  title: 'Empresa de electricidad en CABA y GBA | NERIN',
-  description: 'NERIN Electricidad, empresa de servicios electricos para hogares, comercios, edificios, empresas y obras.',
-}
+export const metadata = buildSeoMetadata({
+  title: 'Empresa de electricidad en CABA | NERIN',
+  description: 'NERIN Electricidad trabaja en servicios electricos para hogares, comercios, edificios, empresas y obras en CABA/GBA con alcance claro.',
+  path: '/empresa',
+})
 
 export default function EmpresaPage() {
+  const breadcrumbs = breadcrumbJsonLd([
+    { name: 'Inicio', path: '/' },
+    { name: 'Empresa', path: '/empresa' },
+  ])
+
   return (
     <div className="bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
       <section className="border-b border-slate-200 bg-slate-50 py-14">
         <div className="container max-w-4xl">
           <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Empresa</p>

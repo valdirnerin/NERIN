@@ -1,15 +1,24 @@
 import Link from 'next/link'
 import { ArrowRight, Camera, Search } from 'lucide-react'
 import { serviceCatalog, smallJobCategories } from '@/lib/nerin-electricidad'
+import { breadcrumbJsonLd, buildSeoMetadata } from '@/lib/seo'
 
-export const metadata = {
-  title: 'Trabajos chicos electricos con precios orientativos | NERIN',
-  description: 'Pedidos electricos simples en CABA/GBA con precio desde, incluye, no incluye, duracion, zona y fotos para cotizar.',
-}
+export const metadata = buildSeoMetadata({
+  title: 'Trabajos electricos chicos en CABA | NERIN',
+  description:
+    'Cambio de tomacorriente, revision de tablero, fallas electricas, luminarias y tomas para aire en CABA con precios orientativos y cotizacion por fotos.',
+  path: '/trabajos-chicos',
+})
 
 export default function TrabajosChicosPage() {
+  const breadcrumbs = breadcrumbJsonLd([
+    { name: 'Inicio', path: '/' },
+    { name: 'Trabajos chicos', path: '/trabajos-chicos' },
+  ])
+
   return (
     <div className="bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
       <section className="border-b border-slate-200 bg-slate-50 py-14">
         <div className="container max-w-5xl">
           <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Trabajos chicos</p>
