@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { ArrowLeft, FileText, ImageIcon, LockKeyhole, MapPin } from 'lucide-react'
 import { getRealCaseBySlug, realCases } from '@/lib/real-cases'
 import { Badge } from '@/components/ui/badge'
+import { breadcrumbJsonLd, buildSeoMetadata, caseStudyJsonLd } from '@/lib/seo'
 
 export const revalidate = 60
 
@@ -17,15 +18,15 @@ export function generateStaticParams() {
 export function generateMetadata({ params }: Props) {
   const caseItem = getRealCaseBySlug(params.slug)
   if (!caseItem) {
-    return {
-      title: 'Caso real | NERIN',
-    }
+    return { title: 'Caso real | NERIN' }
   }
 
-  return {
+  return buildSeoMetadata({
     title: `${caseItem.title} | Caso real NERIN`,
     description: `${caseItem.clientType}. ${caseItem.scope}`,
-  }
+    path: `/obras/${caseItem.slug}`,
+    type: 'article',
+  })
 }
 
 export default function ObraDetallePage({ params }: Props) {
@@ -34,8 +35,17 @@ export default function ObraDetallePage({ params }: Props) {
     notFound()
   }
 
+  const breadcrumbs = breadcrumbJsonLd([
+    { name: 'Inicio', path: '/' },
+    { name: 'Casos reales', path: '/obras' },
+    { name: caseItem.title, path: `/obras/${caseItem.slug}` },
+  ])
+  const caseSchema = caseStudyJsonLd(caseItem)
+
   return (
     <article className="bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(caseSchema) }} />
       <section className="border-b border-slate-200 bg-slate-950 py-12 text-white">
         <div className="container max-w-5xl">
           <Link href="/obras" className="inline-flex items-center text-sm font-semibold text-slate-300 hover:text-white">
@@ -56,29 +66,14 @@ export default function ObraDetallePage({ params }: Props) {
           <div className="rounded-lg border border-slate-200 bg-slate-50 p-5">
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Ficha minima</p>
             <dl className="mt-4 space-y-4 text-sm">
-              <div>
-                <dt className="font-semibold text-slate-950">Tipo de cliente</dt>
-                <dd className="mt-1 text-slate-600">{caseItem.clientType}</dd>
-              </div>
-              <div>
-                <dt className="font-semibold text-slate-950">Tipo de trabajo</dt>
-                <dd className="mt-1 text-slate-600">{caseItem.workType}</dd>
-              </div>
-              <div>
-                <dt className="font-semibold text-slate-950">Estado</dt>
-                <dd className="mt-1 text-slate-600">{caseItem.status}</dd>
-              </div>
-              <div>
-                <dt className="font-semibold text-slate-950">Periodo</dt>
-                <dd className="mt-1 text-slate-600">{caseItem.period ?? 'No publicado'}</dd>
-              </div>
+              <div><dt className="font-semibold text-slate-950">Tipo de cliente</dt><dd className="mt-1 text-slate-600">{caseItem.clientType}</dd></div>
+              <div><dt className="font-semibold text-slate-950">Tipo de trabajo</dt><dd className="mt-1 text-slate-600">{caseItem.workType}</dd></div>
+              <div><dt className="font-semibold text-slate-950">Estado</dt><dd className="mt-1 text-slate-600">{caseItem.status}</dd></div>
+              <div><dt className="font-semibold text-slate-950">Periodo</dt><dd className="mt-1 text-slate-600">{caseItem.period ?? 'No publicado'}</dd></div>
               {caseItem.approximateLocation ? (
                 <div>
                   <dt className="font-semibold text-slate-950">Ubicacion aproximada</dt>
-                  <dd className="mt-1 inline-flex items-center gap-2 text-slate-600">
-                    <MapPin className="h-4 w-4 text-slate-500" />
-                    {caseItem.approximateLocation}
-                  </dd>
+                  <dd className="mt-1 inline-flex items-center gap-2 text-slate-600"><MapPin className="h-4 w-4 text-slate-500" />{caseItem.approximateLocation}</dd>
                 </div>
               ) : null}
             </dl>
@@ -86,10 +81,7 @@ export default function ObraDetallePage({ params }: Props) {
 
           {caseItem.confidentialityNote ? (
             <div className="rounded-lg border border-amber-200 bg-amber-50 p-5 text-amber-950">
-              <div className="flex items-center gap-2 text-sm font-semibold">
-                <LockKeyhole className="h-4 w-4" />
-                Nota de confidencialidad
-              </div>
+              <div className="flex items-center gap-2 text-sm font-semibold"><LockKeyhole className="h-4 w-4" />Nota de confidencialidad</div>
               <p className="mt-3 text-sm leading-6">{caseItem.confidentialityNote}</p>
             </div>
           ) : null}
@@ -102,24 +94,14 @@ export default function ObraDetallePage({ params }: Props) {
           </section>
 
           <div className="grid gap-5 md:grid-cols-2">
-            <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-xl font-semibold text-slate-950">Problema / reto</h2>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{caseItem.challenge ?? 'Informacion en revision para completar la ficha tecnica.'}</p>
-            </section>
-            <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-xl font-semibold text-slate-950">Solucion</h2>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{caseItem.solution ?? 'Informacion en revision para completar la ficha tecnica.'}</p>
-            </section>
+            <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm"><h2 className="text-xl font-semibold text-slate-950">Problema / reto</h2><p className="mt-3 text-sm leading-6 text-slate-600">{caseItem.challenge ?? 'Informacion en revision para completar la ficha tecnica.'}</p></section>
+            <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm"><h2 className="text-xl font-semibold text-slate-950">Solucion</h2><p className="mt-3 text-sm leading-6 text-slate-600">{caseItem.solution ?? 'Informacion en revision para completar la ficha tecnica.'}</p></section>
           </div>
 
           <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-semibold text-slate-950">Alcance tecnico</h2>
             <ul className="mt-4 grid gap-3 text-sm leading-6 text-slate-600 sm:grid-cols-2">
-              {caseItem.technicalScope.map((item) => (
-                <li key={item} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-                  {item}
-                </li>
-              ))}
+              {caseItem.technicalScope.map((item) => (<li key={item} className="rounded-lg border border-slate-200 bg-slate-50 p-3">{item}</li>))}
             </ul>
           </section>
 
@@ -128,16 +110,12 @@ export default function ObraDetallePage({ params }: Props) {
             {caseItem.gallery.length > 0 ? (
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 {caseItem.gallery.map((image) => (
-                  <img key={image} src={image} alt={caseItem.title} className="aspect-video rounded-lg border border-slate-200 object-cover" />
+                  <img key={image} src={image} alt={`Imagen del caso ${caseItem.title}`} loading="lazy" className="aspect-video rounded-lg border border-slate-200 object-cover" />
                 ))}
               </div>
             ) : (
               <div className="mt-4 flex min-h-32 items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
-                <div>
-                  <ImageIcon className="mx-auto h-6 w-6 text-slate-500" />
-                  <p className="mt-2 text-sm font-semibold text-slate-950">Caso en actualizacion</p>
-                  <p className="mt-1 text-sm text-slate-600">Se agregaran imagenes solo si existen y estan autorizadas.</p>
-                </div>
+                <div><ImageIcon className="mx-auto h-6 w-6 text-slate-500" /><p className="mt-2 text-sm font-semibold text-slate-950">Caso en actualizacion</p><p className="mt-1 text-sm text-slate-600">Se agregaran imagenes solo si existen y estan autorizadas.</p></div>
               </div>
             )}
           </section>
@@ -146,17 +124,10 @@ export default function ObraDetallePage({ params }: Props) {
             <h2 className="text-xl font-semibold text-slate-950">Documentacion relacionada</h2>
             {caseItem.relatedDocumentation.length > 0 ? (
               <ul className="mt-4 space-y-2 text-sm text-slate-600">
-                {caseItem.relatedDocumentation.map((item) => (
-                  <li key={item} className="flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-slate-500" />
-                    {item}
-                  </li>
-                ))}
+                {caseItem.relatedDocumentation.map((item) => (<li key={item} className="flex items-center gap-2"><FileText className="h-4 w-4 text-slate-500" />{item}</li>))}
               </ul>
             ) : (
-              <p className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm leading-6 text-slate-600">
-                Documentacion no publicada. Puede incorporarse a futuro si corresponde y cuenta con autorizacion.
-              </p>
+              <p className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm leading-6 text-slate-600">Documentacion no publicada. Puede incorporarse a futuro si corresponde y cuenta con autorizacion.</p>
             )}
           </section>
         </div>
