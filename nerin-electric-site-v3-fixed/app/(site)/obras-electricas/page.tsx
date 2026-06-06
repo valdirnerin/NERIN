@@ -2,11 +2,14 @@ import { FileCheck2, Milestone, PanelsTopLeft } from 'lucide-react'
 import { getSiteContent, getWhatsappHref } from '@/lib/site-content'
 import { majorWorks } from '@/lib/nerin-electricidad'
 import { LeadWizard } from '@/components/LeadWizard'
+import { breadcrumbJsonLd, buildSeoMetadata } from '@/lib/seo'
 
-export const metadata = {
-  title: 'Obras electricas grandes | NERIN',
-  description: 'Obras electricas para locales, edificios y obras nuevas con planificacion, presupuesto formal, seguimiento y portal cliente.',
-}
+export const metadata = buildSeoMetadata({
+  title: 'Obras e instalaciones electricas en CABA | NERIN',
+  description:
+    'Obra electrica para local comercial, edificios, oficinas y obras nuevas en CABA/GBA con planificacion por etapas, presupuesto formal y seguimiento.',
+  path: '/obras-electricas',
+})
 
 const obraHighlights = [
   { icon: Milestone, title: 'Planificacion por etapas', text: 'Alcance ordenado para coordinar rubros, tiempos, materiales y prioridades de obra.' },
@@ -17,9 +20,14 @@ const obraHighlights = [
 export default async function ObrasElectricasPage() {
   const site = await getSiteContent()
   const whatsappHref = getWhatsappHref(site)
+  const breadcrumbs = breadcrumbJsonLd([
+    { name: 'Inicio', path: '/' },
+    { name: 'Obras electricas', path: '/obras-electricas' },
+  ])
 
   return (
     <div className="bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
       <section className="border-b border-slate-200 bg-slate-950 py-14 text-white">
         <div className="container max-w-4xl">
           <p className="text-xs font-bold uppercase tracking-[0.24em] text-amber-300">Obras electricas</p>
