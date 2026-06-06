@@ -1,18 +1,26 @@
 import { getSiteContent, getWhatsappHref } from '@/lib/site-content'
 import { specialServices } from '@/lib/nerin-electricidad'
 import { LeadWizard } from '@/components/LeadWizard'
+import { breadcrumbJsonLd, buildSeoMetadata } from '@/lib/seo'
 
-export const metadata = {
-  title: 'Servicios electricos especiales | NERIN',
-  description: 'Diagnostico, informes, revision de tablero, puesta a tierra, cortes frecuentes y relevamientos electricos.',
-}
+export const metadata = buildSeoMetadata({
+  title: 'Servicios electricos especiales en CABA | NERIN',
+  description:
+    'Diagnostico electrico, informes, revision de tablero, puesta a tierra, cortes frecuentes y relevamientos en CABA/GBA con revision tecnica.',
+  path: '/servicios-especiales',
+})
 
 export default async function ServiciosEspecialesPage() {
   const site = await getSiteContent()
   const whatsappHref = getWhatsappHref(site)
+  const breadcrumbs = breadcrumbJsonLd([
+    { name: 'Inicio', path: '/' },
+    { name: 'Servicios especiales', path: '/servicios-especiales' },
+  ])
 
   return (
     <div className="bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
       <section className="border-b border-slate-200 bg-slate-50 py-14">
         <div className="container max-w-4xl">
           <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Servicios especiales</p>
