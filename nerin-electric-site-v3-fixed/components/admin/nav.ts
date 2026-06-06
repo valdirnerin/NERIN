@@ -12,28 +12,15 @@ export type AdminNavSection = {
 
 export const adminNav: AdminNavSection[] = [
   {
-    label: 'Panel de NERIN',
+    label: 'Centro de control',
     items: [
-      { title: 'Inicio', href: '/admin' as Route },
-      { title: 'Solicitudes', href: '/admin/solicitudes' as Route },
-    ],
-  },
-  {
-    label: 'Operacion',
-    items: [
+      { title: 'Consultas', href: '/admin/consultas' as Route },
+      { title: 'Presupuestos', href: '/admin/presupuestos' as Route },
       { title: 'Trabajos chicos', href: '/admin/trabajos-chicos' as Route },
       { title: 'Refacciones', href: '/admin/refacciones' as Route },
       { title: 'Obras', href: '/admin/obras' as Route },
-      { title: 'Clientes', href: '/admin/clientes' as Route },
-      { title: 'Presupuestos', href: '/admin/presupuestos' as Route },
-    ],
-  },
-  {
-    label: 'Gestion',
-    items: [
       { title: 'Dinero', href: '/admin/dinero' as Route },
-      { title: 'Catalogo web', href: '/admin/catalogo-web' as Route },
-      { title: 'Configuracion', href: '/admin/ajustes' as Route },
+      { title: 'Capacidad', href: '/admin/capacidad' as Route },
     ],
   },
 ]
