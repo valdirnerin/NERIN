@@ -16,7 +16,7 @@ export function AdminSidebar({ onNavigate, className }: AdminSidebarProps) {
   return (
     <aside className={cn('flex h-full w-72 flex-col gap-6 border-r border-border bg-white px-4 py-6', className)}>
       <div className="px-2">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">NERIN</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">NERIN Electricidad</p>
         <p className="text-sm font-semibold text-slate-700">Centro de control</p>
       </div>
       <nav className="flex flex-1 flex-col gap-5 text-sm">
@@ -48,7 +48,7 @@ export function AdminSidebar({ onNavigate, className }: AdminSidebarProps) {
         ))}
       </nav>
       <div className="rounded-2xl border border-border/60 bg-slate-50 px-3 py-2 text-xs text-slate-500">
-        Flujo recomendado: Inicio admin → editar contenido → revisar consultas.
+        Flujo recomendado: consultas, presupuestos, trabajo, dinero y capacidad.
       </div>
     </aside>
   )

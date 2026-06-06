@@ -12,7 +12,7 @@ export function AdminTopbar({ onToggleSidebar }: AdminTopbarProps) {
   const pathname = usePathname()
   const match = findAdminNavMatch(pathname)
   const sectionLabel = match?.sectionLabel ?? adminNav[0]?.label ?? 'Admin'
-  const title = match?.title ?? 'Inicio admin'
+  const title = match?.title ?? 'Centro de control'
 
   return (
     <div className="sticky top-0 z-20 border-b border-border bg-white/95 px-4 py-3 backdrop-blur sm:px-6 sm:py-4">
@@ -22,7 +22,7 @@ export function AdminTopbar({ onToggleSidebar }: AdminTopbarProps) {
             type="button"
             onClick={onToggleSidebar}
             className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-white lg:hidden"
-            aria-label="Abrir menú de administración"
+            aria-label="Abrir menu de administracion"
           >
             <svg aria-hidden viewBox="0 0 24 24" className="h-5 w-5 stroke-current" fill="none" strokeWidth="1.8">
               <path d="M4 7h16M4 12h16M4 17h16" />
@@ -35,16 +35,16 @@ export function AdminTopbar({ onToggleSidebar }: AdminTopbarProps) {
         </div>
         <div className="flex items-center gap-2">
           <Link
-            href="/admin"
-            className="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
-          >
-            Centro admin
-          </Link>
-          <Link
-            href="/admin/leads"
+            href="/admin/consultas"
             className="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
           >
             Consultas
+          </Link>
+          <Link
+            href="/admin/capacidad"
+            className="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+          >
+            Capacidad
           </Link>
           <Link
             href="/"
