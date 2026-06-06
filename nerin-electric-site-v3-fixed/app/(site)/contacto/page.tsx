@@ -1,17 +1,24 @@
 import { getSiteContent, getWhatsappHref } from '@/lib/site-content'
 import { LeadWizard } from '@/components/LeadWizard'
+import { breadcrumbJsonLd, buildSeoMetadata } from '@/lib/seo'
 
-export const metadata = {
-  title: 'Contacto y presupuesto electrico | NERIN',
-  description: 'Solicita presupuesto para trabajos chicos, refacciones, obras y servicios electricos especiales en CABA/GBA.',
-}
+export const metadata = buildSeoMetadata({
+  title: 'Contacto para presupuesto electrico en CABA | NERIN',
+  description: 'Solicita presupuesto para trabajos electricos chicos, refacciones, obras y servicios especiales en CABA/GBA con fotos, zona y urgencia.',
+  path: '/contacto',
+})
 
 export default async function ContactoPage() {
   const site = await getSiteContent()
   const whatsappHref = getWhatsappHref(site)
+  const breadcrumbs = breadcrumbJsonLd([
+    { name: 'Inicio', path: '/' },
+    { name: 'Contacto', path: '/contacto' },
+  ])
 
   return (
     <div className="bg-slate-50">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
       <section className="border-b border-slate-200 bg-white py-14">
         <div className="container max-w-4xl">
           <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Contacto</p>
