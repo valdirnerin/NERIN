@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import type { Route } from 'next'
 import { ArrowRight, CheckCircle2, MessageCircle, Search, ShieldCheck, Zap } from 'lucide-react'
 import { getSiteContent, getWhatsappHref } from '@/lib/site-content'
 import { resolveCommercialSite, type CommercialSite } from '@/lib/commercial-content'
@@ -32,6 +33,10 @@ function imageFor(site: CommercialSite, location: string, fallback: string) {
   return site.commercialImages.find((image) => image.active && image.location === location)?.url || fallback
 }
 
+function asRoute(href: string, fallback: Route = '/trabajos-electricos') {
+  return (href || fallback) as Route
+}
+
 export default async function HomePage() {
   const site = resolveCommercialSite(await getSiteContent())
   const whatsappHref = getWhatsappHref(site)
@@ -55,7 +60,7 @@ export default async function HomePage() {
             </div>
             <div className="grid gap-3 sm:flex">
               <Button asChild size="lg" className="h-12 bg-slate-950 px-6 text-base font-bold text-white hover:bg-slate-800">
-                <Link href={site.hero.primaryCta.href || '/trabajos-electricos'}>
+                <Link href={asRoute(site.hero.primaryCta.href)}>
                   <Search className="mr-2 h-5 w-5" />
                   {site.hero.primaryCta.label}
                 </Link>
@@ -113,7 +118,7 @@ export default async function HomePage() {
             <article key={item.title} className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
               <h3 className="text-2xl font-semibold text-slate-950">{item.title}</h3>
               <p className="mt-3 text-sm leading-6 text-slate-600">{item.description}</p>
-              <Link href={item.href} className="mt-5 inline-flex items-center rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white">
+              <Link href={asRoute(item.href)} className="mt-5 inline-flex items-center rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white">
                 {item.ctaLabel}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
