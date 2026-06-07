@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import type { Route } from 'next'
 import { ArrowRight, Camera, Search } from 'lucide-react'
 import { getSiteContent } from '@/lib/site-content'
 import { resolveCommercialSite } from '@/lib/commercial-content'
@@ -83,7 +84,7 @@ export default async function TrabajosElectricosPage() {
               <p><strong className="text-slate-950">Zona:</strong> {service.coverageZone}</p>
               <p><strong className="text-slate-950">Duracion:</strong> {service.estimatedDuration}</p>
             </div>
-            <Link href={`/trabajos-electricos/${service.slug}`} className="mt-5 inline-flex items-center rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white">
+            <Link href={`/trabajos-electricos/${service.slug}` as Route} className="mt-5 inline-flex items-center rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white">
               <Camera className="mr-2 h-4 w-4" />
               {service.customCta || 'Enviar fotos para cotizar'}
               <ArrowRight className="ml-2 h-4 w-4" />
