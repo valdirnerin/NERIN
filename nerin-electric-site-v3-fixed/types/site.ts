@@ -1,3 +1,77 @@
+export type CommercialBarDisplayMode = 'estatica' | 'rotativa' | 'marquee-suave'
+
+export interface CommercialBarSettings {
+  enabled: boolean
+  messages: string[]
+  optionalLinkHref: string
+  optionalLinkLabel: string
+  displayMode: CommercialBarDisplayMode
+  mobilePriority: boolean
+}
+
+export interface HeroBenefit {
+  text: string
+}
+
+export interface CommercialImage {
+  title: string
+  url: string
+  alt: string
+  location: string
+  active: boolean
+}
+
+export interface CommercialCard {
+  title: string
+  description: string
+  ctaLabel: string
+  href: string
+}
+
+export interface PricingRules {
+  technicalVisitFrom: number
+  currency: string
+  visitDiscountable: boolean
+  visitCommercialText: string
+  urgencySurcharge: string
+  zoneSurcharge: string
+  minimumJob: string
+  quoteValidity: string
+  priceDisclaimer: string
+}
+
+export interface SmallService {
+  active: boolean
+  featured: boolean
+  category: string
+  name: string
+  slug: string
+  shortDescription: string
+  priceFrom: number
+  showPrice: boolean
+  requiresVisit: boolean
+  quoteByPhotos: boolean
+  includes: string[]
+  excludes: string[]
+  priceChanges: string[]
+  estimatedDuration: string
+  coverageZone: string
+  imageUrl: string
+  imageAlt: string
+  customCta: string
+  order: number
+}
+
+export interface AdditionalCost {
+  name: string
+  description: string
+  type: 'fijo' | 'desde' | 'porcentaje' | 'a-confirmar'
+  amount: number
+  active: boolean
+  appliesWhen: string
+  order: number
+}
+
 export interface SiteExperience {
   name: string
   tagline: string
@@ -22,6 +96,7 @@ export interface SiteExperience {
     whatsappMessage: string
     whatsappCtaLabel: string
   }
+  commercialBar?: CommercialBarSettings
   hero: {
     badge: string
     title: string
@@ -31,9 +106,15 @@ export interface SiteExperience {
     primaryCta: { label: string; href: string }
     secondaryCta: { label: string; href: string }
     tertiaryCta: { label: string; href: string }
+    benefits?: HeroBenefit[]
     highlights: Array<{ title: string; description: string }>
     stats: Array<{ label: string; description: string }>
   }
+  commercialCards?: CommercialCard[]
+  pricingRules?: PricingRules
+  smallServices?: SmallService[]
+  additionalCosts?: AdditionalCost[]
+  commercialImages?: CommercialImage[]
   services: {
     title: string
     description: string

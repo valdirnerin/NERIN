@@ -1,20 +1,21 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Menu, MessageCircle, X, Zap } from 'lucide-react'
 import { Logo } from './Logo'
 import { Button } from './ui/button'
 
 interface HeaderProps {
-  contact: {
-    whatsappHref: string
-    whatsappLabel: string
-  }
-  logo: {
-    title: string
-    subtitle: string
-    imageUrl?: string | null
+  contact: { whatsappHref: string; whatsappLabel: string }
+  logo: { title: string; subtitle: string; imageUrl?: string | null }
+  commercialBar?: {
+    enabled: boolean
+    messages: string[]
+    optionalLinkHref?: string
+    optionalLinkLabel?: string
+    displayMode?: 'estatica' | 'rotativa' | 'marquee-suave'
+    mobilePriority?: boolean
   }
 }
 
@@ -28,29 +29,72 @@ const navigation = [
   { href: '/contacto', label: 'Contacto' },
 ] as const
 
-const marqueeMessages = [
-  'Trabajos chicos con precios orientativos',
-  'Refacciones y obras con revision por Valdir Nerin',
-  'Materiales, jornales y costos separados',
-  'CABA y GBA con confirmacion de zona',
-]
+const fallbackMessages = ['Visita tecnica desde $80.000', 'Precios orientativos online', 'CABA y GBA', 'Envia fotos por WhatsApp']
 
-export function Header({ contact, logo }: HeaderProps) {
+export function Header({ contact, logo, commercialBar }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [activeMessage, setActiveMessage] = useState(0)
   const isWhatsappExternal = contact.whatsappHref.startsWith('http')
+  const incomingMessages = useMemo(() => commercialBar?.messages?.filter(Boolean) ?? [], [commercialBar?.messages])
+  const barMessages = useMemo(() => (incomingMessages.length ? incomingMessages : fallbackMessages), [incomingMessages])
+  const displayMode = commercialBar?.displayMode ?? 'marquee-suave'
+  const showBar = commercialBar?.enabled !== false
+
+  useEffect(() => {
+    if (displayMode !== 'rotativa' || barMessages.length < 2) return undefined
+    const interval = window.setInterval(() => setActiveMessage((current) => (current + 1) % barMessages.length), 3200)
+    return () => window.clearInterval(interval)
+  }, [barMessages.length, displayMode])
 
   return (
     <>
-      <div className="overflow-hidden border-b border-slate-200 bg-slate-950 text-white">
-        <div className="marquee-track flex gap-10 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.18em]">
-          {[...marqueeMessages, ...marqueeMessages].map((message, idx) => (
-            <span key={`${message}-${idx}`} className="inline-flex items-center gap-2">
-              <Zap className="h-3 w-3 text-amber-300" />
-              {message}
-            </span>
-          ))}
+      {showBar ? (
+        <div className="overflow-hidden border-b border-amber-200 bg-slate-950 text-white">
+          {displayMode === 'estatica' ? (
+            <div className="container flex flex-wrap items-center justify-center gap-x-5 gap-y-1 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.14em] sm:justify-between">
+              <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1">
+                {barMessages.map((message) => (
+                  <span key={message} className="inline-flex items-center gap-2 whitespace-nowrap">
+                    <Zap className="h-3 w-3 text-amber-300" />
+                    {message}
+                  </span>
+                ))}
+              </div>
+              {commercialBar?.optionalLinkHref && commercialBar.optionalLinkLabel ? (
+                <Link href={commercialBar.optionalLinkHref} className="text-amber-200 underline-offset-4 hover:underline">
+                  {commercialBar.optionalLinkLabel}
+                </Link>
+              ) : null}
+            </div>
+          ) : displayMode === 'rotativa' ? (
+            <div className="container flex items-center justify-center gap-3 px-4 py-2 text-center text-[11px] font-bold uppercase tracking-[0.14em] sm:justify-between">
+              <span className="inline-flex items-center gap-2">
+                <Zap className="h-3 w-3 text-amber-300" />
+                {barMessages[activeMessage] ?? barMessages[0]}
+              </span>
+              {commercialBar?.optionalLinkHref && commercialBar.optionalLinkLabel ? (
+                <Link href={commercialBar.optionalLinkHref} className="hidden text-amber-200 underline-offset-4 hover:underline sm:inline-flex">
+                  {commercialBar.optionalLinkLabel}
+                </Link>
+              ) : null}
+            </div>
+          ) : (
+            <div className="marquee-track flex gap-10 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.14em]">
+              {[...barMessages, ...barMessages].map((message, idx) => (
+                <span key={`${message}-${idx}`} className="inline-flex items-center gap-2 whitespace-nowrap">
+                  <Zap className="h-3 w-3 text-amber-300" />
+                  {message}
+                </span>
+              ))}
+              {commercialBar?.optionalLinkHref && commercialBar.optionalLinkLabel ? (
+                <Link href={commercialBar.optionalLinkHref} className="inline-flex whitespace-nowrap text-amber-200 underline-offset-4 hover:underline">
+                  {commercialBar.optionalLinkLabel}
+                </Link>
+              ) : null}
+            </div>
+          )}
         </div>
-      </div>
+      ) : null}
 
       <header className="sticky top-0 z-50 border-b border-border/80 bg-white/95 backdrop-blur supports-[padding:env(safe-area-inset-top)]:pt-[env(safe-area-inset-top)]">
         <div className="container flex items-center justify-between gap-3 py-2.5 sm:gap-4 sm:py-3">
@@ -97,12 +141,7 @@ export function Header({ contact, logo }: HeaderProps) {
             <div className="container space-y-5 py-4">
               <nav className="grid gap-1 text-sm font-medium text-foreground">
                 {navigation.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="rounded-lg px-3 py-2 hover:bg-muted"
-                    onClick={() => setMenuOpen(false)}
-                  >
+                  <Link key={item.href} href={item.href} className="rounded-lg px-3 py-2 hover:bg-muted" onClick={() => setMenuOpen(false)}>
                     {item.label}
                   </Link>
                 ))}
@@ -110,11 +149,7 @@ export function Header({ contact, logo }: HeaderProps) {
 
               <div className="grid gap-2">
                 <Button asChild className="bg-[#25D366] text-black hover:bg-[#1ebe5a]">
-                  <a
-                    href={contact.whatsappHref}
-                    target={isWhatsappExternal ? '_blank' : undefined}
-                    rel={isWhatsappExternal ? 'noopener noreferrer' : undefined}
-                  >
+                  <a href={contact.whatsappHref} target={isWhatsappExternal ? '_blank' : undefined} rel={isWhatsappExternal ? 'noopener noreferrer' : undefined}>
                     WhatsApp
                   </a>
                 </Button>

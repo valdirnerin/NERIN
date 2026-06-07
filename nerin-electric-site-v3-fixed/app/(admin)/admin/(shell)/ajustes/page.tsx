@@ -20,6 +20,13 @@ export default function AdminSettingsPage() {
             </Button>
           </div>
           <div className="rounded-2xl border border-border/60 p-4 text-sm text-slate-600">
+            <p className="font-semibold text-foreground">Contenido comercial</p>
+            <p className="mt-1">Edita franja superior, hero, precios, servicios, costos e imagenes.</p>
+            <Button asChild className="mt-4" size="sm">
+              <Link href="/admin/contenido-comercial">Abrir editor</Link>
+            </Button>
+          </div>
+          <div className="rounded-2xl border border-border/60 p-4 text-sm text-slate-600">
             <p className="font-semibold text-foreground">Operativo CAC/IVA</p>
             <p className="mt-1">Gestioná certificados y pagos operativos.</p>
             <Button asChild className="mt-4" size="sm" variant="secondary">
