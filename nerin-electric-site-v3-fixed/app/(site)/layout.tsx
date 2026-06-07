@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 import { Suspense } from 'react'
 import { getSiteContent, getWhatsappHref } from '@/lib/site-content'
+import { resolveCommercialSite } from '@/lib/commercial-content'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { TrackingScripts } from '@/components/tracking/TrackingScripts'
@@ -43,6 +44,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function SiteLayout({ children }: { children: ReactNode }) {
   const site = await getSiteContent()
+  const commercialSite = resolveCommercialSite(site)
   const whatsappHref = getWhatsappHref(site)
   const siteUrl = process.env.SITE_URL || 'https://nerin-1.onrender.com'
   const gtmId = process.env.GTM_ID || process.env.NEXT_PUBLIC_GTM_ID
@@ -120,6 +122,7 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
           subtitle: site.logo.subtitle,
           imageUrl: site.logo.imageUrl,
         }}
+        commercialBar={commercialSite.commercialBar}
       />
       <main className="pb-20">{children}</main>
       <Footer site={site} />
