@@ -14,6 +14,7 @@ export const adminNav: AdminNavSection[] = [
   {
     label: 'Centro de control',
     items: [
+      { title: 'Contenido comercial', href: '/admin/contenido-comercial' as Route },
       { title: 'Consultas', href: '/admin/consultas' as Route },
       { title: 'Presupuestos', href: '/admin/presupuestos' as Route },
       { title: 'Trabajos chicos', href: '/admin/trabajos-chicos' as Route },
