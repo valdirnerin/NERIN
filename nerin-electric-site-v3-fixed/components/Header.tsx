@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import type { Route } from 'next'
 import { useEffect, useMemo, useState } from 'react'
 import { Menu, MessageCircle, X, Zap } from 'lucide-react'
 import { Logo } from './Logo'
@@ -30,6 +31,10 @@ const navigation = [
 ] as const
 
 const fallbackMessages = ['Visita tecnica desde $80.000', 'Precios orientativos online', 'CABA y GBA', 'Envia fotos por WhatsApp']
+
+function asRoute(href: string) {
+  return href as Route
+}
 
 export function Header({ contact, logo, commercialBar }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -61,7 +66,7 @@ export function Header({ contact, logo, commercialBar }: HeaderProps) {
                 ))}
               </div>
               {commercialBar?.optionalLinkHref && commercialBar.optionalLinkLabel ? (
-                <Link href={commercialBar.optionalLinkHref} className="text-amber-200 underline-offset-4 hover:underline">
+                <Link href={asRoute(commercialBar.optionalLinkHref)} className="text-amber-200 underline-offset-4 hover:underline">
                   {commercialBar.optionalLinkLabel}
                 </Link>
               ) : null}
@@ -73,7 +78,7 @@ export function Header({ contact, logo, commercialBar }: HeaderProps) {
                 {barMessages[activeMessage] ?? barMessages[0]}
               </span>
               {commercialBar?.optionalLinkHref && commercialBar.optionalLinkLabel ? (
-                <Link href={commercialBar.optionalLinkHref} className="hidden text-amber-200 underline-offset-4 hover:underline sm:inline-flex">
+                <Link href={asRoute(commercialBar.optionalLinkHref)} className="hidden text-amber-200 underline-offset-4 hover:underline sm:inline-flex">
                   {commercialBar.optionalLinkLabel}
                 </Link>
               ) : null}
@@ -87,7 +92,7 @@ export function Header({ contact, logo, commercialBar }: HeaderProps) {
                 </span>
               ))}
               {commercialBar?.optionalLinkHref && commercialBar.optionalLinkLabel ? (
-                <Link href={commercialBar.optionalLinkHref} className="inline-flex whitespace-nowrap text-amber-200 underline-offset-4 hover:underline">
+                <Link href={asRoute(commercialBar.optionalLinkHref)} className="inline-flex whitespace-nowrap text-amber-200 underline-offset-4 hover:underline">
                   {commercialBar.optionalLinkLabel}
                 </Link>
               ) : null}
