@@ -1,7 +1,7 @@
 import { CheckCircle2 } from 'lucide-react'
 import { breadcrumbJsonLd, buildSeoMetadata } from '@/lib/seo'
 
-const process = ['Relevamiento', 'Diagnostico', 'Presupuesto claro', 'Ejecucion prolija', 'Seguimiento y cierre']
+const process = ['Relevamiento', 'Diagnóstico', 'Presupuesto claro', 'Ejecución prolija', 'Seguimiento y cierre']
 
 export const metadata = buildSeoMetadata({
   title: 'Empresa de electricidad en CABA | NERIN',
@@ -46,3 +46,4 @@ export default function EmpresaPage() {
     </div>
   )
 }
+

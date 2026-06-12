@@ -1,4 +1,4 @@
-﻿import fs from 'fs'
+import fs from 'fs'
 import path from 'path'
 import type { SiteExperience } from '@/types/site'
 
@@ -13,11 +13,11 @@ export function getStorageDir() {
 const SITE_FILE = 'site.json'
 
 export const SITE_DEFAULTS: SiteExperience = {
-  name: 'NERIN Â· IngenierÃ­a ElÃ©ctrica',
+  name: 'NERIN · Ingeniería Eléctrica',
   tagline: 'Trabajos electricos, refacciones y obras con presupuesto claro.',
   logo: {
     title: 'NERIN',
-    subtitle: 'IngenierÃ­a ElÃ©ctrica',
+    subtitle: 'Ingeniería Eléctrica',
     imageUrl: '',
   },
   accent: '#f59e0b',
@@ -284,7 +284,7 @@ export const SITE_DEFAULTS: SiteExperience = {
     ],
   },
   seo: {
-    metaTitle: 'NERIN Â· IngenierÃ­a elÃ©ctrica certificada en CABA y GBA',
+    metaTitle: 'NERIN · Ingeniería eléctrica certificada en CABA y GBA',
     metaDescription:
       'Trabajos electricos, refacciones, servicios especiales y obras con presupuesto claro.',
     keywords: [

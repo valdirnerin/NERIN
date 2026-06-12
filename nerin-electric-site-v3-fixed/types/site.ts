@@ -26,6 +26,8 @@ export interface CommercialCard {
   description: string
   ctaLabel: string
   href: string
+  order?: number
+  active?: boolean
 }
 
 export interface PricingRules {
@@ -203,3 +205,4 @@ export interface SiteExperience {
     keywords: string[]
   }
 }
+

@@ -12,6 +12,15 @@ function cloneDefaults(defaults: SiteExperience): SiteExperience {
   return JSON.parse(JSON.stringify(defaults))
 }
 
+function repairEncoding(value: unknown): unknown {
+  if (typeof value === 'string' && /[ÃÂâ]/.test(value)) {
+    return Buffer.from(value, 'latin1').toString('utf8')
+  }
+  if (Array.isArray(value)) return value.map(repairEncoding)
+  if (isRecord(value)) return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, repairEncoding(item)]))
+  return value
+}
+
 function mergeSite(defaults: SiteExperience, incoming: unknown): SiteExperience {
   const target = cloneDefaults(defaults)
 
@@ -44,7 +53,7 @@ function mergeSite(defaults: SiteExperience, incoming: unknown): SiteExperience 
     return patch ?? base
   }
 
-  return merge(target, incoming) as SiteExperience
+  return repairEncoding(merge(target, incoming)) as SiteExperience
 }
 
 export async function getSiteContent(): Promise<SiteExperience> {
@@ -83,3 +92,4 @@ export function getWhatsappHref(site: SiteExperience): string {
   }
   return `https://wa.me/${normalized}?text=${encodeURIComponent(site.contact.whatsappMessage)}`
 }
+

@@ -5,7 +5,7 @@ import { LeadWizard } from '@/components/LeadWizard'
 import { breadcrumbJsonLd, buildSeoMetadata } from '@/lib/seo'
 
 export const metadata = buildSeoMetadata({
-  title: 'Refaccion electrica de departamento en CABA | NERIN',
+  title: 'Refacción eléctrica de departamento en CABA | NERIN',
   description:
     'Refacciones electricas de departamentos, casas, locales y oficinas en CABA/GBA con relevamiento, fotos, alcance claro y presupuesto por caso.',
   path: '/refacciones-electricas',
@@ -75,3 +75,4 @@ export default async function RefaccionesElectricasPage() {
     </div>
   )
 }
+
