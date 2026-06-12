@@ -6,7 +6,7 @@ import { breadcrumbJsonLd, buildSeoMetadata } from '@/lib/seo'
 export const metadata = buildSeoMetadata({
   title: 'Servicios electricos especiales en CABA | NERIN',
   description:
-    'Diagnostico electrico, informes, revision de tablero, puesta a tierra, cortes frecuentes y relevamientos en CABA/GBA con revision tecnica.',
+    'Diagnóstico eléctrico, informes, revisión de tablero, puesta a tierra, cortes frecuentes y relevamientos en CABA/GBA con revisión técnica.',
   path: '/servicios-especiales',
 })
 
@@ -51,3 +51,4 @@ export default async function ServiciosEspecialesPage() {
     </div>
   )
 }
+

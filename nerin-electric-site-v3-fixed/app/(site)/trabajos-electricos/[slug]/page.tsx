@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     title: `${service.name} en CABA y GBA | NERIN`,
     description: `${service.shortDescription} Precio orientativo desde ${
       service.showPrice ? money(service.priceFrom, site.pricingRules.currency) : 'a confirmar'
-    }. Envia fotos para cotizar el trabajo electrico.`,
+    }. Enviá fotos para cotizar el trabajo eléctrico.`,
     path: `/trabajos-electricos/${service.slug}`,
   })
 }
@@ -67,7 +67,7 @@ export default async function TrabajoElectricoPage({ params }: { params: { slug:
           <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
             <h2 className="text-xl font-semibold text-slate-950">Condiciones comerciales</h2>
             <div className="mt-3 grid gap-2 text-sm text-slate-700">
-              <p><strong className="text-slate-950">Visita tecnica:</strong> desde {money(site.pricingRules.technicalVisitFrom, site.pricingRules.currency)}</p>
+              <p><strong className="text-slate-950">Visita técnica:</strong> desde {money(site.pricingRules.technicalVisitFrom, site.pricingRules.currency)}</p>
               <p><strong className="text-slate-950">Requiere visita:</strong> {service.requiresVisit ? 'Si' : 'No siempre'}</p>
               <p><strong className="text-slate-950">Cotizacion por fotos:</strong> {service.quoteByPhotos ? 'Si' : 'A confirmar'}</p>
               <p><strong className="text-slate-950">Zona:</strong> {service.coverageZone}</p>
@@ -80,7 +80,7 @@ export default async function TrabajoElectricoPage({ params }: { params: { slug:
           <div className="rounded-lg border border-amber-200 bg-amber-50 p-5">
             <h2 className="flex items-center text-xl font-semibold text-slate-950">
               <Camera className="mr-2 h-5 w-5" />
-              Envia fotos y evita visitas innecesarias
+              Enviá fotos y evitá visitas innecesarias
             </h2>
             <p className="mt-3 text-sm leading-6 text-slate-700">
               Mostranos el punto, tablero, toma, llave, luminaria o falla. Si hay olor, recalentamiento, humedad o corte,
@@ -114,3 +114,4 @@ function InfoBlock({ title, items }: { title: string; items: string[] }) {
     </section>
   )
 }
+

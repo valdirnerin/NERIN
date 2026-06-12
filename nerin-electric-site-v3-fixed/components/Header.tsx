@@ -30,7 +30,7 @@ const navigation = [
   { href: '/contacto', label: 'Contacto' },
 ] as const
 
-const fallbackMessages = ['Visita tecnica desde $80.000', 'Precios orientativos online', 'CABA y GBA', 'Envia fotos por WhatsApp']
+const fallbackMessages = ['⚡ Mirá precios antes de consultar · Visita técnica desde $80.000 · Enviá fotos por WhatsApp · CABA y GBA']
 
 function asRoute(href: string) {
   return href as Route
@@ -54,7 +54,7 @@ export function Header({ contact, logo, commercialBar }: HeaderProps) {
   return (
     <>
       {showBar ? (
-        <div className="overflow-hidden border-b border-amber-200 bg-slate-950 text-white">
+        <div className="max-h-9 overflow-hidden border-b border-amber-200 bg-slate-950 text-white sm:max-h-none">
           {displayMode === 'estatica' ? (
             <div className="container flex flex-wrap items-center justify-center gap-x-5 gap-y-1 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.14em] sm:justify-between">
               <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1">
@@ -166,3 +166,4 @@ export function Header({ contact, logo, commercialBar }: HeaderProps) {
     </>
   )
 }
+

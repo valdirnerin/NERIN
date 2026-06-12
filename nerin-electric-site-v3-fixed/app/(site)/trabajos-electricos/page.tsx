@@ -43,7 +43,7 @@ export default async function TrabajosElectricosPage() {
           </p>
           <div className="mt-6 grid gap-3 rounded-lg border border-amber-200 bg-white p-4 sm:grid-cols-[0.8fr_1.2fr]">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Visita tecnica</p>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Visita técnica</p>
               <p className="mt-1 text-2xl font-semibold text-slate-950">
                 Desde {money(site.pricingRules.technicalVisitFrom, site.pricingRules.currency)}
               </p>
@@ -52,7 +52,7 @@ export default async function TrabajosElectricosPage() {
           </div>
           <div className="mt-5 flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3 text-slate-500">
             <Search className="h-5 w-5" />
-            <span className="text-sm">Busca por categoria o elegi la ficha mas parecida a tu pedido y envia fotos.</span>
+            <span className="text-sm">Buscá por categoría o elegí la ficha más parecida a tu pedido y enviá fotos.</span>
           </div>
         </div>
       </section>
@@ -83,6 +83,8 @@ export default async function TrabajosElectricosPage() {
               <p><strong className="text-slate-950">Puede cambiar por:</strong> {service.priceChanges.slice(0, 2).join(', ')}</p>
               <p><strong className="text-slate-950">Zona:</strong> {service.coverageZone}</p>
               <p><strong className="text-slate-950">Duracion:</strong> {service.estimatedDuration}</p>
+              <p><strong className="text-slate-950">Visita técnica:</strong> {service.requiresVisit ? 'Requerida' : 'No siempre es necesaria'}</p>
+              <p><strong className="text-slate-950">Cotización por fotos:</strong> {service.quoteByPhotos ? 'Disponible' : 'Requiere revisión previa'}</p>
             </div>
             <Link href={`/trabajos-electricos/${service.slug}` as Route} className="mt-5 inline-flex items-center rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white">
               <Camera className="mr-2 h-4 w-4" />
@@ -117,3 +119,4 @@ export default async function TrabajosElectricosPage() {
     </div>
   )
 }
+
