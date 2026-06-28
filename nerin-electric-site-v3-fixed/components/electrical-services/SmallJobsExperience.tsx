@@ -1,7 +1,7 @@
 'use client'
 
-import { useMemo, useRef, useState } from 'react'
-import { CheckCircle2, ClipboardList, Settings2, Store, Wrench, X } from 'lucide-react'
+import { useMemo, useRef, useState, type ReactNode } from 'react'
+import { CheckCircle2, ClipboardList, ImagePlus, Settings2, Store, Wrench, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -150,12 +150,33 @@ const commercialRequestServices = [
   },
 ]
 
-const commercialSpaces = ['local', 'oficina', 'depósito', 'galería', 'consorcio', 'country']
-const commercialSchedules = ['normal', 'fuera de horario']
-const commercialMaterials = ['aporta cliente', 'cotiza NERIN']
+const commercialSpaces = [
+  'local',
+  'oficina',
+  'depósito',
+  'galería',
+  'consorcio',
+  'country',
+  'barrio privado',
+]
+const commercialSchedules = [
+  'horario comercial',
+  'antes de apertura',
+  'después del cierre',
+  'fuera de horario',
+]
+const commercialMaterials = ['aporta cliente', 'cotiza NERIN', 'a definir']
 const ladderOptions = ['sí', 'no', 'no sé']
 
-type RequestItem = { id: string; title: string; quantity: number; labor: number; note: string }
+type RequestKind = 'quick' | 'installation' | 'diagnostic' | 'commercial'
+type RequestItem = {
+  id: string
+  title: string
+  quantity: number
+  labor: number
+  note: string
+  kind: RequestKind
+}
 
 function SelectField({
   label,
@@ -205,6 +226,43 @@ function StatusPill({ children }: { children: string }) {
   )
 }
 
+function RadioGroup({ label, options }: { label: string; options: string[] }) {
+  return (
+    <fieldset className="rounded-2xl border border-slate-200 bg-white p-4">
+      <legend className="px-1 text-sm font-bold text-slate-950">{label}</legend>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {options.map((option, index) => (
+          <label
+            key={option}
+            className="inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 text-sm font-semibold text-slate-700 has-[:checked]:border-slate-950 has-[:checked]:bg-slate-950 has-[:checked]:text-white"
+          >
+            <input type="radio" name={label} defaultChecked={index === 0} className="sr-only" />
+            {option}
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  )
+}
+
+function RequestStep({
+  eyebrow,
+  title,
+  children,
+}: {
+  eyebrow: string
+  title: string
+  children: ReactNode
+}) {
+  return (
+    <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+      <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">{eyebrow}</p>
+      <h3 className="mt-1 text-xl font-semibold text-slate-950">{title}</h3>
+      <div className="mt-4">{children}</div>
+    </section>
+  )
+}
+
 export function SmallJobsExperience() {
   const [activeMode, setActiveMode] = useState(entryCards[0].id)
   const [openService, setOpenService] = useState<string | null>(quickServices[0]?.id ?? null)
@@ -231,6 +289,10 @@ export function SmallJobsExperience() {
   })
   const estimate = useMemo(() => generateTechnicalSummary(selection), [selection])
   const subtotal = items.reduce((acc, item) => acc + item.labor * item.quantity, 0)
+  const hasQuick = items.some((item) => item.kind === 'quick')
+  const hasInstallation = items.some((item) => item.kind === 'installation')
+  const hasDiagnostic = items.some((item) => item.kind === 'diagnostic')
+  const hasCommercial = items.some((item) => item.kind === 'commercial')
 
   function addService(service: ElectricalService) {
     setItems((current) => [
@@ -241,6 +303,7 @@ export function SmallJobsExperience() {
         quantity: 1,
         labor: service.baseLaborPrice,
         note: service.materialPolicy,
+        kind: 'quick',
       },
     ])
     setAddedLabel(service.title)
@@ -264,6 +327,7 @@ export function SmallJobsExperience() {
         quantity: 1,
         labor: estimate.labor,
         note: 'Instalación configurable · estimado pendiente de validación técnica',
+        kind: 'installation',
       },
       'config',
     )
@@ -276,19 +340,27 @@ export function SmallJobsExperience() {
         quantity: Number(commercialConfig.quantity) || 1,
         labor: 0,
         note: `Cotizar: ${commercialConfig.height}, ${commercialConfig.spaceType}, ${commercialConfig.schedule}, materiales: ${commercialConfig.materials}, escalera especial: ${commercialConfig.ladder}. ${commercialConfig.observations}`.trim(),
+        kind: 'commercial',
       },
       'comercial-lamparas',
     )
   }
 
   return (
-    <div className="bg-white pb-20 lg:pb-0">
+    <div className="bg-white pb-32 lg:pb-0">
       <button
         type="button"
         onClick={openSolicitud}
-        className="fixed inset-x-3 bottom-3 z-40 flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-950 px-4 py-3 text-sm font-semibold text-white shadow-2xl lg:hidden"
+        className="fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-950 px-4 py-3 text-sm font-semibold text-white shadow-2xl lg:hidden"
       >
-        <span>Solicitud · {items.length} servicios</span>
+        <span>
+          Solicitud ·{' '}
+          {items.length === 0
+            ? 'sin servicios'
+            : items.length === 1
+              ? '1 servicio'
+              : `${items.length} servicios`}
+        </span>
         <span>{subtotal ? money(subtotal) : 'Ver resumen'}</span>
       </button>
 
@@ -678,6 +750,7 @@ export function SmallJobsExperience() {
                         quantity: 1,
                         labor: fault.initialPrice,
                         note: 'Diagnóstico inicial con aprobación previa para adicionales',
+                        kind: 'diagnostic',
                       },
                       fault.id,
                     )
@@ -779,6 +852,7 @@ export function SmallJobsExperience() {
                             quantity: 1,
                             labor: 0,
                             note: `${service.quoteNeeds} Materiales no incluidos salvo acuerdo.`,
+                            kind: 'commercial',
                           },
                           service.id,
                         )
@@ -937,54 +1011,300 @@ export function SmallJobsExperience() {
             </div>
           )}
         </aside>
-        <form
-          onSubmit={(event) => {
-            event.preventDefault()
-            setSent(true)
-          }}
-          className="rounded-3xl border border-slate-200 bg-slate-50 p-5"
-        >
-          <h2 className="text-2xl font-semibold text-slate-950">Enviar solicitud</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-600">
-            NERIN Instalaciones Eléctricas revisa zona, fotos, disponibilidad, alcance y estado de
-            la instalación antes de confirmar.
-          </p>
-          <div className="mt-5 grid gap-4 sm:grid-cols-2">
-            <Input className="h-12" required placeholder="Nombre" />
-            <Input className="h-12" required placeholder="Teléfono" />
-            <Input className="h-12" type="email" placeholder="Email opcional" />
-            <Input className="h-12" required placeholder="Dirección / zona" />
-            <SelectField
-              label="Tipo de propiedad"
-              value={selection.propertyType}
-              options={propertyTypes}
-              onChange={(propertyType) => setSelection({ ...selection, propertyType })}
-            />
-            <Input className="h-12" placeholder="Disponibilidad horaria" />
-            <Input type="file" multiple className="h-12 pt-3 sm:col-span-2" />
-            <Textarea className="min-h-28 sm:col-span-2" placeholder="Observaciones" />
+        {items.length === 0 ? (
+          <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 shadow-sm">
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">
+              Solicitud guiada
+            </p>
+            <h2 className="mt-2 text-2xl font-semibold text-slate-950">
+              Todavía no agregaste servicios.
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-slate-600">
+              Elegí un servicio rápido, configurá una instalación, solicitá diagnóstico o armá una
+              solicitud comercial. Después vas a poder cargar tus datos y enviar el pedido para
+              revisión.
+            </p>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              {entryCards.map((card) => (
+                <Button
+                  key={card.id}
+                  type="button"
+                  variant={card.id === activeMode ? 'primary' : 'outline'}
+                  onClick={() => {
+                    setActiveMode(card.id)
+                    document
+                      .getElementById(card.id)
+                      ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  }}
+                  className="min-h-12 justify-start"
+                >
+                  {card.id === 'servicios-rapidos'
+                    ? 'Ver servicios rápidos'
+                    : card.id === 'instalaciones-configurables'
+                      ? 'Configurar instalación'
+                      : card.id === 'diagnostico-de-fallas'
+                        ? 'Pedir diagnóstico'
+                        : 'Servicio comercial / consorcio'}
+                </Button>
+              ))}
+            </div>
+            <p className="mt-5 rounded-2xl border border-amber-100 bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-950">
+              Primero agregá al menos un servicio a la solicitud.
+            </p>
           </div>
-          <Button className="mt-5 min-h-12 w-full" size="lg" disabled={items.length === 0}>
-            Enviar solicitud
-          </Button>
-          {sent ? (
-            <div className="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm leading-6 text-emerald-950">
-              <CheckCircle2 className="mb-2 h-5 w-5" />
-              <b>Solicitud enviada. Pendiente de aprobación por NERIN.</b>
-              <p>
-                Vamos a revisar zona, fotos, disponibilidad, alcance y estado de la instalación.
-                Luego confirmamos si el servicio puede realizarse con el valor estimado, si requiere
-                ajuste o si corresponde una visita técnica previa.
+        ) : (
+          <form
+            onSubmit={(event) => {
+              event.preventDefault()
+              if (items.length === 0) return
+              setSent(true)
+            }}
+            className="space-y-5 rounded-3xl border border-slate-200 bg-slate-50 p-5"
+          >
+            <div>
+              <h2 className="text-2xl font-semibold text-slate-950">
+                Enviar solicitud para revisión
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                Completá los datos por bloques. NERIN revisa zona, fotos, agenda, acceso, estado
+                real y alcance antes de confirmar.
               </p>
             </div>
-          ) : null}
-          <a
-            className="mt-4 inline-flex text-sm font-semibold text-slate-950"
-            href={`https://wa.me/?text=${encodeURIComponent(`Solicitud NERIN Instalaciones Eléctricas\nSubtotal estimado: ${money(subtotal)}\n${items.map((item) => `- ${item.title} x${item.quantity}`).join('\n')}`)}`}
-          >
-            Generar resumen para WhatsApp
-          </a>
-        </form>
+
+            <RequestStep eyebrow="Paso 1" title="Servicios solicitados">
+              <div className="space-y-3">
+                {items.map((item) => (
+                  <div key={item.id} className="rounded-2xl bg-slate-50 p-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-semibold text-slate-950">{item.title}</p>
+                        <p className="mt-1 text-xs leading-5 text-slate-500">{item.note}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setItems(items.filter((entry) => entry.id !== item.id))}
+                        className="rounded-full p-1 text-slate-500 hover:bg-white hover:text-slate-950"
+                        aria-label="Eliminar"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <div className="mt-3 grid gap-3 sm:grid-cols-[120px_1fr]">
+                      <Input
+                        className="h-11"
+                        type="number"
+                        min={1}
+                        value={item.quantity}
+                        onChange={(e) =>
+                          setItems(
+                            items.map((entry) =>
+                              entry.id === item.id
+                                ? { ...entry, quantity: Number(e.target.value) || 1 }
+                                : entry,
+                            ),
+                          )
+                        }
+                      />
+                      <Input className="h-11" placeholder="Aclaraciones sobre este servicio" />
+                    </div>
+                  </div>
+                ))}
+                <div className="rounded-2xl border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-600">
+                  <b className="text-slate-950">Subtotal estimado:</b>{' '}
+                  {subtotal ? money(subtotal) : 'a cotizar'} · Materiales no incluidos o a definir ·{' '}
+                  <b>Pendiente de validación técnica</b>.
+                </div>
+              </div>
+            </RequestStep>
+
+            <RequestStep eyebrow="Paso 2" title="Datos del lugar">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Input className="h-12" required placeholder="Dirección / zona" />
+                <SelectField
+                  label="Tipo de propiedad"
+                  value={selection.propertyType}
+                  options={propertyTypes}
+                  onChange={(propertyType) => setSelection({ ...selection, propertyType })}
+                />
+                <SelectField
+                  label="Acceso"
+                  value="libre"
+                  options={['libre', 'con autorización', 'con coordinación previa', 'no sé']}
+                  onChange={() => {}}
+                />
+                <Input className="h-12" placeholder="Disponibilidad horaria" />
+              </div>
+            </RequestStep>
+
+            <RequestStep eyebrow="Paso 3" title="Datos de contacto">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Input className="h-12" required placeholder="Nombre" />
+                <Input className="h-12" required placeholder="Teléfono" />
+                <Input className="h-12 sm:col-span-2" type="email" placeholder="Email opcional" />
+              </div>
+            </RequestStep>
+
+            <RequestStep eyebrow="Paso 4" title="Fotos y detalles">
+              <div className="space-y-4">
+                <label className="block cursor-pointer rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-5 text-center transition hover:border-slate-950 hover:bg-white">
+                  <ImagePlus className="mx-auto h-7 w-7 text-slate-950" />
+                  <span className="mt-3 block text-base font-semibold text-slate-950">
+                    Fotos del trabajo
+                  </span>
+                  <span className="mt-1 block text-sm leading-6 text-slate-600">
+                    Subí fotos del tablero, punto eléctrico, luminaria, falla o zona de trabajo.
+                  </span>
+                  <span className="mt-4 inline-flex rounded-full bg-slate-950 px-5 py-3 text-sm font-bold text-white">
+                    Agregar fotos
+                  </span>
+                  <span className="mt-3 block text-xs leading-5 text-slate-500">
+                    Podés subir varias imágenes. Ayudan a validar alcance, materiales y acceso.
+                  </span>
+                  <input type="file" multiple className="sr-only" />
+                </label>
+                <div className="grid gap-3">
+                  {hasQuick ? (
+                    <>
+                      <RadioGroup
+                        label="¿El punto eléctrico ya existe?"
+                        options={['sí', 'no', 'no sé']}
+                      />
+                      <RadioGroup
+                        label="¿Hay daño visible?"
+                        options={['no', 'caja rota', 'cables quemados', 'falso contacto', 'no sé']}
+                      />
+                      <RadioGroup
+                        label="¿Tenés foto del punto y del tablero?"
+                        options={['sí', 'no', 'puedo sacarla']}
+                      />
+                      <RadioGroup
+                        label="¿El material lo aporta el cliente o lo cotiza NERIN?"
+                        options={['cliente', 'cotiza NERIN', 'a definir']}
+                      />
+                    </>
+                  ) : null}
+                  {hasInstallation ? (
+                    <>
+                      <RadioGroup label="¿Hay cañería existente?" options={['sí', 'no', 'no sé']} />
+                      <RadioGroup
+                        label="¿Hay recorrido visible para pasar cable?"
+                        options={['sí', 'no', 'a revisar']}
+                      />
+                      <RadioGroup
+                        label="¿Querés instalación exterior o embutida?"
+                        options={['exterior', 'embutida', 'no sé']}
+                      />
+                      <RadioGroup label="¿Hay tablero cercano?" options={['sí', 'no', 'no sé']} />
+                      <p className="rounded-2xl border border-amber-100 bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-950">
+                        Puede requerir circuito dedicado según carga, distancia y estado del
+                        tablero. Se valida técnicamente antes de confirmar.
+                      </p>
+                    </>
+                  ) : null}
+                  {hasDiagnostic ? (
+                    <>
+                      <Input className="h-12" placeholder="¿Qué problema ocurre?" />
+                      <RadioGroup
+                        label="¿Cuándo ocurre?"
+                        options={[
+                          'siempre',
+                          'a veces',
+                          'al prender algo',
+                          'con lluvia o humedad',
+                          'de noche',
+                          'no sé',
+                        ]}
+                      />
+                      <RadioGroup
+                        label="¿Qué protección salta?"
+                        options={['disyuntor', 'térmica', 'ambas', 'ninguna', 'no sé']}
+                      />
+                      <RadioGroup label="¿Ya vino otro electricista?" options={['sí', 'no']} />
+                      <RadioGroup
+                        label="¿La falla está ocurriendo ahora?"
+                        options={['sí', 'no', 'intermitente']}
+                      />
+                      <RadioGroup
+                        label="¿Hay olor a quemado, calor o chispas?"
+                        options={['sí', 'no', 'no sé']}
+                      />
+                      <p className="rounded-2xl border border-red-100 bg-red-50 p-4 text-sm font-semibold leading-6 text-red-950">
+                        Si hay olor a quemado, chispas, tablero caliente o riesgo visible, no
+                        manipules la instalación. Solicitá revisión técnica.
+                      </p>
+                    </>
+                  ) : null}
+                  {hasCommercial ? (
+                    <>
+                      <SelectField
+                        label="Tipo de espacio"
+                        value={commercialConfig.spaceType}
+                        options={commercialSpaces}
+                        onChange={(spaceType) =>
+                          setCommercialConfig({ ...commercialConfig, spaceType })
+                        }
+                      />
+                      <RadioGroup
+                        label="Requiere autorización"
+                        options={[
+                          'administración',
+                          'seguridad',
+                          'encargado',
+                          'propietario',
+                          'no requiere',
+                          'no sé',
+                        ]}
+                      />
+                      <SelectField
+                        label="Horario de trabajo"
+                        value={commercialConfig.schedule}
+                        options={commercialSchedules}
+                        onChange={(schedule) =>
+                          setCommercialConfig({ ...commercialConfig, schedule })
+                        }
+                      />
+                      <SelectField
+                        label="Altura aproximada"
+                        value={commercialConfig.height}
+                        options={['hasta 3 m', '3 a 5 m', 'más de 5 m', 'no sé']}
+                        onChange={(height) => setCommercialConfig({ ...commercialConfig, height })}
+                      />
+                      <SelectField
+                        label="Materiales"
+                        value={commercialConfig.materials}
+                        options={commercialMaterials}
+                        onChange={(materials) =>
+                          setCommercialConfig({ ...commercialConfig, materials })
+                        }
+                      />
+                      <Input
+                        className="h-12"
+                        type="number"
+                        min={1}
+                        placeholder="Cantidad aproximada"
+                      />
+                      <RadioGroup
+                        label="Acceso"
+                        options={['libre', 'con autorización', 'con coordinación previa', 'no sé']}
+                      />
+                    </>
+                  ) : null}
+                  <Textarea className="min-h-28" placeholder="Observaciones generales" />
+                </div>
+              </div>
+            </RequestStep>
+
+            <Button className="min-h-12 w-full" size="lg">
+              Enviar solicitud para revisión
+            </Button>
+            {sent ? (
+              <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm leading-6 text-emerald-950">
+                <CheckCircle2 className="mb-2 h-5 w-5" />
+                <b>Solicitud enviada. Pendiente de aprobación por NERIN.</b>
+              </div>
+            ) : null}
+          </form>
+        )}
       </section>
 
       <section className="border-t border-slate-200 bg-slate-50 py-8">
