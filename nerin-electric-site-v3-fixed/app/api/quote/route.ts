@@ -37,7 +37,7 @@ export async function POST(req: Request){
   <div style="max-width:900px;margin:40px auto;">
     <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
       <div>
-        <div style="font-size:22px;font-weight:800;">${site.name || 'NERIN Ingeniería Eléctrica'}</div>
+        <div style="font-size:22px;font-weight:800;">${site.name || 'NERIN Electricidad'}</div>
         <div style="font-size:12px;color:#555;">${site.contact.email || ''} · ${site.contact.phone || ''} · ${site.contact.address || ''}</div>
       </div>
     </div>
