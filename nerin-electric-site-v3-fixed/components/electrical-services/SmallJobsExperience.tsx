@@ -1,7 +1,16 @@
 'use client'
 
-import { useMemo, useRef, useState, type ReactNode } from 'react'
-import { CheckCircle2, ClipboardList, ImagePlus, Pencil, Settings2, Store, Wrench, X } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import {
+  CheckCircle2,
+  ClipboardList,
+  ImagePlus,
+  Pencil,
+  Settings2,
+  Store,
+  Wrench,
+  X,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -263,7 +272,13 @@ function RadioGroup({
             key={option}
             className="inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 text-sm font-semibold text-slate-700 has-[:checked]:border-slate-950 has-[:checked]:bg-slate-950 has-[:checked]:text-white"
           >
-            <input type="radio" name={label} checked={(value ?? options[0]) === option} onChange={() => onChange?.(option)} className="sr-only" />
+            <input
+              type="radio"
+              name={label}
+              checked={(value ?? options[0]) === option}
+              onChange={() => onChange?.(option)}
+              className="sr-only"
+            />
             {option}
           </label>
         ))}
@@ -272,39 +287,72 @@ function RadioGroup({
   )
 }
 
-
 function getQuickQuestions(service: ElectricalService): ConfigQuestion[] {
-  if (service.id === 'cambio-tomacorriente-existente') return [
-    { label: '¿El punto eléctrico ya existe?', options: ['sí', 'no', 'no sé'] },
-    { label: '¿Qué querés hacer?', options: ['reemplazo por estética', 'toma flojo', 'toma quemado', 'falso contacto', 'otro'] },
-    { label: '¿Hay daño visible?', options: ['no', 'caja rota', 'cables quemados', 'tapa rota', 'no sé'] },
-    { label: '¿Qué material querés?', options: ['lo aporta el cliente', 'cotiza NERIN', 'a definir'] },
-    { label: '¿Tenés foto del toma y del tablero?', options: ['sí', 'no', 'puedo sacarla'] },
-    { label: 'Observaciones del punto', multiline: true },
-  ]
-  if (service.id === 'cambio-llave-luz') return [
-    { label: '¿La llave ya existe?', options: ['sí', 'no', 'no sé'] },
-    { label: '¿Es simple, combinación, escalera o no sabés?', options: ['simple', 'combinación', 'escalera', 'no sé'] },
-    { label: '¿El problema es estético, falso contacto o no enciende?', options: ['estético', 'falso contacto', 'no enciende', 'otro'] },
-    { label: 'Material cliente / cotiza NERIN / a definir', options: ['cliente', 'cotiza NERIN', 'a definir'] },
-    { label: 'Foto del punto y tablero', options: ['sí', 'no', 'puedo sacarla'] },
-  ]
-  if (service.id === 'instalacion-luminaria-punto-existente') return [
-    { label: '¿Ya existe boca de iluminación?', options: ['sí', 'no', 'no sé'] },
-    { label: 'Altura aproximada', options: ['hasta 3 m', '3 a 5 m', 'más de 5 m', 'no sé'] },
-    { label: '¿La luminaria la aporta el cliente?', options: ['sí', 'no', 'a definir'] },
-    { label: '¿Es pesada o común?', options: ['común', 'pesada', 'no sé'] },
-    { label: '¿Requiere armado?', options: ['sí', 'no', 'no sé'] },
-    { label: 'Techo de losa, durlock, madera u otro', options: ['losa', 'durlock', 'madera', 'otro', 'no sé'] },
-    { label: 'Foto del punto', options: ['sí', 'no', 'puedo sacarla'] },
-  ]
-  if (service.id === 'cambio-termica' || service.id === 'cambio-disyuntor') return [
-    { label: '¿La protección ya existe en tablero?', options: ['sí', 'no', 'no sé'] },
-    { label: '¿Querés reemplazo por falla o por actualización?', options: ['falla', 'actualización', 'no sé'] },
-    { label: '¿La térmica/disyuntor salta actualmente?', options: ['sí', 'no', 'a veces', 'no sé'] },
-    { label: '¿Hay olor, calor, cables recalentados o daño visible?', options: ['no', 'olor', 'calor', 'cables recalentados', 'daño visible', 'no sé'] },
-    { label: '¿Tenés foto del tablero abierto/cerrado?', options: ['sí', 'no', 'puedo sacarla'] },
-  ]
+  if (service.id === 'cambio-tomacorriente-existente')
+    return [
+      { label: '¿El punto eléctrico ya existe?', options: ['sí', 'no', 'no sé'] },
+      {
+        label: '¿Qué querés hacer?',
+        options: ['reemplazo por estética', 'toma flojo', 'toma quemado', 'falso contacto', 'otro'],
+      },
+      {
+        label: '¿Hay daño visible?',
+        options: ['no', 'caja rota', 'cables quemados', 'tapa rota', 'no sé'],
+      },
+      {
+        label: '¿Qué material querés?',
+        options: ['lo aporta el cliente', 'cotiza NERIN', 'a definir'],
+      },
+      { label: '¿Tenés foto del toma y del tablero?', options: ['sí', 'no', 'puedo sacarla'] },
+      { label: 'Observaciones del punto', multiline: true },
+    ]
+  if (service.id === 'cambio-llave-luz')
+    return [
+      { label: '¿La llave ya existe?', options: ['sí', 'no', 'no sé'] },
+      {
+        label: '¿Es simple, combinación, escalera o no sabés?',
+        options: ['simple', 'combinación', 'escalera', 'no sé'],
+      },
+      {
+        label: '¿El problema es estético, falso contacto o no enciende?',
+        options: ['estético', 'falso contacto', 'no enciende', 'otro'],
+      },
+      {
+        label: 'Material cliente / cotiza NERIN / a definir',
+        options: ['cliente', 'cotiza NERIN', 'a definir'],
+      },
+      { label: 'Foto del punto y tablero', options: ['sí', 'no', 'puedo sacarla'] },
+    ]
+  if (service.id === 'instalacion-luminaria-punto-existente')
+    return [
+      { label: '¿Ya existe boca de iluminación?', options: ['sí', 'no', 'no sé'] },
+      { label: 'Altura aproximada', options: ['hasta 3 m', '3 a 5 m', 'más de 5 m', 'no sé'] },
+      { label: '¿La luminaria la aporta el cliente?', options: ['sí', 'no', 'a definir'] },
+      { label: '¿Es pesada o común?', options: ['común', 'pesada', 'no sé'] },
+      { label: '¿Requiere armado?', options: ['sí', 'no', 'no sé'] },
+      {
+        label: 'Techo de losa, durlock, madera u otro',
+        options: ['losa', 'durlock', 'madera', 'otro', 'no sé'],
+      },
+      { label: 'Foto del punto', options: ['sí', 'no', 'puedo sacarla'] },
+    ]
+  if (service.id === 'cambio-termica' || service.id === 'cambio-disyuntor')
+    return [
+      { label: '¿La protección ya existe en tablero?', options: ['sí', 'no', 'no sé'] },
+      {
+        label: '¿Querés reemplazo por falla o por actualización?',
+        options: ['falla', 'actualización', 'no sé'],
+      },
+      {
+        label: '¿La térmica/disyuntor salta actualmente?',
+        options: ['sí', 'no', 'a veces', 'no sé'],
+      },
+      {
+        label: '¿Hay olor, calor, cables recalentados o daño visible?',
+        options: ['no', 'olor', 'calor', 'cables recalentados', 'daño visible', 'no sé'],
+      },
+      { label: '¿Tenés foto del tablero abierto/cerrado?', options: ['sí', 'no', 'puedo sacarla'] },
+    ]
   return [
     { label: '¿El punto o tablero ya existe?', options: ['sí', 'no', 'no sé'] },
     { label: 'Motivo del pedido', options: ['reemplazo', 'falla', 'mejora', 'revisión', 'otro'] },
@@ -317,46 +365,72 @@ function getQuickQuestions(service: ElectricalService): ConfigQuestion[] {
 function getDiagnosticQuestions(faultName: string): ConfigQuestion[] {
   return [
     { label: '¿Qué problema ocurre?', options: [faultName, 'otro síntoma relacionado'] },
-    { label: '¿Qué protección salta?', options: ['disyuntor', 'térmica', 'ambas', 'ninguna', 'no sé'] },
-    { label: '¿Cuándo ocurre?', options: ['siempre', 'a veces', 'al prender algo', 'con lluvia o humedad', 'sin patrón', 'no sé'] },
+    {
+      label: '¿Qué protección salta?',
+      options: ['disyuntor', 'térmica', 'ambas', 'ninguna', 'no sé'],
+    },
+    {
+      label: '¿Cuándo ocurre?',
+      options: [
+        'siempre',
+        'a veces',
+        'al prender algo',
+        'con lluvia o humedad',
+        'sin patrón',
+        'no sé',
+      ],
+    },
     { label: '¿Es permanente o intermitente?', options: ['permanente', 'intermitente', 'no sé'] },
     { label: '¿Ya vino otro electricista?', options: ['sí', 'no'] },
-    { label: '¿Hay olor a quemado, chispas, calor o ruido?', options: ['no', 'olor', 'chispas', 'calor', 'ruido', 'no sé'] },
+    {
+      label: '¿Hay olor a quemado, chispas, calor o ruido?',
+      options: ['no', 'olor', 'chispas', 'calor', 'ruido', 'no sé'],
+    },
     { label: '¿Qué sectores afecta?', multiline: true },
     { label: '¿Tenés foto/video del problema?', options: ['sí', 'no', 'puedo sacarlo'] },
   ]
 }
 
-
 function getCommercialQuestions(title: string): ConfigQuestion[] {
-  if (title === 'Cambio de lámparas en comercio') return [
-    { label: 'Cantidad de luminarias', multiline: true },
-    { label: 'Tipo de luminaria si lo sabe', options: ['LED', 'tubo', 'spot', 'campana', 'no sé', 'otro'] },
-    { label: 'Altura', options: ['hasta 3 m', '3 a 5 m', 'más de 5 m', 'no sé'] },
-    { label: 'Tipo de espacio', options: commercialSpaces },
-    { label: 'Horario de trabajo', options: commercialSchedules },
-    { label: 'Materiales: cliente / cotiza NERIN / a definir', options: commercialMaterials },
-    { label: 'Requiere escalera especial', options: ['sí', 'no', 'no sé'] },
-    { label: 'Requiere autorización de administración/seguridad/encargado', options: ['sí', 'no', 'no sé'] },
-    { label: 'Fecha tentativa', multiline: true },
-    { label: 'Observaciones', multiline: true },
-  ]
-  if (title.includes('country') || title.includes('barrio privado')) return [
-    { label: 'Barrio/zona', multiline: true },
-    { label: 'Acceso por seguridad', options: ['sí', 'no', 'no sé'] },
-    { label: 'Requiere autorización previa', options: ['sí', 'no', 'no sé'] },
-    { label: 'Horarios permitidos', multiline: true },
-    { label: 'Datos de lote/unidad si querés ponerlo', multiline: true },
-    { label: 'Tipo de trabajo', multiline: true },
-    { label: 'Hay reglamento/condiciones de ingreso', options: ['sí', 'no', 'no sé'] },
-  ]
+  if (title === 'Cambio de lámparas en comercio')
+    return [
+      { label: 'Cantidad de luminarias', multiline: true },
+      {
+        label: 'Tipo de luminaria si lo sabe',
+        options: ['LED', 'tubo', 'spot', 'campana', 'no sé', 'otro'],
+      },
+      { label: 'Altura', options: ['hasta 3 m', '3 a 5 m', 'más de 5 m', 'no sé'] },
+      { label: 'Tipo de espacio', options: commercialSpaces },
+      { label: 'Horario de trabajo', options: commercialSchedules },
+      { label: 'Materiales: cliente / cotiza NERIN / a definir', options: commercialMaterials },
+      { label: 'Requiere escalera especial', options: ['sí', 'no', 'no sé'] },
+      {
+        label: 'Requiere autorización de administración/seguridad/encargado',
+        options: ['sí', 'no', 'no sé'],
+      },
+      { label: 'Fecha tentativa', multiline: true },
+      { label: 'Observaciones', multiline: true },
+    ]
+  if (title.includes('country') || title.includes('barrio privado'))
+    return [
+      { label: 'Barrio/zona', multiline: true },
+      { label: 'Acceso por seguridad', options: ['sí', 'no', 'no sé'] },
+      { label: 'Requiere autorización previa', options: ['sí', 'no', 'no sé'] },
+      { label: 'Horarios permitidos', multiline: true },
+      { label: 'Datos de lote/unidad si querés ponerlo', multiline: true },
+      { label: 'Tipo de trabajo', multiline: true },
+      { label: 'Hay reglamento/condiciones de ingreso', options: ['sí', 'no', 'no sé'] },
+    ]
   return [
     { label: 'Tipo de trabajo', multiline: true },
     { label: 'Cantidad o alcance estimado', multiline: true },
     { label: 'Tipo de espacio', options: commercialSpaces },
     { label: 'Horario de trabajo', options: commercialSchedules },
     { label: 'Materiales', options: commercialMaterials },
-    { label: 'Requiere autorización de administración/seguridad/encargado', options: ['sí', 'no', 'no sé'] },
+    {
+      label: 'Requiere autorización de administración/seguridad/encargado',
+      options: ['sí', 'no', 'no sé'],
+    },
     { label: 'Fecha tentativa', multiline: true },
     { label: 'Observaciones', multiline: true },
   ]
@@ -380,10 +454,53 @@ function RequestStep({
   )
 }
 
+const wizardGroupOrder = ['Alcance', 'Estado del punto', 'Materiales y fotos', 'Observaciones']
+
+function getWizardQuestionGroup(question: ConfigQuestion) {
+  const label = question.label.toLowerCase()
+  if (label.includes('observaciones') || label.includes('fecha tentativa')) return 'Observaciones'
+  if (
+    label.includes('material') ||
+    label.includes('foto') ||
+    label.includes('luminaria la aporta') ||
+    label.includes('archivo')
+  ) {
+    return 'Materiales y fotos'
+  }
+  if (
+    label.includes('existe') ||
+    label.includes('daño') ||
+    label.includes('falla') ||
+    label.includes('salta') ||
+    label.includes('olor') ||
+    label.includes('calor') ||
+    label.includes('protección') ||
+    label.includes('problema') ||
+    label.includes('permanente') ||
+    label.includes('intermitente') ||
+    label.includes('techo') ||
+    label.includes('pesada') ||
+    label.includes('armado')
+  ) {
+    return 'Estado del punto'
+  }
+  return 'Alcance'
+}
+
+function getWizardQuestionGroups(questions: ConfigQuestion[]) {
+  return wizardGroupOrder
+    .map((title) => ({
+      title,
+      questions: questions.filter((question) => getWizardQuestionGroup(question) === title),
+    }))
+    .filter((group) => group.questions.length > 0)
+}
+
 export function SmallJobsExperience() {
   const [activeMode, setActiveMode] = useState(entryCards[0].id)
   const [openService, setOpenService] = useState<string | null>(quickServices[0]?.id ?? null)
   const [addedLabel, setAddedLabel] = useState<string | null>(null)
+  const [lastAddedId, setLastAddedId] = useState<string | null>(null)
   const solicitudRef = useRef<HTMLElement | null>(null)
   const [items, setItems] = useState<RequestItem[]>([])
   const [sent, setSent] = useState(false)
@@ -408,6 +525,24 @@ export function SmallJobsExperience() {
   })
   const estimate = useMemo(() => generateTechnicalSummary(selection), [selection])
   const subtotal = items.reduce((acc, item) => acc + item.labor * item.quantity, 0)
+  const hasQuotedItems = items.some((item) => item.labor === 0)
+  const wizardPreview = wizard
+    ? wizard.questions.map((question) => {
+        const answer = wizard.answers[question.label]?.trim() || 'sin informar'
+        return `${question.label.replace(/^¿|\?$/g, '')}: ${answer}`
+      })
+    : []
+  const wizardPreviewMaterials =
+    wizardPreview.find((item) => item.toLowerCase().includes('material')) ?? 'Materiales: a definir'
+  const wizardPreviewPhotos =
+    wizardPreview.find((item) => item.toLowerCase().includes('foto')) ??
+    'Fotos requeridas: tablero, punto o zona de trabajo'
+
+  useEffect(() => {
+    if (!lastAddedId) return
+    const timeout = window.setTimeout(() => setLastAddedId(null), 4500)
+    return () => window.clearTimeout(timeout)
+  }, [lastAddedId])
 
   function openWizard(draft: Omit<WizardDraft, 'answers'>) {
     setWizard({
@@ -434,8 +569,10 @@ export function SmallJobsExperience() {
   }
 
   function addRequestItem(item: Omit<RequestItem, 'id'>, prefix: string) {
-    setItems((current) => [...current, { ...item, id: `${prefix}-${Date.now()}` }])
+    const id = `${prefix}-${Date.now()}`
+    setItems((current) => [...current, { ...item, id }])
     setAddedLabel(item.title)
+    setLastAddedId(id)
     setSent(false)
   }
 
@@ -445,8 +582,11 @@ export function SmallJobsExperience() {
       const answer = wizard.answers[question.label]?.trim() || 'sin informar'
       return `${question.label.replace(/^¿|\?$/g, '')}: ${answer}`
     })
-    const material = configured.find((item) => item.toLowerCase().includes('material')) ?? 'Materiales: a definir'
-    const photos = configured.find((item) => item.toLowerCase().includes('foto')) ?? 'Fotos requeridas: tablero, punto o zona de trabajo'
+    const material =
+      configured.find((item) => item.toLowerCase().includes('material')) ?? 'Materiales: a definir'
+    const photos =
+      configured.find((item) => item.toLowerCase().includes('foto')) ??
+      'Fotos requeridas: tablero, punto o zona de trabajo'
     addRequestItem(
       {
         title: wizard.title,
@@ -466,9 +606,11 @@ export function SmallJobsExperience() {
     setWizard(null)
   }
 
-
   function editConfiguredItem(item: RequestItem) {
-    const questions = item.details.map((detail) => ({ label: detail.split(':')[0], multiline: true }))
+    const questions = item.details.map((detail) => ({
+      label: detail.split(':')[0],
+      multiline: true,
+    }))
     setItems((current) => current.filter((entry) => entry.id !== item.id))
     setWizard({
       kind: item.kind,
@@ -489,6 +631,17 @@ export function SmallJobsExperience() {
 
   function openSolicitud() {
     solicitudRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  function scrollToOptions() {
+    document.getElementById(activeMode)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  function getCategoryLabel(kind: RequestKind) {
+    if (kind === 'quick') return 'Servicio rápido'
+    if (kind === 'installation') return 'Instalación configurable'
+    if (kind === 'diagnostic') return 'Diagnóstico de fallas'
+    return 'Comercio / consorcio / barrio privado'
   }
 
   function addConfigurable() {
@@ -543,66 +696,210 @@ export function SmallJobsExperience() {
   }
 
   return (
-    <div className="bg-white pb-32 lg:pb-0">
+    <div className="bg-white pb-44 lg:pb-0">
+      <style>{`a[data-content-name='WhatsApp flotante'] { display: none; }`}</style>
 
       {wizard ? (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/55 p-0 backdrop-blur-sm sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-labelledby="wizard-title">
-          <div className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-t-3xl border border-slate-200 bg-white p-5 shadow-2xl sm:rounded-3xl sm:p-6">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Configurar solicitud</p>
-                <h2 id="wizard-title" className="mt-2 text-2xl font-semibold text-slate-950">{wizard.title}</h2>
-                <p className="mt-2 text-sm leading-6 text-slate-600">Completá el alcance mínimo para armar una ficha técnica antes de agregarlo a Solicitud.</p>
+        <div
+          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-950/55 p-3 pt-[calc(0.75rem_+_env(safe-area-inset-top))] backdrop-blur-sm sm:p-4 sm:pt-6"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="wizard-title"
+        >
+          <div className="flex max-h-[calc(100dvh_-_1.5rem_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] w-full max-w-3xl flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl">
+            <div className="shrink-0 border-b border-slate-100 bg-white p-5 sm:p-6">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
+                    Configurar solicitud
+                  </p>
+                  <h2 id="wizard-title" className="mt-2 text-2xl font-semibold text-slate-950">
+                    {wizard.title}
+                  </h2>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    Completá el alcance mínimo para armar una ficha técnica antes de agregarlo a
+                    Solicitud. Revisá el resumen técnico y confirmá cuando esté listo.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setWizard(null)}
+                  className="rounded-full bg-slate-100 p-2 text-slate-600 hover:bg-slate-200"
+                  aria-label="Cerrar configurador"
+                >
+                  <X className="h-5 w-5" />
+                </button>
               </div>
-              <button type="button" onClick={() => setWizard(null)} className="rounded-full bg-slate-100 p-2 text-slate-600 hover:bg-slate-200" aria-label="Cerrar configurador">
-                <X className="h-5 w-5" />
-              </button>
+              {wizard.alert ? (
+                <p className="mt-4 rounded-2xl border border-amber-100 bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-950">
+                  {wizard.alert}
+                </p>
+              ) : null}
             </div>
-            {wizard.alert ? <p className="mt-4 rounded-2xl border border-amber-100 bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-950">{wizard.alert}</p> : null}
-            <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              {wizard.questions.map((question) => (
-                question.options ? (
-                  <RadioGroup
-                    key={question.label}
-                    label={question.label}
-                    options={question.options}
-                    value={wizard.answers[question.label]}
-                    onChange={(value) => setWizard({ ...wizard, answers: { ...wizard.answers, [question.label]: value } })}
-                  />
-                ) : (
-                  <label key={question.label} className="space-y-2 text-sm font-semibold text-slate-800 sm:col-span-2">
-                    <span>{question.label}</span>
-                    {question.multiline ? (
-                      <Textarea
-                        className="min-h-24"
-                        value={wizard.answers[question.label] ?? ''}
-                        onChange={(event) => setWizard({ ...wizard, answers: { ...wizard.answers, [question.label]: event.target.value } })}
-                      />
-                    ) : (
-                      <Input
-                        className="h-12"
-                        value={wizard.answers[question.label] ?? ''}
-                        onChange={(event) => setWizard({ ...wizard, answers: { ...wizard.answers, [question.label]: event.target.value } })}
-                      />
-                    )}
-                  </label>
-                )
-              ))}
+
+            <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 pb-32 sm:px-6 sm:pb-36">
+              <div className="space-y-5">
+                {getWizardQuestionGroups(wizard.questions).map((group) => (
+                  <section
+                    key={group.title}
+                    className="rounded-3xl border border-slate-200 bg-slate-50/70 p-4 shadow-sm"
+                  >
+                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">
+                      {group.title}
+                    </p>
+                    <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                      {group.questions.map((question) =>
+                        question.options ? (
+                          <RadioGroup
+                            key={question.label}
+                            label={question.label}
+                            options={question.options}
+                            value={wizard.answers[question.label]}
+                            onChange={(value) =>
+                              setWizard({
+                                ...wizard,
+                                answers: { ...wizard.answers, [question.label]: value },
+                              })
+                            }
+                          />
+                        ) : (
+                          <label
+                            key={question.label}
+                            className="space-y-2 text-sm font-semibold text-slate-800 sm:col-span-2"
+                          >
+                            <span>{question.label}</span>
+                            {question.multiline ? (
+                              <Textarea
+                                className="min-h-24 bg-white"
+                                value={wizard.answers[question.label] ?? ''}
+                                onChange={(event) =>
+                                  setWizard({
+                                    ...wizard,
+                                    answers: {
+                                      ...wizard.answers,
+                                      [question.label]: event.target.value,
+                                    },
+                                  })
+                                }
+                              />
+                            ) : (
+                              <Input
+                                className="h-12 bg-white"
+                                value={wizard.answers[question.label] ?? ''}
+                                onChange={(event) =>
+                                  setWizard({
+                                    ...wizard,
+                                    answers: {
+                                      ...wizard.answers,
+                                      [question.label]: event.target.value,
+                                    },
+                                  })
+                                }
+                              />
+                            )}
+                          </label>
+                        ),
+                      )}
+                    </div>
+                  </section>
+                ))}
+
+                <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">
+                    Se agregará a Solicitud
+                  </p>
+                  <div className="mt-3 space-y-3 text-sm leading-6 text-slate-600">
+                    <div>
+                      <p className="font-semibold text-slate-950">{wizard.title}</p>
+                      <p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">
+                        {getCategoryLabel(wizard.kind)}
+                      </p>
+                    </div>
+                    <dl className="grid gap-2 text-xs leading-5 sm:grid-cols-2">
+                      <div className="sm:col-span-2">
+                        <dt className="font-bold text-slate-950">Respuestas principales</dt>
+                        <dd>{wizardPreview.slice(0, 5).join(' · ')}</dd>
+                      </div>
+                      <div>
+                        <dt className="font-bold text-slate-950">Materiales</dt>
+                        <dd>{wizardPreviewMaterials}</dd>
+                      </div>
+                      <div>
+                        <dt className="font-bold text-slate-950">Fotos requeridas</dt>
+                        <dd>{wizardPreviewPhotos}</dd>
+                      </div>
+                      <div>
+                        <dt className="font-bold text-slate-950">Precio base</dt>
+                        <dd>{wizard.labor ? money(wizard.labor) : 'A cotizar'}</dd>
+                      </div>
+                      <div>
+                        <dt className="font-bold text-slate-950">Estado</dt>
+                        <dd>Pendiente de validación técnica</dd>
+                      </div>
+                    </dl>
+                  </div>
+                </section>
+              </div>
             </div>
-            <div className="mt-5 rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-600">
-              <b className="text-slate-950">Ficha técnica:</b> se guardan alcance configurado, respuestas principales, materiales, fotos requeridas, estado de validación y precio base o a cotizar.
+
+            <div className="sticky bottom-0 shrink-0 border-t border-slate-200 bg-white/95 p-4 pb-[calc(1rem_+_env(safe-area-inset-bottom))] shadow-[0_-18px_45px_rgba(15,23,42,0.10)] backdrop-blur sm:p-5">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setWizard(null)}
+                  className="min-h-12 w-full rounded-full"
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="button"
+                  onClick={confirmWizard}
+                  className="min-h-12 w-full rounded-full"
+                >
+                  Confirmar y agregar a Solicitud
+                </Button>
+              </div>
             </div>
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              <Button type="button" variant="outline" onClick={() => setWizard(null)} className="min-h-12 w-full">Cancelar</Button>
-              <Button type="button" onClick={confirmWizard} className="min-h-12 w-full">Confirmar y agregar a Solicitud</Button>
-            </div>
+          </div>
+        </div>
+      ) : null}
+      {addedLabel ? (
+        <div
+          className="fixed inset-x-3 bottom-[calc(5.75rem_+_env(safe-area-inset-bottom))] z-50 rounded-3xl border border-emerald-200 bg-white p-4 text-sm shadow-2xl lg:left-1/2 lg:right-auto lg:bottom-8 lg:w-full lg:max-w-xl lg:-translate-x-1/2"
+          role="status"
+          aria-live="polite"
+        >
+          <p className="font-semibold text-slate-950">{addedLabel} agregado a Solicitud</p>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <Button
+              type="button"
+              onClick={() => {
+                openSolicitud()
+                setAddedLabel(null)
+              }}
+              className="min-h-10"
+            >
+              Ver solicitud
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setAddedLabel(null)
+                scrollToOptions()
+              }}
+              className="min-h-10"
+            >
+              Seguir agregando
+            </Button>
           </div>
         </div>
       ) : null}
       <button
         type="button"
-        onClick={openSolicitud}
-        className="fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-950 px-4 py-3 text-sm font-semibold text-white shadow-2xl lg:hidden"
+        onClick={items.length ? openSolicitud : scrollToOptions}
+        className="fixed inset-x-3 bottom-[env(safe-area-inset-bottom)] z-40 flex min-h-16 items-center justify-between gap-3 rounded-t-3xl border border-slate-200 bg-slate-950 px-4 py-3 pb-[calc(0.75rem_+_env(safe-area-inset-bottom))] text-sm font-semibold text-white shadow-2xl lg:hidden"
       >
         <span>
           Solicitud ·{' '}
@@ -612,7 +909,15 @@ export function SmallJobsExperience() {
               ? '1 servicio'
               : `${items.length} servicios`}
         </span>
-        <span>{subtotal ? money(subtotal) : 'Ver resumen'}</span>
+        <span className="shrink-0 rounded-full bg-white px-3 py-2 text-slate-950">
+          {items.length === 0
+            ? 'Elegir servicio'
+            : subtotal
+              ? money(subtotal)
+              : hasQuotedItems
+                ? 'A cotizar'
+                : 'Ver solicitud'}
+        </span>
       </button>
 
       <section className="border-b border-slate-200 bg-gradient-to-b from-slate-50 via-white to-white py-9 sm:py-14">
@@ -1001,7 +1306,8 @@ export function SmallJobsExperience() {
                       labor: fault.initialPrice,
                       quantity: 1,
                       questions: getDiagnosticQuestions(fault.faultName),
-                      alert: 'Si hay olor a quemado, chispas, calor o ruido, no manipules la instalación.',
+                      alert:
+                        'Si hay olor a quemado, chispas, calor o ruido, no manipules la instalación.',
                     })
                   }
                   className="mt-4 min-h-12 w-full sm:w-auto"
@@ -1209,25 +1515,39 @@ export function SmallJobsExperience() {
           ) : (
             <div className="mt-4 space-y-3">
               {items.map((item) => (
-                <div key={item.id} className="rounded-2xl bg-slate-50 p-3">
+                <div
+                  key={item.id}
+                  className={`rounded-2xl border p-3 transition ${
+                    item.id === lastAddedId
+                      ? 'border-emerald-300 bg-emerald-50 shadow-sm ring-2 ring-emerald-100'
+                      : 'border-transparent bg-slate-50'
+                  }`}
+                >
                   <div className="flex justify-between gap-3">
-                    <p className="text-sm font-semibold text-slate-950">{item.title}</p>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-950">{item.title}</p>
+                      <p className="mt-1 text-xs font-bold uppercase tracking-[0.12em] text-slate-500">
+                        {getCategoryLabel(item.kind)}
+                      </p>
+                    </div>
                     <div className="flex gap-1">
                       <button
                         type="button"
                         onClick={() => editConfiguredItem(item)}
                         aria-label="Editar"
-                        className="rounded-full p-1 text-slate-500 hover:bg-white hover:text-slate-950"
+                        className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold text-slate-500 hover:bg-white hover:text-slate-950"
                       >
                         <Pencil className="h-4 w-4" />
+                        Editar
                       </button>
                       <button
                         type="button"
                         onClick={() => setItems(items.filter((entry) => entry.id !== item.id))}
                         aria-label="Eliminar"
-                        className="rounded-full p-1 text-slate-500 hover:bg-white hover:text-slate-950"
+                        className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold text-slate-500 hover:bg-white hover:text-slate-950"
                       >
                         <X className="h-4 w-4" />
+                        Eliminar
                       </button>
                     </div>
                   </div>
@@ -1255,17 +1575,35 @@ export function SmallJobsExperience() {
                   </div>
                   <p className="mt-1 text-xs leading-5 text-slate-500">{item.note}</p>
                   <dl className="mt-3 grid gap-2 text-xs leading-5 text-slate-600">
-                    <div><dt className="font-bold text-slate-950">Alcance configurado</dt><dd>{item.details.slice(0, 4).join(' · ')}</dd></div>
-                    <div><dt className="font-bold text-slate-950">Materiales</dt><dd>{item.materials}</dd></div>
-                    <div><dt className="font-bold text-slate-950">Fotos requeridas</dt><dd>{item.photos}</dd></div>
-                    <div><dt className="font-bold text-slate-950">Estado</dt><dd>{item.validation}</dd></div>
+                    <div>
+                      <dt className="font-bold text-slate-950">
+                        Respuestas principales del wizard
+                      </dt>
+                      <dd>{item.details.join(' · ')}</dd>
+                    </div>
+                    <div>
+                      <dt className="font-bold text-slate-950">Materiales</dt>
+                      <dd>{item.materials}</dd>
+                    </div>
+                    <div>
+                      <dt className="font-bold text-slate-950">Fotos requeridas</dt>
+                      <dd>{item.photos}</dd>
+                    </div>
+                    <div>
+                      <dt className="font-bold text-slate-950">Estado</dt>
+                      <dd>{item.validation}</dd>
+                    </div>
                   </dl>
-                  {item.alert ? <p className="mt-2 rounded-xl bg-amber-50 p-2 text-xs font-semibold leading-5 text-amber-950">{item.alert}</p> : null}
+                  {item.alert ? (
+                    <p className="mt-2 rounded-xl bg-amber-50 p-2 text-xs font-semibold leading-5 text-amber-950">
+                      {item.alert}
+                    </p>
+                  ) : null}
                 </div>
               ))}
               <div className="rounded-2xl border border-slate-200 bg-white p-4">
                 <p className="text-lg font-semibold text-slate-950">
-                  Subtotal estimado: {money(subtotal)}
+                  Subtotal estimado: {subtotal ? money(subtotal) : 'A cotizar'}
                 </p>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
                   Materiales: no incluidos o estimados según ficha. Estado: pendiente de validación
@@ -1338,32 +1676,53 @@ export function SmallJobsExperience() {
             <RequestStep eyebrow="Paso 1" title="Servicios solicitados">
               <div className="space-y-3">
                 {items.map((item) => (
-                  <div key={item.id} className="rounded-2xl bg-slate-50 p-3">
+                  <div
+                    key={item.id}
+                    className={`rounded-2xl border p-3 transition ${
+                      item.id === lastAddedId
+                        ? 'border-emerald-300 bg-emerald-50 shadow-sm ring-2 ring-emerald-100'
+                        : 'border-transparent bg-slate-50'
+                    }`}
+                  >
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <p className="text-sm font-semibold text-slate-950">{item.title}</p>
-                        <p className="mt-1 text-xs leading-5 text-slate-500">{item.note}</p>
+                        <p className="mt-1 text-xs font-bold uppercase tracking-[0.12em] text-slate-500">
+                          {getCategoryLabel(item.kind)}
+                        </p>
+                        <p className="mt-1 text-xs leading-5 text-slate-500">
+                          {item.labor
+                            ? `${money(item.labor)} mano de obra base`
+                            : 'A cotizar según alcance'}{' '}
+                          · {item.note}
+                        </p>
                         <ul className="mt-2 space-y-1 text-xs leading-5 text-slate-600">
-                          {item.details.map((detail) => <li key={detail}>{detail}</li>)}
+                          {item.details.map((detail) => (
+                            <li key={detail}>{detail}</li>
+                          ))}
                         </ul>
-                        <p className="mt-2 text-xs font-semibold text-slate-700">{item.materials} · {item.photos} · {item.validation}</p>
+                        <p className="mt-2 text-xs font-semibold text-slate-700">
+                          {item.materials} · {item.photos} · {item.validation}
+                        </p>
                       </div>
                       <div className="flex gap-1">
                         <button
                           type="button"
                           onClick={() => editConfiguredItem(item)}
-                          className="rounded-full p-1 text-slate-500 hover:bg-white hover:text-slate-950"
+                          className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold text-slate-500 hover:bg-white hover:text-slate-950"
                           aria-label="Editar"
                         >
                           <Pencil className="h-4 w-4" />
+                          Editar
                         </button>
                         <button
                           type="button"
                           onClick={() => setItems(items.filter((entry) => entry.id !== item.id))}
-                          className="rounded-full p-1 text-slate-500 hover:bg-white hover:text-slate-950"
+                          className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold text-slate-500 hover:bg-white hover:text-slate-950"
                           aria-label="Eliminar"
                         >
                           <X className="h-4 w-4" />
+                          Eliminar
                         </button>
                       </div>
                     </div>
@@ -1436,9 +1795,16 @@ export function SmallJobsExperience() {
                     Agregar fotos
                   </span>
                   <span className="mt-3 block text-xs leading-5 text-slate-500">
-                    {photoCount === 0 ? 'Sin archivos seleccionados' : `${photoCount} archivo(s) seleccionado(s)`}
+                    {photoCount === 0
+                      ? 'Sin archivos seleccionados'
+                      : `${photoCount} archivo(s) seleccionado(s)`}
                   </span>
-                  <input type="file" multiple className="sr-only" onChange={(event) => setPhotoCount(event.target.files?.length ?? 0)} />
+                  <input
+                    type="file"
+                    multiple
+                    className="sr-only"
+                    onChange={(event) => setPhotoCount(event.target.files?.length ?? 0)}
+                  />
                 </label>
                 <div className="grid gap-3">
                   <Textarea className="min-h-28" placeholder="Observaciones finales" />
