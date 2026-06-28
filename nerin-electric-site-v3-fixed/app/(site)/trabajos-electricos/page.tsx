@@ -4,7 +4,7 @@ import { breadcrumbJsonLd, buildSeoMetadata } from '@/lib/seo'
 export const metadata = buildSeoMetadata({
   title: 'Servicios eléctricos con alcance claro | NERIN Electricidad',
   description:
-    'Catálogo de servicios rápidos, configurador de instalaciones, diagnóstico de fallas y solicitudes para comercios con valores orientativos sujetos a validación técnica.',
+    'Sistema guiado para configurar trabajos eléctricos, instalaciones, diagnósticos y solicitudes comerciales con alcance técnico antes de enviar.',
   path: '/trabajos-electricos',
 })
 
