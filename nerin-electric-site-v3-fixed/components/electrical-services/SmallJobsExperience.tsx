@@ -1,10 +1,13 @@
 'use client'
 
+import Image from 'next/image'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import {
   CheckCircle2,
   ClipboardList,
+  Clock3,
   ImagePlus,
+  Info,
   Pencil,
   Settings2,
   Store,
@@ -20,6 +23,10 @@ import {
   quickServices,
   type ElectricalService,
 } from '@/data/electricalServices'
+import {
+  visualGuidesByServiceId,
+  type ElectricalServiceVisualGuide,
+} from '@/data/electricalServiceVisualGuides'
 import { generateTechnicalSummary, type InstallationSelection } from './estimateRules'
 
 function money(value: number) {
@@ -496,9 +503,280 @@ function getWizardQuestionGroups(questions: ConfigQuestion[]) {
     .filter((group) => group.questions.length > 0)
 }
 
+type VisualGuide = ElectricalServiceVisualGuide['visualGuide']
+
+function ServiceGuideImage({
+  guide,
+  title,
+  large = false,
+}: {
+  guide?: VisualGuide
+  title: string
+  large?: boolean
+}) {
+  const [failed, setFailed] = useState(false)
+  const showImage = guide?.imageSrc && !failed
+
+  return (
+    <div
+      className={`relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-blue-50/60 ${large ? 'min-h-[280px]' : 'min-h-[210px]'}`}
+    >
+      {showImage ? (
+        <Image
+          src={guide.imageSrc}
+          alt={guide.imageAlt}
+          fill
+          sizes={large ? '(min-width: 1024px) 50vw, 100vw' : '(min-width: 1024px) 45vw, 100vw'}
+          onError={() => setFailed(true)}
+          className="object-cover"
+        />
+      ) : (
+        <div className="flex min-h-[inherit] flex-col justify-between p-5">
+          <div className="flex items-center justify-between">
+            <span className="rounded-full border border-blue-100 bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-blue-900 shadow-sm">
+              NERIN guía visual
+            </span>
+            <span className="rounded-full bg-slate-950 p-2 text-white">
+              <Info className="h-4 w-4" />
+            </span>
+          </div>
+          <div className="mx-auto my-4 w-full max-w-[260px] rounded-2xl border border-slate-300 bg-white/75 p-5 shadow-sm">
+            <div className="h-24 rounded-2xl border-2 border-dashed border-blue-200 bg-[linear-gradient(135deg,rgba(37,99,235,0.10)_25%,transparent_25%,transparent_50%,rgba(37,99,235,0.10)_50%,rgba(37,99,235,0.10)_75%,transparent_75%,transparent)] bg-[length:22px_22px]" />
+            <div className="mt-4 flex items-center gap-3 text-slate-500">
+              <span className="h-px flex-1 bg-slate-300" />
+              <span className="h-3 w-3 rounded-full border border-slate-400" />
+              <span className="h-px flex-1 bg-slate-300" />
+            </div>
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-slate-950">{title}</p>
+            <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+              Guía visual en preparación
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function AppliesNotApplies({
+  appliesIf,
+  doesNotApplyIf,
+}: {
+  appliesIf: string[]
+  doesNotApplyIf: string[]
+}) {
+  return (
+    <div className="grid gap-3 sm:grid-cols-2">
+      <div className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-3">
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-900">Aplica si</p>
+        <ul className="mt-2 space-y-1 text-sm leading-5 text-emerald-950">
+          {appliesIf.map((item) => (
+            <li key={item}>• {item}</li>
+          ))}
+        </ul>
+      </div>
+      <div className="rounded-2xl border border-rose-100 bg-rose-50/60 p-3">
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-rose-900">No aplica si</p>
+        <ul className="mt-2 space-y-1 text-sm leading-5 text-rose-950">
+          {doesNotApplyIf.map((item) => (
+            <li key={item}>• {item}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  )
+}
+
+function ServiceVisualCard({
+  service,
+  guide,
+  isOpen,
+  onToggleDetail,
+  onChoose,
+  onOpenGuide,
+}: {
+  service: ElectricalService
+  guide?: VisualGuide
+  isOpen: boolean
+  onToggleDetail: () => void
+  onChoose: () => void
+  onOpenGuide: () => void
+}) {
+  return (
+    <article className="rounded-[2rem] border border-slate-200 bg-white p-3 shadow-sm transition hover:border-slate-300 hover:shadow-md sm:p-4">
+      <ServiceGuideImage guide={guide} title={service.title} />
+      <div className="mt-4 px-1">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-900">
+              Guía rápida
+            </p>
+            <h3 className="mt-2 text-xl font-semibold text-slate-950">{service.title}</h3>
+          </div>
+          <div className="shrink-0 rounded-2xl bg-slate-50 px-3 py-2 text-right">
+            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500">
+              Mano de obra
+            </p>
+            <p className="text-sm font-semibold text-slate-950">{money(service.baseLaborPrice)}</p>
+          </div>
+        </div>
+        <p className="mt-3 text-sm leading-6 text-slate-600">
+          {guide?.diagramSubtitle ?? service.description}
+        </p>
+        <div className="mt-4 grid gap-2 text-sm text-slate-600 sm:grid-cols-2">
+          <p className="rounded-2xl bg-slate-50 p-3">
+            <Clock3 className="mb-2 h-4 w-4 text-blue-900" />
+            <b className="text-slate-950">Duración estimada</b>
+            <br />
+            {guide?.durationLabel ?? `${service.durationMin} a ${service.durationMax} min`}
+          </p>
+          <p className="rounded-2xl bg-slate-50 p-3">
+            <b className="text-slate-950">Materiales habituales</b>
+            <br />
+            {guide?.usualMaterialsShort ?? service.usualMaterials.join(', ')}
+          </p>
+        </div>
+        {guide ? (
+          <div className="mt-4">
+            <AppliesNotApplies appliesIf={guide.appliesIf} doesNotApplyIf={guide.doesNotApplyIf} />
+          </div>
+        ) : null}
+        <details
+          className="mt-4 rounded-2xl border border-slate-200 bg-white p-4"
+          open={isOpen}
+          onToggle={(event) => {
+            if (event.currentTarget.open && !isOpen) onToggleDetail()
+          }}
+        >
+          <summary className="cursor-pointer text-sm font-semibold text-slate-950">
+            Detalle técnico
+          </summary>
+          <div className="mt-5 grid gap-5 border-t border-slate-100 pt-5 sm:grid-cols-2">
+            <DetailList title="Qué incluye" items={service.includes} />
+            <DetailList title="Qué no incluye" items={service.excludes} />
+            <DetailList
+              title="Callouts de la guía"
+              items={guide?.callouts.map((item) => `${item.number}. ${item.label}`) ?? []}
+            />
+            <DetailList title="Cuándo cambia el precio" items={service.priceModifiers} />
+          </div>
+        </details>
+        <div className="mt-4 grid gap-2 sm:grid-cols-2">
+          <Button onClick={onChoose} className="min-h-12 w-full">
+            Elegir este servicio
+          </Button>
+          <Button type="button" variant="outline" onClick={onOpenGuide} className="min-h-12 w-full">
+            Ver guía visual
+          </Button>
+        </div>
+      </div>
+    </article>
+  )
+}
+
+function ServiceGuideModal({
+  service,
+  guide,
+  onClose,
+  onChoose,
+}: {
+  service: ElectricalService
+  guide?: VisualGuide
+  onClose: () => void
+  onChoose: () => void
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-950/55 p-3 pt-[calc(0.75rem_+_env(safe-area-inset-top))] backdrop-blur-sm sm:p-4 sm:pt-6"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="guide-title"
+    >
+      <div className="w-full max-w-4xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl">
+        <div className="flex items-start justify-between gap-3 border-b border-slate-100 p-5 sm:p-6">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-900">
+              Guía visual NERIN
+            </p>
+            <h2 id="guide-title" className="mt-2 text-2xl font-semibold text-slate-950">
+              {guide?.diagramTitle ?? service.title}
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">{service.description}</p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-full bg-slate-100 p-2 text-slate-600 hover:bg-slate-200"
+            aria-label="Cerrar guía visual"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        <div className="grid gap-5 p-5 sm:p-6 lg:grid-cols-[1.1fr_0.9fr]">
+          <ServiceGuideImage guide={guide} title={service.title} large />
+          <div className="space-y-4">
+            <div className="rounded-2xl border border-slate-200 p-4">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">
+                Partes señaladas
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {guide?.callouts.map((item) => (
+                  <span
+                    key={item.number}
+                    className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-sm font-semibold text-slate-700"
+                  >
+                    {item.number}. {item.label}
+                  </span>
+                ))}
+              </div>
+            </div>
+            {guide ? (
+              <AppliesNotApplies
+                appliesIf={guide.appliesIf}
+                doesNotApplyIf={guide.doesNotApplyIf}
+              />
+            ) : null}
+            <dl className="grid gap-3 text-sm sm:grid-cols-2">
+              <div className="rounded-2xl bg-slate-50 p-3">
+                <dt className="font-bold text-slate-950">Materiales</dt>
+                <dd className="mt-1 text-slate-600">{guide?.usualMaterialsShort}</dd>
+              </div>
+              <div className="rounded-2xl bg-slate-50 p-3">
+                <dt className="font-bold text-slate-950">Duración</dt>
+                <dd className="mt-1 text-slate-600">{guide?.durationLabel}</dd>
+              </div>
+            </dl>
+            {guide?.relatedIfNotApplies.length ? (
+              <p className="rounded-2xl border border-blue-100 bg-blue-50 p-3 text-sm font-semibold text-blue-950">
+                Si no aplica: {guide.relatedIfNotApplies.map((item) => item.label).join(' · ')}
+              </p>
+            ) : null}
+          </div>
+        </div>
+        <div className="grid gap-3 border-t border-slate-200 bg-white/95 p-4 sm:grid-cols-2 sm:p-5">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            className="min-h-12 w-full rounded-full"
+          >
+            Cerrar guía
+          </Button>
+          <Button type="button" onClick={onChoose} className="min-h-12 w-full rounded-full">
+            Elegir este servicio
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function SmallJobsExperience() {
   const [activeMode, setActiveMode] = useState(entryCards[0].id)
   const [openService, setOpenService] = useState<string | null>(quickServices[0]?.id ?? null)
+  const [guideService, setGuideService] = useState<ElectricalService | null>(null)
   const [addedLabel, setAddedLabel] = useState<string | null>(null)
   const [lastAddedId, setLastAddedId] = useState<string | null>(null)
   const solicitudRef = useRef<HTMLElement | null>(null)
@@ -864,6 +1142,17 @@ export function SmallJobsExperience() {
           </div>
         </div>
       ) : null}
+      {guideService ? (
+        <ServiceGuideModal
+          service={guideService}
+          guide={visualGuidesByServiceId[guideService.id]}
+          onClose={() => setGuideService(null)}
+          onChoose={() => {
+            setGuideService(null)
+            addService(guideService)
+          }}
+        />
+      ) : null}
       {addedLabel ? (
         <div
           className="fixed inset-x-3 bottom-[calc(5.75rem_+_env(safe-area-inset-bottom))] z-50 rounded-3xl border border-emerald-200 bg-white p-4 text-sm shadow-2xl lg:left-1/2 lg:right-auto lg:bottom-8 lg:w-full lg:max-w-xl lg:-translate-x-1/2"
@@ -1044,76 +1333,17 @@ export function SmallJobsExperience() {
           </div>
           <div className="mt-6 grid gap-4 lg:grid-cols-2">
             {quickServices.map((service) => (
-              <article
+              <ServiceVisualCard
                 key={service.id}
-                className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">
-                      {service.category}
-                    </p>
-                    <h3 className="mt-2 text-xl font-semibold text-slate-950">{service.title}</h3>
-                  </div>
-                  <div className="shrink-0 rounded-2xl bg-slate-50 px-3 py-2 text-right">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500">
-                      Mano de obra
-                    </p>
-                    <p className="text-sm font-semibold text-slate-950">
-                      {money(service.baseLaborPrice)}
-                    </p>
-                  </div>
-                </div>
-                <p className="mt-3 text-sm leading-6 text-slate-600">{service.description}</p>
-                <div className="mt-4 grid gap-2 text-sm text-slate-600 sm:grid-cols-3">
-                  <p className="rounded-2xl bg-slate-50 p-3">
-                    <b className="text-slate-950">Duración</b>
-                    <br />
-                    {service.durationMin} a {service.durationMax} min
-                  </p>
-                  <p className="rounded-2xl bg-slate-50 p-3 sm:col-span-2">
-                    <b className="text-slate-950">Materiales</b>
-                    <br />
-                    {service.materialPolicy}
-                  </p>
-                </div>
-                <details
-                  className="mt-4 rounded-2xl border border-slate-200 bg-white p-4"
-                  open={openService === service.id}
-                  onToggle={(event) => {
-                    if (event.currentTarget.open) setOpenService(service.id)
-                  }}
-                >
-                  <summary className="cursor-pointer text-sm font-semibold text-slate-950">
-                    Ver detalle
-                  </summary>
-                  <div className="mt-5 grid gap-5 border-t border-slate-100 pt-5 sm:grid-cols-2">
-                    <DetailList title="Qué incluye" items={service.includes} />
-                    <DetailList title="Qué no incluye" items={service.excludes} />
-                    <DetailList title="Materiales habituales" items={service.usualMaterials} />
-                    <DetailList title="Cuándo cambia el precio" items={service.priceModifiers} />
-                    <p className="text-sm leading-6 text-slate-600">
-                      <b>Aplica si:</b> {service.appliesWhen}
-                    </p>
-                    <p className="text-sm leading-6 text-slate-600">
-                      <b>NO aplica si:</b> {service.doesNotApplyWhen}
-                    </p>
-                  </div>
-                </details>
-                <div className="mt-4 grid gap-2 sm:grid-cols-2">
-                  <Button onClick={() => addService(service)} className="min-h-12 w-full">
-                    Agregar a solicitud
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setOpenService(openService === service.id ? null : service.id)}
-                    className="min-h-12 w-full"
-                  >
-                    Ver detalle
-                  </Button>
-                </div>
-              </article>
+                service={service}
+                guide={visualGuidesByServiceId[service.id]}
+                isOpen={openService === service.id}
+                onToggleDetail={() =>
+                  setOpenService(openService === service.id ? null : service.id)
+                }
+                onChoose={() => addService(service)}
+                onOpenGuide={() => setGuideService(service)}
+              />
             ))}
           </div>
         </section>
