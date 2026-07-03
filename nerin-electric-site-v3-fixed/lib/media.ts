@@ -79,7 +79,43 @@ export function resolveMediaPath(parts: string[]) {
 }
 
 export function getMediaPublicUrl(filename: string) {
-  return `/media/${filename.split('/').map((part) => encodeURIComponent(part)).join('/')}`
+  return `/media/${filename
+    .split('/')
+    .map((part) => encodeURIComponent(part))
+    .join('/')}`
+}
+
+async function storeCloudinaryImage(file: File, folder: string): Promise<StoredMediaFile> {
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME
+  const uploadPreset = process.env.CLOUDINARY_UPLOAD_PRESET
+  if (!cloudName || !uploadPreset) {
+    throw new Error(
+      'Storage externo no configurado: faltan CLOUDINARY_CLOUD_NAME y CLOUDINARY_UPLOAD_PRESET.',
+    )
+  }
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('upload_preset', uploadPreset)
+  if (folder) formData.append('folder', folder)
+  const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+    method: 'POST',
+    body: formData,
+  })
+  const payload = (await response.json().catch(() => null)) as {
+    secure_url?: string
+    public_id?: string
+    error?: { message?: string }
+  } | null
+  if (!response.ok || !payload?.secure_url) {
+    throw new Error(payload?.error?.message ?? 'No se pudo subir la imagen a Cloudinary')
+  }
+  return {
+    originalName: file.name,
+    mimeType: file.type,
+    size: file.size,
+    storedPath: payload.public_id ?? payload.secure_url,
+    publicUrl: payload.secure_url,
+  }
 }
 
 export async function storeMediaFile({
@@ -100,6 +136,14 @@ export async function storeMediaFile({
   }
 
   const safeFolder = sanitizeMediaFolder(folder)
+
+  if (process.env.STORAGE_PROVIDER === 'cloudinary') {
+    if (!file.type.startsWith('image/')) {
+      throw new Error('Cloudinary está configurado solo para imágenes en este endpoint.')
+    }
+    return storeCloudinaryImage(file, safeFolder)
+  }
+
   const originalName = preferredName ?? file.name ?? 'archivo'
   const safeName = sanitizeMediaFilename(originalName)
   const uniqueName = `${Date.now()}-${crypto.randomUUID()}-${safeName}`

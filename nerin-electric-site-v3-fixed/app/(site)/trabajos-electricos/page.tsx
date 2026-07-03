@@ -1,4 +1,5 @@
 import { SmallJobsExperience } from '@/components/electrical-services/SmallJobsExperience'
+import { getElectricalAdminContent } from '@/lib/electrical-admin-content'
 import { breadcrumbJsonLd, buildSeoMetadata } from '@/lib/seo'
 
 export const metadata = buildSeoMetadata({
@@ -8,7 +9,8 @@ export const metadata = buildSeoMetadata({
   path: '/trabajos-electricos',
 })
 
-export default function TrabajosElectricosPage() {
+export default async function TrabajosElectricosPage() {
+  const content = await getElectricalAdminContent()
   const breadcrumbs = breadcrumbJsonLd([
     { name: 'Inicio', path: '/' },
     { name: 'Trabajos electricos', path: '/trabajos-electricos' },
@@ -20,7 +22,7 @@ export default function TrabajosElectricosPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }}
       />
-      <SmallJobsExperience />
+      <SmallJobsExperience content={content} />
     </>
   )
 }
