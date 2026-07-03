@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import {
   CheckCircle2,
@@ -27,6 +26,7 @@ import {
   visualGuidesByServiceId,
   type ElectricalServiceVisualGuide,
 } from '@/data/electricalServiceVisualGuides'
+import type { ElectricalAdminContent } from '@/lib/electrical-admin-content'
 import { generateTechnicalSummary, type InstallationSelection } from './estimateRules'
 
 function money(value: number) {
@@ -522,13 +522,11 @@ function ServiceGuideImage({
       className={`relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-blue-50/60 ${large ? 'min-h-[280px]' : 'min-h-[210px]'}`}
     >
       {showImage ? (
-        <Image
+        <img
           src={guide.imageSrc}
           alt={guide.imageAlt}
-          fill
-          sizes={large ? '(min-width: 1024px) 50vw, 100vw' : '(min-width: 1024px) 45vw, 100vw'}
           onError={() => setFailed(true)}
-          className="object-cover"
+          className="absolute inset-0 h-full w-full object-cover"
         />
       ) : (
         <div className="flex min-h-[inherit] flex-col justify-between p-5">
@@ -773,9 +771,19 @@ function ServiceGuideModal({
   )
 }
 
-export function SmallJobsExperience() {
+export function SmallJobsExperience({ content }: { content?: ElectricalAdminContent } = {}) {
+  const quickServicesData = content?.quickServices ?? quickServices
+  const diagnosticFaultsData = content?.diagnosticFaults ?? diagnosticFaults
+  const visualGuidesData = content?.visualGuides?.length
+    ? (Object.fromEntries(
+        content.visualGuides.map((guide) => [guide.serviceId, guide.visualGuide]),
+      ) as typeof visualGuidesByServiceId)
+    : visualGuidesByServiceId
+  const commercialRequestServicesData = content?.commercialServices?.length
+    ? (content.commercialServices as typeof commercialRequestServices)
+    : commercialRequestServices
   const [activeMode, setActiveMode] = useState(entryCards[0].id)
-  const [openService, setOpenService] = useState<string | null>(quickServices[0]?.id ?? null)
+  const [openService, setOpenService] = useState<string | null>(quickServicesData[0]?.id ?? null)
   const [guideService, setGuideService] = useState<ElectricalService | null>(null)
   const [addedLabel, setAddedLabel] = useState<string | null>(null)
   const [lastAddedId, setLastAddedId] = useState<string | null>(null)
@@ -1145,7 +1153,7 @@ export function SmallJobsExperience() {
       {guideService ? (
         <ServiceGuideModal
           service={guideService}
-          guide={visualGuidesByServiceId[guideService.id]}
+          guide={visualGuidesData[guideService.id]}
           onClose={() => setGuideService(null)}
           onChoose={() => {
             setGuideService(null)
@@ -1332,11 +1340,11 @@ export function SmallJobsExperience() {
             </p>
           </div>
           <div className="mt-6 grid gap-4 lg:grid-cols-2">
-            {quickServices.map((service) => (
+            {quickServicesData.map((service) => (
               <ServiceVisualCard
                 key={service.id}
                 service={service}
-                guide={visualGuidesByServiceId[service.id]}
+                guide={visualGuidesData[service.id]}
                 isOpen={openService === service.id}
                 onToggleDetail={() =>
                   setOpenService(openService === service.id ? null : service.id)
@@ -1509,7 +1517,7 @@ export function SmallJobsExperience() {
             </div>
           </div>
           <div className="mt-6 grid gap-3 lg:grid-cols-2">
-            {diagnosticFaults.map((fault) => (
+            {diagnosticFaultsData.map((fault) => (
               <details key={fault.id} className="rounded-2xl border border-slate-200 bg-white p-4">
                 <summary className="cursor-pointer text-sm font-semibold text-slate-950 sm:text-base">
                   {fault.faultName} · diagnóstico inicial {money(fault.initialPrice)}
@@ -1595,7 +1603,7 @@ export function SmallJobsExperience() {
             </div>
 
             <div className="mt-6 grid gap-4 lg:grid-cols-2">
-              {commercialRequestServices.map((service) => (
+              {commercialRequestServicesData.map((service) => (
                 <article
                   key={service.id}
                   className="rounded-3xl border border-white/10 bg-white p-5 text-slate-950 shadow-sm"
