@@ -10,9 +10,9 @@ import { Button } from '@/components/ui/button'
 const todayCards: Array<{ label: string; value: string; href: Route }> = [
   { label: 'Consultas nuevas', value: '0', href: '/admin/consultas' as Route },
   { label: 'Presupuestos', value: '0', href: '/admin/presupuestos' as Route },
-  { label: 'Trabajos chicos', value: '0', href: '/admin/trabajos-chicos' as Route },
-  { label: 'Refacciones', value: '0', href: '/admin/refacciones' as Route },
-  { label: 'Obras activas', value: '0', href: '/admin/obras' as Route },
+  { label: 'Trabajos chicos', value: '0', href: '/admin/contenido/trabajos-electricos' as Route },
+  { label: 'Refacciones', value: '0', href: '/admin/contenido' as Route },
+  { label: 'Obras activas', value: '0', href: '/admin/contenido' as Route },
   { label: 'Dinero', value: '$0', href: '/admin/dinero' as Route },
   { label: 'Capacidad', value: 'Ver', href: '/admin/capacidad' as Route },
 ]

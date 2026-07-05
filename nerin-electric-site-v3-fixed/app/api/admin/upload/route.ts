@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/auth'
 import { storeMediaFile, sanitizeMediaFolder } from '@/lib/media'
+import { addMediaLibraryItem } from '@/lib/media-library'
 
 export async function POST(req: Request) {
   await requireAdmin()
@@ -17,7 +18,15 @@ export async function POST(req: Request) {
 
   try {
     const stored = await storeMediaFile({ file, folder, preferredName: originalName })
-    return NextResponse.json({ ok: true, url: stored.publicUrl, storedPath: stored.storedPath })
+    const media = await addMediaLibraryItem({
+      url: stored.publicUrl,
+      name: stored.originalName,
+      mimeType: stored.mimeType,
+      size: stored.size,
+      provider: process.env.STORAGE_PROVIDER || 'local',
+      storedPath: stored.storedPath,
+    })
+    return NextResponse.json({ ok: true, url: stored.publicUrl, storedPath: stored.storedPath, media })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'No se pudo subir el archivo'
     return NextResponse.json({ error: message }, { status: 400 })

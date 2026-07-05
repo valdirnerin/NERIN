@@ -14,13 +14,10 @@ export const adminNav: AdminNavSection[] = [
   {
     label: 'Centro de control',
     items: [
-      { title: 'Contenido comercial', href: '/admin/contenido-comercial' as Route },
+      { title: 'Admin madre · Contenido', href: '/admin/contenido' as Route },
       { title: 'Consultas', href: '/admin/consultas' as Route },
       { title: 'Presupuestos', href: '/admin/presupuestos' as Route },
-      { title: 'Trabajos chicos', href: '/admin/trabajos-chicos' as Route },
-      { title: 'Trabajos eléctricos', href: '/admin/trabajos-electricos' as Route },
-      { title: 'Refacciones', href: '/admin/refacciones' as Route },
-      { title: 'Obras', href: '/admin/obras' as Route },
+      { title: 'Media library', href: '/admin/contenido/media' as Route },
       { title: 'Dinero', href: '/admin/dinero' as Route },
       { title: 'Capacidad', href: '/admin/capacidad' as Route },
     ],
