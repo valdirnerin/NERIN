@@ -1,26 +1,27 @@
 import Link from 'next/link'
 import type { Route } from 'next'
 import { getAdminTechnicalStatus } from '@/lib/admin-technical-status'
-import { getElectricalAdminContent } from '@/lib/electrical-admin-content'
+import { getElectricalAdminContentState } from '@/lib/electrical-admin-content'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 const sections: Array<{ title: string; description: string; href: Route; status: string }> = [
-  { title: 'Trabajos eléctricos', description: 'Servicios rápidos, guías visuales, diagnóstico y trabajos para comercios/consorcios/countries.', href: '/admin/contenido/trabajos-electricos' as Route, status: 'Conectado a WebsiteContent' },
-  { title: 'Imágenes / Biblioteca de medios', description: 'Carga de archivos, preview, URL final y selección para guías visuales.', href: '/admin/contenido/media' as Route, status: 'Conectado al storage configurado' },
-  { title: 'Home', description: 'Hero, textos principales, CTAs, servicios destacados e imágenes.', href: '/admin/contenido-comercial' as Route, status: 'Migración progresiva: WebsiteContent/SiteExperience' },
-  { title: 'Refacciones', description: 'Textos, secciones, CTA y configuración del formulario.', href: '/admin/contenido-comercial' as Route, status: 'Pendiente de extraer de contenido comercial' },
-  { title: 'Obras', description: 'Textos, secciones, CTA y configuración del formulario.', href: '/admin/contenido-comercial' as Route, status: 'Pendiente de extraer de contenido comercial' },
-  { title: 'Contacto', description: 'Teléfono, WhatsApp, email, zona, horarios y textos de formulario.', href: '/admin/ajustes' as Route, status: 'Conectado a ajustes generales' },
-  { title: 'Ajustes generales', description: 'Identidad, contacto y parámetros técnicos compartidos.', href: '/admin/ajustes' as Route, status: 'Configuración global' },
+  { title: 'Trabajos eléctricos', description: 'Servicios rápidos, guías visuales, diagnóstico y pedidos comerciales.', href: '/admin/contenido/trabajos-electricos' as Route, status: 'WebsiteContent' },
+  { title: 'Biblioteca de medios', description: 'Subida de imágenes, preview, URL final y selección para guías visuales.', href: '/admin/contenido/media' as Route, status: 'Storage persistente' },
+  { title: 'Home', description: 'Hero, textos principales, CTAs, servicios destacados e imágenes.', href: '/admin/contenido-comercial' as Route, status: 'SiteExperience' },
+  { title: 'Refacciones', description: 'Textos, secciones, CTA y configuración del formulario.', href: '/admin/contenido-comercial' as Route, status: 'SiteExperience' },
+  { title: 'Obras', description: 'Textos, secciones, CTA y configuración del formulario.', href: '/admin/contenido-comercial' as Route, status: 'SiteExperience' },
+  { title: 'Contacto', description: 'WhatsApp, teléfono, email, zona, horarios y textos de formulario.', href: '/admin/ajustes' as Route, status: 'Ajustes' },
+  { title: 'Ajustes generales', description: 'Identidad, contacto y parámetros técnicos compartidos.', href: '/admin/ajustes' as Route, status: 'Global' },
 ]
 
 export default async function AdminContenidoPage() {
-  const [technicalStatus, electricalContent] = await Promise.all([
+  const [technicalStatus, electricalState] = await Promise.all([
     getAdminTechnicalStatus(),
-    getElectricalAdminContent(),
+    getElectricalAdminContentState(),
   ])
+  const warnings = [...new Set([...technicalStatus.warnings, ...electricalState.status.warnings])]
 
   return (
     <div className="space-y-6">
@@ -28,25 +29,25 @@ export default async function AdminContenidoPage() {
         <p className="text-sm font-semibold uppercase tracking-wide text-amber-600">Admin madre</p>
         <h1 className="mt-2 text-3xl font-semibold text-slate-950">Contenido público de NERIN</h1>
         <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-600">
-          Esta es la entrada única para contenido editable del sitio. La fuente de verdad elegida es
-          <strong> WebsiteContent</strong> para contenido público versionable en JSON, con fallback estático solo como respaldo visible.
+          Entrada única para editar contenido público. Trabajos eléctricos usa WebsiteContent; TypeScript queda solo como fallback informado.
         </p>
       </header>
 
-      <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        <Status label="DB configurada" value={technicalStatus.dbConfigured ? 'Sí' : 'No'} danger={!technicalStatus.dbConfigured} />
+      <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+        <Status label="DB persistente" value={technicalStatus.dbPersistent ? 'Sí' : 'No'} danger={!technicalStatus.dbPersistent} />
         <Status label="DB temporal" value={technicalStatus.dbTemporary ? 'Sí' : 'No'} danger={technicalStatus.dbTemporary} />
         <Status label="Storage configurado" value={technicalStatus.storageConfigured ? 'Sí' : 'No'} danger={!technicalStatus.storageConfigured} />
         <Status label="Upload persistente" value={technicalStatus.uploadPersistent ? 'Sí' : 'No'} danger={!technicalStatus.uploadPersistent} />
+        <Status label="Fallback eléctrico" value={electricalState.status.isFallback ? 'Sí' : 'No'} danger={electricalState.status.isFallback} />
       </section>
 
-      {technicalStatus.warnings.length ? (
+      {warnings.length ? (
         <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
           <p className="font-semibold">Advertencias técnicas</p>
           <ul className="mt-2 list-disc space-y-1 pl-5">
-            {technicalStatus.warnings.map((warning) => <li key={warning}>{warning}</li>)}
+            {warnings.map((warning) => <li key={warning}>{warning}</li>)}
           </ul>
-          <p className="mt-3">Provider de storage activo: <strong>{technicalStatus.storageProvider}</strong></p>
+          <p className="mt-3">DB: <strong>{technicalStatus.databaseUrlLabel}</strong> · Storage: <strong>{technicalStatus.storageProvider}</strong> · Dir: <strong>{technicalStatus.storageDirLabel}</strong></p>
         </div>
       ) : null}
 
@@ -62,8 +63,8 @@ export default async function AdminContenidoPage() {
 
       <section className="rounded-2xl border bg-white p-5 text-sm text-slate-700">
         <h2 className="text-lg font-semibold text-slate-950">Estado de contenido eléctrico</h2>
-        <p className="mt-2">Servicios rápidos: {electricalContent.quickServices.length} · Guías visuales: {electricalContent.visualGuides.length} · Diagnósticos: {electricalContent.diagnosticFaults.length} · Comercial: {electricalContent.commercialServices.length}</p>
-        <p className="mt-2 text-amber-700">Si no hay fila guardada en WebsiteContent, la web pública usa fallback estático y este admin lo informa como respaldo, no como persistencia real.</p>
+        <p className="mt-2">Servicios rápidos: {electricalState.content.quickServices.length} · Guías visuales: {electricalState.content.visualGuides.length} · Diagnósticos: {electricalState.content.diagnosticFaults.length} · Comercial: {electricalState.content.commercialServices.length}</p>
+        <p className="mt-2 text-amber-700">Contenido guardado: {electricalState.status.hasPersistedContent ? 'sí' : 'no'}.</p>
       </section>
     </div>
   )
