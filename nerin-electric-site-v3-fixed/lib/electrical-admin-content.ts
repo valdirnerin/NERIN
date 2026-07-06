@@ -187,6 +187,10 @@ function normalizeCommercialServices(value: unknown): ManagedCommercialElectrica
   })
 }
 
+function publicList<T extends { active: boolean; order: number }>(items: T[]) {
+  return items.filter((item) => item.active !== false).sort((a, b) => a.order - b.order)
+}
+
 export function normalizeElectricalContent(raw: unknown): ElectricalAdminContent {
   const value = raw && typeof raw === 'object' ? (raw as Partial<ElectricalAdminContent>) : {}
   return {
@@ -194,6 +198,15 @@ export function normalizeElectricalContent(raw: unknown): ElectricalAdminContent
     visualGuides: normalizeVisualGuides(value.visualGuides),
     diagnosticFaults: normalizeDiagnosticFaults(value.diagnosticFaults),
     commercialServices: normalizeCommercialServices(value.commercialServices),
+  }
+}
+
+export function toPublicElectricalContent(content: ElectricalAdminContent): ElectricalAdminContent {
+  return {
+    quickServices: publicList(content.quickServices),
+    visualGuides: publicList(content.visualGuides),
+    diagnosticFaults: publicList(content.diagnosticFaults),
+    commercialServices: publicList(content.commercialServices),
   }
 }
 
@@ -220,7 +233,7 @@ export async function getElectricalAdminContentState(): Promise<ElectricalAdminC
 
 export async function getElectricalAdminContent(): Promise<ElectricalAdminContent> {
   const state = await getElectricalAdminContentState()
-  return state.content
+  return toPublicElectricalContent(state.content)
 }
 
 export async function saveElectricalAdminContent(content: ElectricalAdminContent) {
