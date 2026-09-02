@@ -183,7 +183,7 @@ export async function POST(request: Request) {
     if (lead.email && lead.email.includes('@')) {
       await sendTransactionalEmail({
         to: lead.email,
-        subject: 'Recibimos tu solicitud de presupuesto',
+        subject: 'Recibimos tu solicitud',
         html: `
           <p>Hola ${lead.name},</p>
           <p>¡Gracias por contactarnos! Recibimos tu pedido y te responderemos en 24–48 h.</p>

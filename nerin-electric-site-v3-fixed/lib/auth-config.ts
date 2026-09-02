@@ -7,7 +7,7 @@ import type { JWT } from 'next-auth/jwt'
 import { prisma } from './db'
 import { authLogger } from './auth-logger'
 import { createAuthAdapter } from './auth-adapter'
-import { resendClient } from './resend'
+import { sendTransactionalEmail } from './resend'
 import { sanitizeError } from './logging'
 import { ensureAdminUser, getAdminUserByEmail } from './admin-users'
 import { compare } from 'bcryptjs'
@@ -253,14 +253,12 @@ export async function resolveAuthOptions(
     sendVerificationRequest: async ({ identifier, url }) => {
       const to = identifier
 
-      const resendApiKey = process.env.RESEND_API_KEY
-      if (!resendApiKey || resendApiKey.startsWith('re_mock')) {
+      if (!process.env.BREVO_API_KEY && !process.env.SMTP_HOST) {
         console.info('[AUTH:magic-link]', { to, url })
         return
       }
 
-      await resendClient.emails.send({
-        from: fromEmail,
+      await sendTransactionalEmail({
         to,
         subject: 'Ingresá a tu portal NERIN',
         html: `<p>Hola,</p><p>Hacé clic en el enlace para ingresar al portal de clientes NERIN:</p><p><a href="${url}">${url}</a></p><p>Si no solicitaste este acceso, ignorá este correo.</p>`.replace(/\n/g, ''),

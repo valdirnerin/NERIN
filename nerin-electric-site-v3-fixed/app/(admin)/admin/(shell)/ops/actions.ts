@@ -6,6 +6,9 @@ import { prisma } from '@/lib/db'
 import { DB_ENABLED } from '@/lib/dbMode'
 import { createPreference } from '@/lib/mercadopago'
 import { getSession } from '@/lib/auth'
+import fs from 'node:fs/promises'
+import path from 'node:path'
+import { getMediaDir, getMediaPublicUrl, sanitizeMediaFilename } from '@/lib/media'
 
 const toNumber = (value: FormDataEntryValue | null, fallback = 0) => {
   if (typeof value !== 'string') return fallback
@@ -238,6 +241,18 @@ export async function createOpsAdditional(formData: FormData) {
     redirect(`${returnTo}?mpError=1`)
   }
 
+  let evidenceUrl = String(formData.get('evidenceUrl') || '').trim() || null
+  const evidenceFile = formData.get('evidenceFile') as File | null
+  if (evidenceFile?.size) {
+    const safeName = sanitizeMediaFilename(evidenceFile.name || 'adicional')
+    const storedPath = path.posix.join('ops', projectId, `${Date.now()}-${safeName}`)
+    const outputPath = path.join(getMediaDir(), storedPath)
+    await fs.mkdir(path.dirname(outputPath), { recursive: true })
+    await fs.writeFile(outputPath, Buffer.from(await evidenceFile.arrayBuffer()))
+    evidenceUrl = getMediaPublicUrl(storedPath)
+    await prisma.opsProjectPhoto.create({ data: { projectId, title: 'Evidencia de adicional', url: evidenceUrl, takenAt: new Date() } })
+  }
+
   const additional = await prisma.opsProjectAdditionalItem.create({
     data: {
       projectId,
@@ -250,7 +265,7 @@ export async function createOpsAdditional(formData: FormData) {
       status: 'PENDING_CLIENT_APPROVAL',
       approvalStatus: 'PENDING',
       requestedBy: String(formData.get('requestedBy') || '').trim() || null,
-      evidenceUrl: String(formData.get('evidenceUrl') || '').trim() || null,
+      evidenceUrl,
     },
   })
 
@@ -327,4 +342,72 @@ export async function approveOpsAdditionalByClient(formData: FormData) {
 
   revalidatePath(returnTo)
   redirect(returnTo)
+}
+
+const technicianReturn = (projectId: string) => `/tecnico/obra/${projectId}`
+
+export async function updateOpsMaterialConfirmation(formData: FormData) {
+  ensureDb()
+  const materialId = String(formData.get('materialId') || '')
+  const projectId = String(formData.get('projectId') || '')
+  const action = String(formData.get('action') || 'confirmed')
+  if (!materialId || !projectId) return
+  await prisma.opsProjectMaterial.update({
+    where: { id: materialId },
+    data: action === 'used' ? { usedAt: new Date(), confirmedAt: new Date() } : { confirmedAt: new Date() },
+  })
+  revalidatePath(technicianReturn(projectId))
+}
+
+export async function recordOpsFieldEvent(formData: FormData) {
+  ensureDb()
+  const projectId = String(formData.get('projectId') || '')
+  const type = String(formData.get('type') || '')
+  const detail = String(formData.get('detail') || '').trim()
+  if (!projectId || !type || !detail) return
+  const session = await getSession()
+  await prisma.$transaction([
+    prisma.opsProjectEvent.create({ data: { projectId, type, detail, createdBy: session?.user?.name || session?.user?.email || null } }),
+    prisma.opsProject.update({ where: { id: projectId }, data: { operationalStatus: type === 'IMPEDIMENT' ? 'BLOCKED' : type === 'SECOND_VISIT' ? 'FOLLOW_UP' : 'IN_PROGRESS' } }),
+  ])
+  revalidatePath(technicianReturn(projectId))
+  revalidatePath('/tecnico')
+}
+
+export async function startOpsWork(formData: FormData) {
+  ensureDb()
+  const projectId = String(formData.get('projectId') || '')
+  if (!projectId) return
+  await prisma.opsProject.update({ where: { id: projectId }, data: { operationalStatus: 'IN_PROGRESS' } })
+  await prisma.opsProjectEvent.create({ data: { projectId, type: 'STARTED', detail: 'Trabajo iniciado desde el portal operativo.' } })
+  revalidatePath(technicianReturn(projectId))
+  revalidatePath('/tecnico')
+}
+
+export async function uploadOpsEvidence(formData: FormData) {
+  ensureDb()
+  const projectId = String(formData.get('projectId') || '')
+  const file = formData.get('file') as File | null
+  if (!projectId || !file || !file.size) return
+  const safeName = sanitizeMediaFilename(file.name || 'evidencia')
+  const storedPath = path.posix.join('ops', projectId, `${Date.now()}-${safeName}`)
+  const outputPath = path.join(getMediaDir(), storedPath)
+  await fs.mkdir(path.dirname(outputPath), { recursive: true })
+  await fs.writeFile(outputPath, Buffer.from(await file.arrayBuffer()))
+  await prisma.opsProjectPhoto.create({ data: { projectId, title: 'Evidencia de obra', url: getMediaPublicUrl(storedPath), takenAt: new Date() } })
+  revalidatePath(technicianReturn(projectId))
+}
+
+export async function closeOpsWork(formData: FormData) {
+  ensureDb()
+  const projectId = String(formData.get('projectId') || '')
+  const notes = String(formData.get('closureNotes') || '').trim()
+  const signedBy = String(formData.get('signedBy') || '').trim()
+  if (!projectId || !notes || !signedBy) return
+  await prisma.$transaction([
+    prisma.opsProject.update({ where: { id: projectId }, data: { operationalStatus: 'COMPLETED', closureNotes: notes, closureSignedBy: signedBy, closedAt: new Date(), status: 'COMPLETED', progressPercent: 100 } }),
+    prisma.opsProjectEvent.create({ data: { projectId, type: 'CLOSED', detail: notes } }),
+  ])
+  revalidatePath(technicianReturn(projectId))
+  revalidatePath('/tecnico')
 }

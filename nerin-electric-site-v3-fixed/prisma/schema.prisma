@@ -454,12 +454,52 @@ model OpsProject {
   progressPercent      Int                      @default(0)
   cacIndex             Float?
   notes                String?
+  assignedTo           String?
+  scheduledAt          DateTime?
+  estimatedDuration    Int?
+  contactName          String?
+  contactPhone         String?
+  accessInstructions   String?
+  scope                String?
+  operationalStatus    String                   @default("ASSIGNED")
+  closureNotes         String?
+  closureSignedBy      String?
+  closedAt             DateTime?
   createdAt            DateTime                 @default(now())
   updatedAt            DateTime                 @updatedAt
   client               OpsClient                @relation(fields: [clientId], references: [id], onDelete: Cascade)
   certificates         OpsProgressCertificate[]
   additionals          OpsProjectAdditionalItem[]
   photos               OpsProjectPhoto[]
+  materials            OpsProjectMaterial[]
+  events               OpsProjectEvent[]
+}
+
+model OpsProjectMaterial {
+  id          String     @id @default(cuid())
+  projectId   String
+  name        String
+  quantity    Float      @default(1)
+  unit        String     @default("unidad")
+  brandModel  String?
+  sku         String?
+  imageUrl    String?
+  technicalInfo String?
+  confirmedAt DateTime?
+  usedAt      DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  project     OpsProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model OpsProjectEvent {
+  id          String     @id @default(cuid())
+  projectId   String
+  type        String
+  detail      String
+  createdBy   String?
+  createdAt   DateTime   @default(now())
+  project     OpsProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
 
 model OpsProgressCertificate {
